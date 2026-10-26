@@ -1,0 +1,31 @@
+name: Playtest feedback
+description: Tell us how Project Valhalla felt to play
+title: "Feedback: "
+labels: ["feedback"]
+body:
+  - type: dropdown
+    id: fun
+    attributes:
+      label: How fun was it?
+      options: ["5 - Loved it", "4", "3", "2", "1 - Not fun"]
+    validations:
+      required: true
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      options: ["Too easy", "Just right", "Too hard"]
+    validations:
+      required: true
+  - type: input
+    id: wave
+    attributes:
+      label: Furthest wave reached
+      placeholder: "12"
+  - type: textarea
+    id: notes
+    attributes:
+      label: What felt good, what felt bad, any bugs?
+      placeholder: The shop felt slow on wave 3, and the Frost Giant's circles were hard to see.
+    validations:
+      required: true
