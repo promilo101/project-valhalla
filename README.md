@@ -17,7 +17,7 @@ Use **Send feedback** in the game (title screen, pause menu or after a raid). It
 | Key | Action |
 | --- | --- |
 | WASD / arrows | Move the hero |
-| Space | Dash in battle · start the next wave in the shop |
+| Space | Dash in battle (uses one dash charge) · start the next wave in the shop |
 | P / Esc | Pause |
 | T | Show or hide power-up tooltips |
 | R | Reroll the shop (3 gold) |
@@ -29,12 +29,14 @@ Use **Send feedback** in the game (title screen, pause menu or after a raid). It
 
 Drag units between the bench and the formation, or right-click a unit to send it across. Drop a unit on the Sell button to sell it.
 
-## Prototype 0.5
+## Prototype 0.6
 
 - 20 waves in about 15 minutes, with mini-bosses on waves 5, 10 and 15 and Fenrir on wave 20
 - Endless mode after Fenrir: waves that keep getting harder, returning bosses every 5 waves that enrage after 75 seconds, and a shop you open yourself at most once every 3 minutes
 - Fenrir reworked: new sprite, Gleipnir's Snap (chains that bind and pull) and Devour the Sun (an eclipse with shadow-wolf lunges)
 - Warrior throws returning axes and has a new ability, Berserker Leap
+- Fenrir is the World-Eater on wave 20 and returns Gleipnir-Bound in Endless mode
+- Dash charges: 1 of 3 slots unlocked at the start, the Sleipnir's Stride power-up unlocks more, and the Sleipnir's Hooves rune raises the cap to 5
 - 4 classes: Warrior and Archer (physical), Mage and Priest (magic)
 - 6 card modifiers: Iron, Frost, Fire, Blood, Lightning and Rune
 - Class synergies (2/4) and modifier synergies (2/3)
@@ -44,6 +46,11 @@ Drag units between the bench and the formation, or right-click a unit to send it
 - Shop card locks, rising reroll/XP/heal prices within a shop phase, healing bought in the shop
 - In-game feedback form
 - Rune Forge with permanent upgrades between raids (saved in the browser)
+
+## Branches
+
+- `main` is the public build that GitHub Pages serves.
+- `dev` is the test build. It shows "DEV build" on the title screen and has a hidden debug menu.
 
 ## Publishing with GitHub Pages
 

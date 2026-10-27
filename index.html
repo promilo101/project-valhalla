@@ -79,7 +79,11 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .mini{padding:5px}
 #mini{display:block;width:150px;height:150px}
 .gold{color:var(--gold)}
-.dash{margin-top:4px;color:var(--muted);font-size:17px}
+.dash{margin-top:4px;color:var(--muted);font-size:17px;display:flex;align-items:center;gap:8px}
+.dpips{display:flex;gap:3px}
+.dpips i{width:12px;height:6px;background:var(--frost);border:1px solid #000}
+.dpips i.empty{background:#1d2a42}
+.dpips i.locked{background:transparent;border:1px dashed #3a4256}
 .dash.ready{color:var(--frost)}
 .buff{font-size:17px;color:var(--ember)}
 .hud-mid{display:grid;gap:6px;justify-items:center;min-width:0}
@@ -178,6 +182,19 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .pu-list dd{margin:0}
 
 #pause{position:absolute;inset:0;display:grid;place-items:center;background:rgba(7,8,12,.7)}
+#dbg{position:absolute;top:8px;right:8px;bottom:8px;width:min(330px,calc(100% - 16px));z-index:20;overflow:auto;background:rgba(9,10,15,.96);border:1px solid #4a3b12;border-radius:2px;padding:10px 12px;font-size:17px;display:grid;gap:10px;align-content:start;box-shadow:0 0 0 1px rgba(226,178,76,.25)}
+#dbg h2{font-size:18px;display:flex;justify-content:space-between;align-items:center;color:var(--gold);margin:0}
+#dbg fieldset{border:0;border-top:1px solid var(--line);margin:0;padding:8px 0 0;display:grid;gap:6px}
+#dbg legend{color:var(--muted);font-size:15px;letter-spacing:.12em;text-transform:uppercase;padding:0 6px 0 0}
+#dbg .r{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#dbg button,#dbg select,#dbg input[type=number]{font:inherit;font-size:16px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:2px;padding:2px 8px}
+#dbg input[type=number]{width:64px}
+#dbg button:hover{border-color:#6a5a2a}
+#dbg button.on{background:var(--gold);color:#1a1205;border-color:var(--gold)}
+#dbg button.warn{border-color:var(--hp)}
+#dbg label{display:flex;align-items:center;gap:6px;cursor:pointer}
+#dbg .stats{font-variant-numeric:tabular-nums;color:var(--muted);white-space:pre;font-size:16px}
+#dbg kbd{font-size:14px}
 #pause .box{display:grid;gap:12px;justify-items:center;text-align:center}
 #feedback{z-index:5;background:rgba(7,8,12,.94)}
 .fb fieldset{border:0;padding:0;margin:0;display:grid;gap:6px}
@@ -282,7 +299,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.5</span> · Norse dark fantasy</div>
+      <div class="eyebrow">Prototype <span id="verTxt">0.6</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
@@ -390,6 +407,38 @@ a.btn{text-decoration:none;display:inline-block}
     </form>
   </section>
 
+  <aside id="dbg" hidden aria-label="Debug menu">
+    <h2>Debug <button type="button" id="dbgClose" aria-label="Close debug menu">Close <kbd>Ctrl+Shift+D</kbd></button></h2>
+    <div class="stats" id="dbgStats"></div>
+    <fieldset><legend>Hero</legend>
+      <div class="r"><label for="dbgGod"><input type="checkbox" id="dbgGod"> God mode</label><button type="button" id="dbgHeal">Full heal</button><button type="button" id="dbgDash">Unlock all dash slots</button></div>
+    </fieldset>
+    <fieldset><legend>Waves</legend>
+      <div class="r"><label for="dbgWave">Wave</label><input type="number" id="dbgWave" min="1" max="99" value="20"><button type="button" id="dbgGo">Jump to wave</button></div>
+      <div class="r"><label for="dbgNoSpawn"><input type="checkbox" id="dbgNoSpawn"> Stop enemy spawns</label></div>
+      <div class="r"><button type="button" id="dbgKill">Kill all enemies</button><button type="button" id="dbgKillBoss">Kill boss</button><button type="button" id="dbgShopCd">Reset shop cooldown</button></div>
+    </fieldset>
+    <fieldset><legend>Spawn</legend>
+      <div class="r"><select id="dbgBoss" aria-label="Boss"><option value="jarl">Draugr Jarl</option><option value="giant">Frost Giant</option><option value="herald">Herald of Hel</option><option value="fenrir:B">Fenrir, World-Eater</option><option value="fenrir:A">Fenrir, Gleipnir-Bound</option></select><button type="button" id="dbgSpawnBoss">Spawn boss</button></div>
+      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Seiðkona</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
+      <div class="r"><select id="dbgPu" aria-label="Power-up"></select><button type="button" id="dbgSpawnPu">Spawn power-up</button></div>
+    </fieldset>
+    <fieldset><legend>Economy and units</legend>
+      <div class="r"><button type="button" id="dbgGold">+50 gold</button><label for="dbgInfGold"><input type="checkbox" id="dbgInfGold"> Infinite gold</label></div>
+      <div class="r"><label for="dbgLevel">Level</label><select id="dbgLevel"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option selected>8</option></select><button type="button" id="dbgSetLevel">Set level</button></div>
+      <div class="r"><select id="dbgCls" aria-label="Class"></select><select id="dbgMod" aria-label="Modifier"></select><select id="dbgStar" aria-label="Stars"><option value="1">★</option><option value="2">★★</option><option value="3">★★★</option></select><button type="button" id="dbgGive">Give unit</button></div>
+      <div class="r"><button type="button" id="dbgMana">Fill mana</button></div>
+    </fieldset>
+    <fieldset><legend>Game</legend>
+      <div class="r" id="dbgSpeed"><span>Speed</span><button type="button" data-sp=".5">0.5×</button><button type="button" data-sp="1" class="on">1×</button><button type="button" data-sp="2">2×</button><button type="button" data-sp="4">4×</button></div>
+      <div class="r"><label for="dbgHit"><input type="checkbox" id="dbgHit"> Hitboxes and ranges</label></div>
+      <div class="r"><label for="dbgFenrir">Fenrir look</label><select id="dbgFenrir"><option value="auto">Auto (B, then A in endless)</option><option value="A">Always A</option><option value="B">Always B</option></select></div>
+    </fieldset>
+    <fieldset><legend>Saved progress</legend>
+      <div class="r"><button type="button" id="dbgRunes">+100 runes</button><button type="button" id="dbgReset" class="warn">Reset all progress</button></div>
+    </fieldset>
+  </aside>
+
   <div id="toast" hidden></div>
 </div>
 
@@ -406,7 +455,7 @@ function weighted(o){ let t = 0; for (const k in o) t += o[k]; let r = Math.rand
 
 /* ================= META (persists between runs) ================= */
 const META_KEY = 'valhalla.meta.v1';
-const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, best: 0, runs: 0, wins: 0, bestEndless: 0 };
+const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, dash: 0, best: 0, runs: 0, wins: 0, bestEndless: 0 };
 try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.parse(s)); } catch (e) {}
 function saveMeta(){ try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch (e) {} }
 const UPGRADES = [
@@ -417,8 +466,12 @@ const UPGRADES = [
   { k: 'mana',    name: 'Mana',            max: 5, d: l => `+${l*10}% mana, abilities fire more often` },
   { k: 'hp',      name: 'Vitality',        max: 5, d: l => `+${l*15} max health for the hero` },
   { k: 'gold',    name: 'War Chest',       max: 3, d: l => `+${l} gold at the start of a raid` },
+  { k: 'dash',    name: "Sleipnir's Hooves", max: 2, cost: l => [40, 80][l], d: l => `Up to ${3 + l} dash slots can be unlocked in a raid` },
 ];
 const upCost = l => 4 + l * 4;
+const costOf = (u, l) => u.cost ? u.cost(l) : upCost(l);
+const DASH_RECHARGE = 2.5;
+const dashCap = () => 3 + (meta.dash || 0); // dash slots the hero can unlock this raid
 
 /* ================= DATA ================= */
 const CLASSES = {
@@ -453,6 +506,7 @@ const POWERUPS = {
   thor:  { name: "Thor's Wrath",   col: '#f4e04d', short: 'Strike nearby foes', desc: 'Lightning strikes every enemy nearby' },
   raven: { name: "Huginn's Call",  col: '#b98cff', short: 'Pull in all souls',  desc: 'Pulls in every soul on the field' },
   hoard: { name: 'Dwarven Hoard',  col: '#e2b24c', short: 'Bonus gold',         desc: 'Grants gold right away' },
+  stride: { name: "Sleipnir's Stride", col: '#e6ebf5', short: '+1 dash slot',      desc: 'Unlocks one more dash slot for this raid. With every slot unlocked, it refills your dashes' },
   frost: { name: 'Frost Rune',     col: '#a0f0ff', short: 'Freeze all foes',    desc: 'Freezes every enemy for 3 seconds' },
 };
 
@@ -511,7 +565,7 @@ function waveDef(n){
   let w;
   if (k % 5 === 0){
     const b = ENDLESS_BOSSES[(k / 5 - 1) % ENDLESS_BOSSES.length];
-    w = { name: `${ENEMIES[b].name} returns`, d: 'Boss. Stronger every time it comes back.', mix: { draugr: 2, wolf: 2, armored: 1, witch: 1 }, boss: b, endless: true };
+    w = { name: b === 'fenrir' ? 'Fenrir returns, Gleipnir-Bound' : `${ENEMIES[b].name} returns`, d: 'Boss. Stronger every time it comes back.', mix: { draugr: 2, wolf: 2, armored: 1, witch: 1 }, boss: b, endless: true };
   } else w = Object.assign({ endless: true }, ENDLESS_WAVES[(k - 1 - Math.floor(k / 5)) % ENDLESS_WAVES.length]);
   return endlessCache[n] = w;
 }
@@ -690,7 +744,6 @@ function fenrirFX(g, design, spr, ox, oy, sc, face, t){
   }
   g.globalAlpha = 1; g.globalCompositeOperation = prev;
 }
-const FENRIR_DESIGN = 'A'; // 'A' = Gleipnir-Bound, 'B' = World-Eater
 const SPR = {};
 function buildSprites(){
   const H = (m, extra) => makeSprite(HUM, m, extra);
@@ -709,8 +762,10 @@ function buildSprites(){
   SPR.giant = H({ H:'#e3edf5', h:'#9db7cc', F:'#8fb8d4', E:PAL.C, T:'#e3edf5', A:'#3b5c80', a:'#26405d' });
   SPR.herald = H({ H:'#1b0f20', h:PAL.K, F:PAL.W, E:PAL.O, T:PAL.R, A:'#2a1530', a:PAL.K }, STAFF('#2a1530', PAL.O));
   SPR.wolf = makeSprite(WOLF, { E: '#e8e080' });
-  SPR.fenrir = buildFenrirSprite(FENRIR_DESIGN, 0);
-  SPR.fenrir1 = buildFenrirSprite(FENRIR_DESIGN, 1);
+  // wave 20 Fenrir is the World-Eater (B); in Endless he comes back Gleipnir-Bound (A)
+  SPR.fenrir = buildFenrirSprite('B', 0);
+  SPR.fenrirB0 = SPR.fenrir; SPR.fenrirB1 = buildFenrirSprite('B', 1);
+  SPR.fenrirA0 = buildFenrirSprite('A', 0); SPR.fenrirA1 = buildFenrirSprite('A', 1);
   SPR.axe = makeSprite(['....SS.', '...SSSs', '....BSs', '...B.s.', '..B....', '.B.....', 'B......'], { S: '#d3d8e2', s: '#7d8494', B: '#8a5a34' });
   SPR.raven = makeSprite(RAVEN, { E: '#d84a3a', Y: '#5a5a66' });
   for (const k of Object.keys(SPR)) { SPR[k + '_f'] = flip(SPR[k]); SPR[k + '_w'] = whiteOf(SPR[k]); SPR[k + '_wf'] = flip(SPR[k + '_w']); }
@@ -743,7 +798,7 @@ const SLOT_OFF = Array.from({ length: 8 }, (_, i) => { const a = -Math.PI / 2 + 
 function newRun(){
   S = {
     wave: 1, gold: 5 + meta.gold, level: 1, xp: 0,
-    hero: { x: 0, y: 0, hp: 100, maxHp: 100, inv: 0, dashCd: 0, dashT: 0, dx: 0, dy: 1, face: 1, walk: 0 },
+    hero: { x: 0, y: 0, hp: 100, maxHp: 100, inv: 0, dashSlots: 1, dashCh: 1, dashRt: 0, dashT: 0, dx: 0, dy: 1, face: 1, walk: 0 },
     bench: Array(8).fill(null), board: Array(8).fill(null), shop: [],
     enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [],
     souls: 0, kills: 0, bosses: 0, waveT: 0, spawnAcc: 0, shake: 0, boss: null, endDelay: 0, sel: null,
@@ -920,10 +975,14 @@ function startWave(){
   banner(`Wave ${S.wave} · ${W.name}`, W.d);
   if (moved) toast(`${moved} unit${moved > 1 ? 's' : ''} moved from the bench into formation`);
 }
-function spawnBoss(type){
+function spawnBoss(type, design){
   const a = rand(0, Math.PI * 2);
   S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110);
-  $('#bossName').textContent = ENEMIES[type].name;
+  if (type === 'fenrir'){
+    const d = design || (dbg.fenrir !== 'auto' ? dbg.fenrir : S.wave > WAVES.length ? 'A' : 'B');
+    S.boss.design = d; S.boss.title = d === 'A' ? 'Fenrir, Gleipnir-Bound' : 'Fenrir, the World-Eater';
+  }
+  $('#bossName').textContent = S.boss.title || ENEMIES[type].name;
 }
 function clearBossFx(){ S.chains = []; S.lunges = []; S.eclipse = 0; S.bind = null; }
 // Endless mode: waves roll straight into the next one, with no shop in between
@@ -997,7 +1056,7 @@ function spawnEnemy(type, x, y, elite){
 /* ================= POWER-UPS ================= */
 function spawnPowerup(){
   const h = S.hero, a = rand(0, Math.PI * 2), d = rand(140, 320);
-  const type = weighted({ mead: 3, fury: 3, thor: 2, raven: 2, hoard: 2, frost: 2 });
+  const type = weighted({ mead: 3, fury: 3, thor: 2, raven: 2, hoard: 2, frost: 2, stride: 2 });
   S.pups.push({ type, x: h.x + Math.cos(a) * d, y: h.y + Math.sin(a) * d, life: 35, max: 35, t: 0 });
 }
 function takePowerup(p){
@@ -1008,6 +1067,10 @@ function takePowerup(p){
   if (p.type === 'mead') healHero(h.maxHp * .35);
   else if (p.type === 'fury') S.fury = 10;
   else if (p.type === 'raven') S.magnet = 4;
+  else if (p.type === 'stride'){
+    if (h.dashSlots < dashCap()){ h.dashSlots++; h.dashCh++; addText(h.x, h.y - 26, `${h.dashSlots} dash slots`, '#e6ebf5', true); }
+    else { h.dashCh = h.dashSlots; h.dashRt = 0; addText(h.x, h.y - 26, 'Dashes refilled', '#e6ebf5', true); }
+  }
   else if (p.type === 'hoard'){ const g = 3 + Math.floor(S.wave / 5); S.gold += g; addText(h.x, h.y - 26, `+${g} gold`, '#e2b24c', true); }
   else if (p.type === 'frost'){ for (const e of S.enemies) if (!e.dead){ e.frz = e.d.boss ? 1.5 : 3; } S.rings.push({ x: h.x, y: h.y, r: 220, life: .6, max: .6, col: '#a0f0ff' }); }
   else if (p.type === 'thor'){
@@ -1069,7 +1132,7 @@ function gainSouls(v){ S.souls += v; while (S.souls >= 10){ S.souls -= 10; S.gol
 function healHero(n){ const h = S.hero; h.hp = Math.min(h.maxHp, h.hp + n); }
 function heroDamage(d){
   const h = S.hero;
-  if (h.inv > 0 || h.dashT > 0 || mode !== 'combat') return;
+  if (dbg.god || h.inv > 0 || h.dashT > 0 || mode !== 'combat') return;
   d *= S.dmgTaken; h.hp -= d; h.inv = .5; S.hurt = .25; S.shake = Math.min(7, S.shake + 3);
   addText(h.x, h.y - 10, Math.round(d), '#ff6b6b', true);
   if (h.hp <= 0){ h.hp = 0; gameOver(false); }
@@ -1173,7 +1236,7 @@ function updateBossFx(dt){
       const along = rx * ex + ry * ey, perp = Math.abs(rx * ey - ry * ex);
       if (along > 0 && along < c.len && perp < 8 && h.dashT <= 0 && h.inv <= 0){
         heroDamage(c.dmg);
-        if (mode === 'combat'){ S.bind = { t: 1.8, e: c.e }; addText(h.x, h.y - 14, 'Bound! Dash to break free', '#b4bccb', true); }
+        if (mode === 'combat' && !dbg.god){ S.bind = { t: 1.8, e: c.e }; addText(h.x, h.y - 14, 'Bound! Dash to break free', '#b4bccb', true); }
       }
     }
   }
@@ -1225,7 +1288,8 @@ function update(dt){
   let mx = (keys.ArrowRight || keys.KeyD ? 1 : 0) - (keys.ArrowLeft || keys.KeyA ? 1 : 0);
   let my = (keys.ArrowDown || keys.KeyS ? 1 : 0) - (keys.ArrowUp || keys.KeyW ? 1 : 0);
   const ml = Math.hypot(mx, my); if (ml){ mx /= ml; my /= ml; h.dx = mx; h.dy = my; if (mx) h.face = mx < 0 ? -1 : 1; h.walk += dt; }
-  h.dashCd = Math.max(0, h.dashCd - dt); h.inv = Math.max(0, h.inv - dt);
+  if (h.dashCh < h.dashSlots){ h.dashRt -= dt; if (h.dashRt <= 0){ h.dashCh++; h.dashRt = h.dashCh < h.dashSlots ? DASH_RECHARGE : 0; } }
+  h.inv = Math.max(0, h.inv - dt);
   if (h.dashT > 0){ h.dashT -= dt; h.x += h.dx * 270 * dt; h.y += h.dy * 270 * dt; if (Math.random() < .8) S.parts.push({ x: h.x, y: h.y, vx: 0, vy: 0, life: .25, max: .25, col: '#86d4ff', s: 2, add: true }); }
   else {
     let spd = 78;
@@ -1252,7 +1316,7 @@ function update(dt){
   if (S.endDelay > 0){ S.endDelay -= dt; if (S.endDelay <= 0) return S.endless ? endlessNext() : endWave(); }
   else if (!W.boss && S.waveT >= WAVE_DUR) return S.endless ? endlessNext() : endWave();
   if (S.endDelay <= 0 && (W.boss || S.waveT < WAVE_DUR - 1.5)){
-    S.spawnAcc += waveRate() * dt * (1 + S.waveT / WAVE_DUR * .5);
+    S.spawnAcc += dbg.noSpawn ? 0 : waveRate() * dt * (1 + S.waveT / WAVE_DUR * .5);
     const cap = W.boss ? (W.endless ? 120 : 40) : 340;
     while (S.spawnAcc >= 1){ S.spawnAcc--; if (S.enemies.length < cap) spawnFromWave(); }
   }
@@ -1505,6 +1569,7 @@ function render(dt){
   }
   ctx.globalAlpha = 1;
   st.cracks = st.cracks.filter(c => c.life > 0);
+  if (dbg.hitbox && S) drawHitboxes();
   // Gleipnir's chains: dashed warning first, then solid links when they snap
   for (const c of st.chains){
     const ex = Math.cos(c.a), ey = Math.sin(c.a);
@@ -1553,10 +1618,10 @@ function render(dt){
         ctx.strokeStyle = 'rgba(255,59,43,.55)'; ctx.lineWidth = e.r * 1.2; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.cx * 160, e.y + e.cy * 160); ctx.stroke();
       }
       const bob = e.frz > 0 || e.stun > 0 ? 0 : e.d.fly ? Math.sin(e.t * 8) * 2 - 4 : Math.abs(Math.sin(e.t * 7)) * -1;
-      const isF = e.d.boss === 'fenrir', sname = isF && e.state !== 'cast' && Math.floor(e.t * 6) % 2 ? 'fenrir1' : e.spr;
+      const isF = e.d.boss === 'fenrir', sname = isF ? 'fenrir' + (e.design || 'B') + (e.state !== 'cast' && Math.floor(e.t * 6) % 2 ? 1 : 0) : e.spr;
       drawSprite(sname, e.x, e.y + bob, e.sc, e.face, e.flash > 0);
-      if (isF && e.flash <= 0){ const sp = SPR[sname]; fenrirFX(ctx, FENRIR_DESIGN, sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
-      if (e.frz > 0){ ctx.globalAlpha = .55; drawSprite(e.spr, e.x, e.y + bob, e.sc, e.face, true); ctx.globalAlpha = 1; }
+      if (isF && e.flash <= 0){ const sp = SPR[sname]; fenrirFX(ctx, e.design || 'B', sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
+      if (e.frz > 0){ ctx.globalAlpha = .55; drawSprite(sname, e.x, e.y + bob, e.sc, e.face, true); ctx.globalAlpha = 1; }
       if (e.stun > 0){ ctx.fillStyle = '#ffe066'; for (let k = 0; k < 3; k++){ const a = st.time * 8 + k * 2.09; ctx.fillRect(Math.round(e.x + Math.cos(a) * 5), Math.round(e.y - e.h / 2 - 3 + Math.sin(a) * 1.5), 1, 1); } }
       if (e.slowT > 0){ ctx.fillStyle = 'rgba(134,212,255,.35)'; ctx.fillRect(Math.round(e.x - e.w / 2), Math.round(e.y + e.h / 2 - 2), e.w, 2); }
       if (e.elite && !e.d.boss){ ctx.fillStyle = '#000'; ctx.fillRect(Math.round(e.x - 7), Math.round(e.y - e.h / 2 - 5), 14, 2); ctx.fillStyle = '#e2b24c'; ctx.fillRect(Math.round(e.x - 7), Math.round(e.y - e.h / 2 - 5), Math.max(0, 14 * e.hp / e.max), 2); }
@@ -1904,7 +1969,8 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () =
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.5';
+const VERSION = '0.6';
+const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
 const FEEDBACK_REPO = (() => {
@@ -1930,7 +1996,7 @@ function feedbackText(){
     `Difficulty: ${diff || 'not rated'}`,
     name ? `From: ${name}` : null,
     '', 'Notes:', notes || '(no notes)', '', '---',
-    `Version ${VERSION} · best wave ${meta.best} · raids played ${meta.runs}`,
+    `Version ${VERSION}${BUILD ? '-' + BUILD : ''} · best wave ${meta.best} · raids played ${meta.runs}`,
     run ? `Run: ${run.result} · level ${run.level} · ${run.kills} kills · ${run.bosses} bosses` : 'Run: no raid played yet',
     run ? `Formation: ${run.board}` : null,
     `Screen: ${innerWidth}×${innerHeight} · ${navigator.userAgent.replace(/\s*\(.*?\)\s*/g, ' ').slice(0, 120)}`,
@@ -1969,8 +2035,87 @@ $('#fbCopy').onclick = () => {
   } catch (err){ fallback(); }
 };
 $('#btnFbTitle').onclick = () => openFeedback('title');
+$('#devTag').hidden = !BUILD;
 $('#btnFbOver').onclick = () => openFeedback('over');
 $('#btnFbPause').onclick = () => openFeedback('pause');
+
+/* ================= DEBUG MENU (hidden: Ctrl+Shift+D, or type "odin" on the title screen) ================= */
+const dbg = { open: false, god: false, noSpawn: false, infGold: false, hitbox: false, speed: 1, fenrir: 'auto', fps: 0, fpsAcc: 0, fpsN: 0, statT: 0, resetArm: 0 };
+let titleBuf = '';
+function toggleDbg(v){
+  dbg.open = v == null ? !dbg.open : v;
+  $('#dbg').hidden = !dbg.open;
+}
+function needRun(){ if (!S){ toast('Start a raid first'); return false; } return true; }
+function dbgGiveUnit(cls, mod, star){
+  const i = S.bench.indexOf(null);
+  if (i < 0){ toast('The bench is full'); return; }
+  S.bench[i] = { id: ++uid, cls, mod, star, mana: 0, cd: 0, x: S.hero.x, y: S.hero.y, face: 1, anim: 0 };
+  if (mode === 'shop') renderShop();
+  toast(`Added ${cardName({ cls, mod })} ${'★'.repeat(star)} to the bench`);
+}
+function dbgJump(n){
+  n = clamp(Math.round(n) || 1, 1, 99);
+  if (!S) newRun();
+  if (!S.board.some(Boolean) && !S.bench.some(Boolean)) S.bench[0] = { id: ++uid, cls: 'warrior', mod: 'jern', star: 1, mana: 0, cd: 0, x: 0, y: 0, face: 1, anim: 0 };
+  S.enemies = []; S.eprojs = []; S.projs = []; S.tele = []; S.pups = []; S.orbs = []; clearBossFx(); S.boss = null; S.endDelay = 0;
+  S.wave = n; S.endless = n > WAVES.length; S.won = S.won || S.endless; S.midBattle = false; S.endlessStart = S.endless; S.shopCd = 0;
+  toggleDbg(false);
+  rollShop(); openShop();
+  toast(`Jumped to wave ${n}${S.endless ? ' (endless)' : ''}`);
+}
+function drawHitboxes(){
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = 'rgba(255,80,80,.7)';
+  for (const e of S.enemies){ ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, 6.283); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(120,255,160,.9)'; ctx.beginPath(); ctx.arc(S.hero.x, S.hero.y, 6, 0, 6.283); ctx.stroke();
+  ctx.setLineDash([2, 3]);
+  S.board.forEach((u, i) => { if (!u || i >= slotCount()) return; ctx.strokeStyle = MODS[u.mod].col + '88'; ctx.beginPath(); ctx.arc(u.x, u.y, (u.st || calcStats(u)).range, 0, 6.283); ctx.stroke(); });
+  ctx.setLineDash([]);
+}
+function dbgTick(dt){
+  if (dbg.infGold && S && S.gold < 999){ S.gold = 999; if (mode === 'shop') renderShop(); }
+  dbg.fpsAcc += dt; dbg.fpsN++;
+  if (dbg.fpsAcc >= .5){ dbg.fps = Math.round(dbg.fpsN / dbg.fpsAcc); dbg.fpsAcc = 0; dbg.fpsN = 0; }
+  if (!dbg.open) return;
+  dbg.statT -= dt; if (dbg.statT > 0) return; dbg.statT = .25;
+  $('#dbgStats').textContent = S
+    ? `FPS ${dbg.fps}   mode ${mode}\nwave ${S.wave}${S.endless ? ' (endless)' : ''}   time ${S.waveT.toFixed(1)} s\nenemies ${S.enemies.length}   projectiles ${S.projs.length}\nparticles ${S.parts.length}   gold ${S.gold}   level ${S.level}\nhealth ${Math.ceil(S.hero.hp)}/${S.hero.maxHp}   dashes ${S.hero.dashCh}/${S.hero.dashSlots}${S.endless ? `\nshop cooldown ${Math.ceil(S.shopCd)} s` : ''}`
+    : `FPS ${dbg.fps}   no raid running`;
+}
+(function initDbg(){
+  $('#dbgPu').innerHTML = Object.entries(POWERUPS).map(([k, p]) => `<option value="${k}">${p.name}</option>`).join('');
+  $('#dbgCls').innerHTML = CLS_ORDER.map(k => `<option value="${k}">${CLASSES[k].name}</option>`).join('');
+  $('#dbgMod').innerHTML = Object.entries(MODS).map(([k, m]) => `<option value="${k}">${m.name}</option>`).join('');
+  const on = (id, fn) => $(id).addEventListener('click', e => { fn(e); e.currentTarget.blur && e.currentTarget.blur(); });
+  on('#dbgClose', () => toggleDbg(false));
+  $('#dbgGod').onchange = e => { dbg.god = e.target.checked; if (dbg.god && S) S.bind = null; };
+  $('#dbgNoSpawn').onchange = e => { dbg.noSpawn = e.target.checked; };
+  $('#dbgInfGold').onchange = e => { dbg.infGold = e.target.checked; };
+  $('#dbgHit').onchange = e => { dbg.hitbox = e.target.checked; };
+  $('#dbgFenrir').onchange = e => { dbg.fenrir = e.target.value; };
+  on('#dbgHeal', () => { if (needRun()) S.hero.hp = S.hero.maxHp; });
+  on('#dbgDash', () => { if (!needRun()) return; const h = S.hero; h.dashSlots = dashCap(); h.dashCh = h.dashSlots; h.dashRt = 0; toast(`${h.dashSlots} dash slots unlocked`); });
+  on('#dbgGo', () => dbgJump(+$('#dbgWave').value));
+  on('#dbgKill', () => { if (!needRun()) return; S.enemies.forEach(e => { if (!e.d.boss) kill(e); }); });
+  on('#dbgKillBoss', () => { if (needRun() && S.boss && !S.boss.dead) kill(S.boss); });
+  on('#dbgShopCd', () => { if (needRun()) S.shopCd = 0; });
+  on('#dbgSpawnBoss', () => { if (!needRun() || mode !== 'combat') return toast('Start a wave first'); const [t, d] = $('#dbgBoss').value.split(':'); spawnBoss(t, d); });
+  on('#dbgSpawnEnemy', () => { if (!needRun() || mode !== 'combat') return toast('Start a wave first'); for (let k = 0; k < 5; k++){ const a = rand(0, 6.283); spawnEnemy($('#dbgEnemy').value, S.hero.x + Math.cos(a) * 90, S.hero.y + Math.sin(a) * 70, $('#dbgElite').checked); } });
+  on('#dbgSpawnPu', () => { if (!needRun()) return; S.pups.push({ type: $('#dbgPu').value, x: S.hero.x + 40, y: S.hero.y, life: 35, max: 35, t: 0 }); });
+  on('#dbgGold', () => { if (!needRun()) return; S.gold += 50; if (mode === 'shop') renderShop(); });
+  on('#dbgSetLevel', () => { if (!needRun()) return; S.level = +$('#dbgLevel').value; S.xp = 0; computeTraits(); if (mode === 'shop') renderShop(); toast(`Level ${S.level}`); });
+  on('#dbgGive', () => { if (needRun()) dbgGiveUnit($('#dbgCls').value, $('#dbgMod').value, +$('#dbgStar').value); });
+  on('#dbgMana', () => { if (needRun()) S.board.forEach(u => { if (u) u.mana = 100; }); });
+  $('#dbgSpeed').addEventListener('click', e => { const b = e.target.closest('button[data-sp]'); if (!b) return; dbg.speed = +b.dataset.sp; $('#dbgSpeed').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); b.blur(); });
+  on('#dbgRunes', () => { meta.runes += 100; saveMeta(); if (mode === 'title') renderTitle(); if (mode === 'meta') renderMeta(); toast('+100 runes'); });
+  on('#dbgReset', e => {
+    const b = e.currentTarget;
+    if (performance.now() > dbg.resetArm){ dbg.resetArm = performance.now() + 3000; b.textContent = 'Click again to confirm'; setTimeout(() => { b.textContent = 'Reset all progress'; }, 3000); return; }
+    for (const k of Object.keys(meta)) meta[k] = 0; saveMeta(); dbg.resetArm = 0; b.textContent = 'Reset all progress';
+    if (mode === 'title') renderTitle(); if (mode === 'meta') renderMeta(); toast('All saved progress reset');
+  });
+})();
 
 function renderTitle(){
   $('#tRunes').textContent = meta.runes;
@@ -1979,7 +2124,7 @@ function renderTitle(){
 function renderMeta(){
   $('#mRunes').textContent = meta.runes;
   $('#ups').innerHTML = UPGRADES.map(u => {
-    const l = meta[u.k], max = l >= u.max, cost = upCost(l);
+    const l = meta[u.k], max = l >= u.max, cost = max ? 0 : costOf(u, l);
     return `<div class="up"><div class="top"><span class="nm">${u.name}</span><span class="pips">${Array.from({ length: u.max }, (_, i) => `<i class="${i < l ? 'on' : ''}"></i>`).join('')}</span></div>
       <div class="d">${l ? u.d(l) : 'Not bought yet'}${max ? '' : ` → next: ${u.d(l + 1)}`}</div>
       <button class="btn" type="button" data-k="${u.k}" ${max || meta.runes < cost ? 'disabled' : ''}>${max ? 'Fully upgraded' : `Buy · ${cost} runes`}</button></div>`;
@@ -1987,7 +2132,7 @@ function renderMeta(){
 }
 $('#ups').addEventListener('click', e => {
   const b = e.target.closest('button[data-k]'); if (!b) return;
-  const u = UPGRADES.find(x => x.k === b.dataset.k), l = meta[u.k], c = upCost(l);
+  const u = UPGRADES.find(x => x.k === b.dataset.k), l = meta[u.k], c = costOf(u, l);
   if (l >= u.max || meta.runes < c) return;
   meta.runes -= c; meta[u.k]++; saveMeta(); renderMeta();
 });
@@ -2009,12 +2154,14 @@ function gameOver(win, quit){
 function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; }
 
 addEventListener('keydown', e => {
-  if (e.target && e.target.closest && e.target.closest('input, textarea')) return; // typing in the feedback form
+  if (e.ctrlKey && e.shiftKey && e.code === 'KeyD'){ e.preventDefault(); toggleDbg(); return; }
+  if (mode === 'title' && /^[a-z]$/i.test(e.key)){ titleBuf = (titleBuf + e.key.toLowerCase()).slice(-4); if (titleBuf === 'odin'){ titleBuf = ''; toggleDbg(true); return; } }
+  if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return; // typing in a form
   if (!$('#feedback').hidden){ if (e.code === 'Escape') closeFeedback(); return; }
   keys[e.code] = true;
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (mode === 'combat' || mode === 'shop')) e.preventDefault();
   if (mode === 'combat'){
-    if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCd <= 0){ h.dashT = .16; h.dashCd = 2.5; if (S.bind){ S.bind = null; addText(h.x, h.y - 14, 'Broke free!', '#b4bccb', true); } } }
+    if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCh > 0 && h.dashT <= 0){ h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; if (S.bind){ S.bind = null; addText(h.x, h.y - 14, 'Broke free!', '#b4bccb', true); } } }
     if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
     if (e.code === 'KeyT' && !e.repeat) toggleTips();
     if (e.code === 'KeyB' && !e.repeat) openEndlessShop();
@@ -2040,8 +2187,9 @@ function updateHud(dt){
   const h = S.hero, W = waveDef(S.wave);
   $('#hpTxt').textContent = `${Math.ceil(h.hp)}/${h.maxHp}`;
   $('#hpBar').style.width = (h.hp / h.maxHp * 100) + '%';
-  $('#dashTxt').textContent = h.dashCd > 0 ? `Dash in ${h.dashCd.toFixed(1)} s` : 'Dash ready · Space';
-  $('#dashTxt').classList.toggle('ready', h.dashCd <= 0);
+  const cap = dashCap();
+  $('#dashTxt').innerHTML = `<span class="dpips">${Array.from({ length: cap }, (_, i) => `<i class="${i < h.dashCh ? 'on' : i < h.dashSlots ? 'empty' : 'locked'}"></i>`).join('')}</span>${h.dashCh < h.dashSlots ? `next in ${Math.max(0, h.dashRt).toFixed(1)} s` : 'Dash · Space'}`;
+  $('#dashTxt').classList.toggle('ready', h.dashCh > 0);
   const buffs = [];
   if (S.fury > 0) buffs.push(`Fury ${Math.ceil(S.fury)} s`);
   if (S.magnet > 0) buffs.push("Huginn's Call");
@@ -2069,7 +2217,8 @@ let last = performance.now(), acc = 0;
 const STEP = 1 / 60;
 function frame(now){
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
-  if (mode === 'combat' && !paused){ acc += dt; let n = 0; while (acc >= STEP && n < 4){ update(STEP); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= 4) acc = 0; }
+  if (mode === 'combat' && !paused){ acc += dt * dbg.speed; let n = 0; const lim = 4 * Math.ceil(dbg.speed); while (acc >= STEP && n < lim){ update(STEP); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= lim) acc = 0; }
+  dbgTick(dt);
   render(mode === 'combat' && paused ? 0 : dt);
   updateTips();
   updateHud(dt);
@@ -2079,7 +2228,7 @@ setMode('title');
 requestAnimationFrame(frame);
 
 // small hook for automated playtesting
-window.VALHALLA = { get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss };
+window.VALHALLA = { dbg, toggleDbg, dbgJump, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss };
 })();
 </script>
 
