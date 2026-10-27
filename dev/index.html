@@ -491,7 +491,7 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="r"><button type="button" id="dbgKill">Kill all enemies</button><button type="button" id="dbgKillBoss">Kill boss</button><button type="button" id="dbgShopCd">Reset shop cooldown</button></div>
     </fieldset>
     <fieldset><legend>Spawn</legend>
-      <div class="r"><select id="dbgBoss" aria-label="Boss"><option value="jarl">Draugr Jarl</option><option value="giant">Frost Giant</option><option value="herald">Herald of Hel</option><option value="fenrir:B">Fenrir, World-Eater</option><option value="fenrir:A">Fenrir, Gleipnir-Bound</option></select><button type="button" id="dbgSpawnBoss">Spawn boss</button></div>
+      <div class="r"><select id="dbgBoss" aria-label="Boss"><option value="jarl:A">Jarl, Barrow King (A)</option><option value="jarl:B">Jarl, Mound-Dweller (B)</option><option value="giant:A">Giant, Rime-Jötunn (A)</option><option value="giant:B">Giant, Hrímþurs (B)</option><option value="herald:A">Herald, Half-Faced (A)</option><option value="herald:B">Herald, Hel's Valkyrie (B)</option><option value="fenrir:B">Fenrir, World-Eater</option><option value="fenrir:A">Fenrir, Gleipnir-Bound</option></select><button type="button" id="dbgSpawnBoss">Spawn boss</button></div>
       <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Seiðkona</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
       <div class="r"><select id="dbgPu" aria-label="Power-up"></select><button type="button" id="dbgSpawnPu">Spawn power-up</button></div>
     </fieldset>
@@ -613,9 +613,11 @@ const ENEMIES = {
   raven:   { name: 'Raven',           hp: 7,   spd: 64, dmg: 4,  r: 4, armor: 0,   ward: 0,   spr: 'raven', fly: true },
   armored: { name: 'Iron Draugr',     hp: 42,  spd: 22, dmg: 10, r: 6, armor: 140, ward: 10,  spr: 'armored' },
   witch:   { name: 'Seiðkona',        hp: 20,  spd: 30, dmg: 7,  r: 5, armor: 10,  ward: 120, spr: 'witch', ranged: true },
-  jarl:    { name: 'The Draugr Jarl', hp: 650,  spd: 24, dmg: 14, r: 11, armor: 40, ward: 30,  spr: 'jarl',   boss: 'jarl',   scale: 2 },
-  giant:   { name: 'The Frost Giant', hp: 2800, spd: 15, dmg: 22, r: 15, armor: 70, ward: 50,  spr: 'giant',  boss: 'giant',  scale: 3 },
-  herald:  { name: 'Herald of Hel',   hp: 4600, spd: 26, dmg: 16, r: 11, armor: 30, ward: 70, spr: 'herald', boss: 'herald', scale: 2 },
+  jarl:    { name: 'The Draugr Jarl', hp: 650,  spd: 24, dmg: 14, r: 11, armor: 40, ward: 30,  spr: 'jarlA0',   boss: 'jarl',   scale: 1 },
+  giant:   { name: 'The Frost Giant', hp: 2800, spd: 15, dmg: 22, r: 20, armor: 70, ward: 50,  spr: 'giantA0',  boss: 'giant',  scale: 2 },
+  herald:  { name: 'Herald of Hel',   hp: 4600, spd: 26, dmg: 16, r: 11, armor: 30, ward: 70, spr: 'heraldA0', boss: 'herald', scale: 1 },
+  wight:   { name: 'Barrow Wight',    hp: 150, spd: 30, dmg: 9,  r: 6, armor: 20, ward: 20, spr: 'wight', fly: true },
+  wisp:    { name: 'Soul Wisp',       hp: 45,  spd: 24, dmg: 14, r: 5, armor: 0,  ward: 0,  spr: 'wisp',  fly: true, wisp: true },
   fenrir:  { name: 'Fenrir',          hp: 15000, spd: 34, dmg: 26, r: 22, armor: 60, ward: 60, spr: 'fenrir', boss: 'fenrir', scale: 2 },
 };
 const WAVES = [
@@ -623,17 +625,17 @@ const WAVES = [
   { name: 'Hour of the Wolf', d: 'Fast wolves hunt in packs.', mix: { wolf: 3, draugr: 1 } },
   { name: 'Shadow of the Ravens', d: "Odin's ravens have turned against you.", mix: { draugr: 2, raven: 2 } },
   { name: 'Seiðr in the Mist', d: 'Seiðkonur cast curses from afar.', mix: { draugr: 3, witch: 1 } },
-  { name: 'The Draugr Jarl', d: 'Mini-boss. He raises his dead warriors to fight.', mix: { draugr: 1 }, boss: 'jarl' },
+  { name: 'The Draugr Jarl', d: 'Mini-boss. He raises his dead, hurls his axe, and hides in his barrow when wounded.', mix: { draugr: 1 }, boss: 'jarl' },
   { name: 'Raven Swarm', d: 'Many weak ravens. Hit many at once.', mix: { raven: 6, draugr: 1 }, rate: 1.7, hp: .8 },
   { name: 'The Iron Dead', d: 'Heavy armor. Magic damage works best.', mix: { armored: 3, draugr: 2 } },
   { name: 'The Witch Circle', d: 'Seiðkonur resist magic. Physical damage works best.', mix: { witch: 3, wolf: 2 } },
   { name: 'Blood Moon', d: 'Every enemy is faster tonight.', mix: { draugr: 2, wolf: 2, raven: 1, witch: 1 }, spd: 1.35 },
-  { name: 'The Frost Giant', d: 'Mini-boss. Stay out of the circles when he stomps.', mix: { wolf: 1, draugr: 1 }, boss: 'giant' },
+  { name: 'The Frost Giant', d: 'Mini-boss. Stay out of his stomps and boulders. When wounded, his breath freezes the ground.', mix: { wolf: 1, draugr: 1 }, boss: 'giant' },
   { name: 'Ice Wind', d: 'Wolves and ravens ride the storm.', mix: { wolf: 3, raven: 2, draugr: 2 }, spd: 1.15 },
   { name: 'Army of the Dead', d: 'A wall of draugr marches in.', mix: { draugr: 4, armored: 2 }, rate: 1.3 },
   { name: 'Voices of Hel', d: 'Mixed forces. Bring both physical and magic damage.', mix: { witch: 3, armored: 2, draugr: 2 } },
   { name: 'Blood Moon II', d: 'The moon bleeds again. Everything is faster.', mix: { draugr: 2, wolf: 3, raven: 2, witch: 1 }, spd: 1.35, rate: 1.2 },
-  { name: 'Herald of Hel', d: 'Mini-boss. She fires rings of orbs. Find the gaps.', mix: { draugr: 1, witch: 1 }, boss: 'herald' },
+  { name: 'Herald of Hel', d: 'Mini-boss. Rings of orbs, and half the arena turns deadly. When wounded, she sends souls after you.', mix: { draugr: 1, witch: 1 }, boss: 'herald' },
   { name: 'The Wolf Pack', d: "Fenrir's offspring gather.", mix: { wolf: 6, draugr: 1 }, rate: 1.4 },
   { name: 'The Iron Wall', d: 'Armor and seiðr side by side.', mix: { armored: 4, witch: 2 } },
   { name: 'Omens of Ragnarök', d: 'Everything Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2 }, rate: 1.6 },
@@ -841,6 +843,184 @@ function fenrirFX(g, design, spr, ox, oy, sc, face, t){
   }
   g.globalAlpha = 1; g.globalCompositeOperation = prev;
 }
+/* ---- Mini-boss sprites: two designs per boss, built from layered shapes, then shaded and outlined ---- */
+const BOSS_DESIGNS = {
+  jarl:   { A: 'Barrow King', B: 'Mound-Dweller' },
+  giant:  { A: 'Rime-Jötunn', B: 'Hrímþurs' },
+  herald: { A: 'Half-Faced',  B: "Hel's Valkyrie" },
+};
+// layers are drawn back to front; each layer is one material with base / highlight / shadow colours
+function pxBuild(W, H, layers, details, ol){
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  const mat = new Int16Array(W * H).fill(-1);
+  const api = {
+    poly: pts => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fill(); },
+    ell: (x, y, rx, ry, r) => { g.beginPath(); g.ellipse(x, y, rx, ry, r || 0, 0, 7); g.fill(); },
+    rect: (x, y, w, h) => g.fillRect(x, y, w, h),
+    line: (x1, y1, x2, y2, w) => { g.lineWidth = w; g.lineCap = 'round'; g.strokeStyle = '#fff'; g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke(); },
+    clip: (x, y, w, h, fn) => { g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip(); fn(); g.restore(); },
+  };
+  layers.forEach((L, li) => {
+    g.clearRect(0, 0, W, H); g.fillStyle = '#fff'; L.draw(api);
+    const d = g.getImageData(0, 0, W, H).data;
+    for (let i = 0; i < W * H; i++) if (d[i * 4 + 3] > 110) mat[i] = li;
+  });
+  const at = (x, y) => x >= 0 && y >= 0 && x < W && y < H ? mat[y * W + x] : -1;
+  const out = g.createImageData(W, H);
+  const put = (x, y, hex) => {
+    if (x < 0 || y < 0 || x >= W || y >= H || !hex) return;
+    const i = (y * W + x) * 4, n = parseInt(hex.slice(1), 16);
+    out.data[i] = n >> 16; out.data[i + 1] = n >> 8 & 255; out.data[i + 2] = n & 255; out.data[i + 3] = 255;
+  };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    const m = at(x, y);
+    if (m >= 0){
+      const M = layers[m].m, up = at(x, y - 1), dn = at(x, y + 1);
+      put(x, y, up < 0 ? M[1] : (dn < 0 || (dn !== m && dn > m)) ? M[2] : up !== m && up < m ? M[1] : M[0]);
+    } else if (at(x - 1, y) >= 0 || at(x + 1, y) >= 0 || at(x, y - 1) >= 0 || at(x, y + 1) >= 0) put(x, y, ol || '#08070b');
+  }
+  // parts marked edge:true get a dark line where they sit in front of an earlier part (separates heads and arms from bodies)
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    const m = at(x, y); if (m < 0 || !layers[m].edge) continue;
+    for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]){ const n = at(x + dx, y + dy); if (n >= 0 && n < m){ put(x, y, ol || '#08070b'); break; } }
+  }
+  const top = []; for (let x = 0; x < W; x++){ let y = 0; while (y < H && at(x, y) < 0) y++; top.push(y); }
+  const info = { top };
+  if (details) details(put, at, info);
+  g.clearRect(0, 0, W, H); g.putImageData(out, 0, 0);
+  c.info = info;
+  return c;
+}
+function buildBossSprite(boss, design, frame){
+  const f = frame ? 1 : 0;
+  if (boss === 'jarl' && design === 'A'){ // Barrow King: rotting jarl, bent crown, rusted mail, ragged cloak, rusted sword
+    return pxBuild(26, 32, [
+      { m: ['#4a2420', '#6a3428', '#2e1512'], draw: a => a.poly([[6, 9], [17, 9], [20, 27 + f], [17.5, 30], [15, 27.5], [12, 30.5], [9.5, 27.5], [7, 30], [4, 27 - f]]) },
+      { m: ['#3c3a40', '#55525a', '#26242a'], draw: a => { a.poly([[9, 21], [12.4, 21], [12.4 + f, 30], [8.6 + f, 30]]); a.poly([[13.2, 21], [16.4, 21], [16.8 - f, 30], [13 - f, 30]]); } },
+      { m: ['#7a5a3a', '#9a7448', '#4e3a26'], draw: a => { a.poly([[8, 11], [17.5, 11], [18.5, 22], [7, 22]]); a.poly([[5.6, 11.6], [8.4, 11.4], [8.4, 20], [6, 20.4]]); a.poly([[17, 11.6], [19.4, 11.8], [21.6, 17.4], [19.6, 18.8]]); } },
+      { m: ['#8a9a7e', '#a8b89a', '#5e6c54'], draw: a => { a.ell(13, 7, 3.3, 3.7); a.ell(20.8, 18.2, 1.4, 1.3); a.ell(7, 20.6, 1.3, 1.3); } },
+      { m: ['#9a9890', '#c2c0b6', '#6c6a62'], draw: a => a.poly([[10, 8.4], [16.2, 8.4], [15.4, 13.4], [13, 14.6], [10.8, 13.2]]) },
+      { m: ['#c89a3a', '#ecc860', '#8a6420'], draw: a => { a.rect(9.4, 3.6, 7.2, 1.8); a.poly([[9.6, 4], [10, 1.2], [11.4, 4]]); a.poly([[12.3, 4], [13, .4], [13.9, 4]]); a.poly([[14.9, 4], [16.2, 1.6], [16.6, 4]]); a.rect(7, 19.8, 12, 1.6); } },
+      { m: ['#8a8880', '#b0aea4', '#5c5a54'], draw: a => { a.line(21, 17.4, 24.4, 3.6, 1.6); a.line(19.2, 15.6, 23, 16.8, 1.2); } },
+    ], (put, at, info) => {
+      for (let y = 12; y <= 19; y++) for (let x = 8; x <= 17; x++) if (at(x, y) === 2 && (x + y) % 2) put(x, y, '#5e4430'); // chainmail
+      put(12, 7, '#7dff8a'); put(14, 7, '#7dff8a'); put(13, 10, '#2a2624');                                    // ghost-fire eyes, mouth
+      put(24, 4, '#c26a3a'); put(23, 8, '#a2582e');                                                             // rust on the blade
+      info.eyes = [[12, 7], [14, 7]]; info.glow = '#7dff8a';
+    });
+  }
+  if (boss === 'jarl'){ // Mound-Dweller: hulking bloated draugr dragging a two-handed axe
+    return pxBuild(30, 32, [
+      { m: ['#4a3a2c', '#5e4a38', '#33281e'], draw: a => { a.poly([[8, 22], [12.6, 22], [12.6 + f, 31], [7.6 + f, 31]]); a.poly([[14, 22], [18.6, 22], [19 - f, 31], [14 - f, 31]]); } },
+      { m: ['#4a6578', '#5f7d92', '#33475a'], draw: a => { a.poly([[2.6, 12], [6.4, 11.6], [6.6, 23], [3, 23.6]]); a.ell(4.6, 24.2, 2.3, 2.1); } },
+      { m: ['#5f7d92', '#7d9cb0', '#3e5466'], draw: a => a.poly([[5, 13], [9, 8], [18, 7], [22.4, 11], [22.4, 22.4], [6, 23]]) },
+      { m: ['#4e3e2e', '#685240', '#342a20'], draw: a => a.poly([[5.6, 20], [22.4, 20], [21.4, 25.6], [18, 24.6], [14.4, 26.6], [11, 24.6], [6.6, 25.6]]) },
+      { m: ['#6d8ea4', '#8fb0c4', '#4a6578'], edge: true, draw: a => { a.ell(20, 7.6, 3.8, 3.4); a.poly([[17.6, 8.6], [24.4, 8.6], [23.8, 12.6], [18.4, 12.2]]); } },
+      { m: ['#6a4a2c', '#8a6440', '#44301c'], draw: a => a.line(22.6, 16.6, 27.4, 30.8, 1.8) },
+      { m: ['#5f7d92', '#7d9cb0', '#3e5466'], edge: true, draw: a => { a.poly([[19, 12.4], [23, 12.8], [24.8, 18.6], [22.2, 19.8]]); a.ell(23.8, 19.4, 2.1, 2); } },
+      { m: ['#6c7078', '#a2a6b0', '#45484e'], edge: true, draw: a => a.poly([[22.4, 23.4], [29.8, 20.4], [29.8, 31.6], [24.2, 31.6]]) },
+    ], (put, at, info) => {
+      [[9, 14], [10, 15], [16, 18], [17, 17], [11, 19], [7, 17], [15, 11]].forEach(([x, y]) => put(x, y, '#4a3a2c'));   // grave dirt
+      [[13, 11], [13, 12], [13, 13], [13, 14], [13, 15], [13, 16]].forEach(([x, y]) => put(x, y, '#2e3e4c'));         // stitched seam
+      [[12, 11], [14, 12], [12, 13], [14, 14], [12, 15], [14, 16]].forEach(([x, y]) => put(x, y, '#9ab6c8'));
+      put(19, 7, '#d6f4ff'); put(22, 7, '#d6f4ff');
+      [[19, 11], [21, 11], [23, 11]].forEach(([x, y]) => put(x, y, '#e8e3d6')); put(20, 11, '#1e2a34'); put(22, 11, '#1e2a34');
+      [[27, 22], [28, 24]].forEach(([x, y]) => put(x, y, '#d0d4dc'));
+      info.eyes = [[19, 7], [22, 7]]; info.glow = '#bfe9ff';
+    });
+  }
+  if (boss === 'giant' && design === 'A'){ // Rime-Jötunn: icy skin, icicle beard, glacier club raised
+    return pxBuild(36, 40, [
+      { m: ['#6a7d8c', '#8ea2b0', '#46545e'], draw: a => { a.poly([[10, 28], [16, 28], [16 + f, 39], [9.4 + f, 39]]); a.poly([[18, 28], [24, 28], [24.6 - f, 39], [18 - f, 39]]); } },
+      { m: ['#55809f', '#7aa4c4', '#3a5a76'], draw: a => { a.poly([[4, 14.4], [8.6, 13.6], [8.4, 26], [4.4, 26.6]]); a.ell(6.2, 27.2, 2.8, 2.5); } },
+      { m: ['#6a98c0', '#92bce0', '#466e94'], draw: a => a.poly([[8, 13], [25, 13], [24, 28], [9, 28]]) },
+      { m: ['#6a5a48', '#8a7660', '#4a3e30'], draw: a => a.poly([[8.4, 24], [24.6, 24], [24, 30], [20, 29], [16.5, 31], [13, 29], [9, 30]]) },
+      { m: ['#7aa8d0', '#a0c8ea', '#5482aa'], edge: true, draw: a => a.ell(17, 8.6, 5, 5.2) },
+      { m: ['#dff4ff', '#ffffff', '#a8d4ec'], edge: true, draw: a => { a.poly([[12.4, 10.6], [21.6, 10.6], [20.8, 21], [19.2, 24], [17.8, 20.4], [16.4, 23.6], [15, 20.4], [13.6, 22.4]]); a.poly([[12, 3.2], [22, 3.2], [21.6, 5.2], [12.4, 5.2]]); a.poly([[12.6, 3.6], [11.4, -.4], [14.6, 3.4]]); a.poly([[19.4, 3.4], [22.6, -.6], [21.4, 3.6]]); } },
+      { m: ['#6a98c0', '#92bce0', '#466e94'], edge: true, draw: a => a.poly([[24, 13.4], [27.6, 13.6], [30.4, 6], [27.2, 4.8]]) },
+      { m: ['#9fe6ff', '#e6fbff', '#5fb8de'], edge: true, draw: a => { a.ell(30.6, 5.2, 4.6, 5); a.line(29, 9, 28.4, 12.6, 2.2); } },
+    ], (put, at, info) => {
+      put(15, 8, '#ffffff'); put(19, 8, '#ffffff'); put(14, 8, '#1c3a56'); put(20, 8, '#1c3a56'); put(15, 7, '#2a4a68'); put(19, 7, '#2a4a68');
+      put(17, 9, '#4a7aa4'); put(17, 10, '#4a7aa4');
+      [[10, 16], [22, 18], [11, 22], [23, 15], [6, 18], [26, 10]].forEach(([x, y]) => put(x, y, '#dff4ff'));
+      [[29, 2], [32, 4], [31, 7]].forEach(([x, y]) => put(x, y, '#ffffff'));
+      info.eyes = [[15, 8], [19, 8]]; info.glow = '#bfe9ff';
+    });
+  }
+  if (boss === 'giant'){ // Hrímþurs: ancient rock-and-ice giant with glowing cracks
+    return pxBuild(36, 40, [
+      { m: ['#4a505c', '#646c7a', '#30343c'], draw: a => { a.poly([[10, 29], [15.4, 29], [15.8 + f, 39], [9.4 + f, 39]]); a.poly([[20.4, 29], [26, 29], [26.6 - f, 39], [20 - f, 39]]); } },
+      { m: ['#4c535f', '#6a7382', '#333842'], draw: a => { a.poly([[1.4, 15.4], [5.4, 14.6], [6, 25.6], [2, 26.4]]); a.ell(3.8, 28.2, 3.4, 3.2); a.poly([[30.6, 14.6], [34.6, 15.4], [34, 26.4], [30, 25.6]]); a.ell(32.2, 28.2, 3.4, 3.2); } },
+      { m: ['#5a6270', '#7a8494', '#3c424e'], draw: a => a.poly([[7.4, 14], [11, 9.4], [25, 9.4], [28.6, 14], [27.6, 30], [8.4, 30]]) },
+      { m: ['#666e7c', '#8a94a4', '#464c58'], edge: true, draw: a => { a.ell(8.6, 13.4, 4.6, 4); a.ell(27.4, 13.4, 4.6, 4); } },
+      { m: ['#5a6270', '#7a8494', '#3c424e'], edge: true, draw: a => a.ell(18, 8.2, 4, 3.4) },
+    ], (put, at, info) => {
+      for (let x = 0; x < 36; x++){ const t = info.top[x]; if (t < 40){ put(x, t, '#eef7ff'); if (x % 3) put(x, t + 1, '#c8e2f6'); } }
+      const crack = '#7fe3ff', dim = '#3a8fb0';
+      [[14, 13], [15, 14], [15, 15], [16, 16], [17, 17], [17, 18], [18, 19], [19, 20], [19, 21], [20, 22], [21, 23], [22, 24]].forEach(([x, y]) => put(x, y, crack));
+      [[11, 18], [12, 19], [12, 20], [13, 21], [23, 15], [24, 16], [24, 17], [3, 20], [33, 19], [32, 21]].forEach(([x, y]) => put(x, y, dim));
+      put(16, 8, '#bfffff'); put(20, 8, '#bfffff'); put(17, 10, '#2a3038'); put(18, 10, '#2a3038'); put(19, 10, '#2a3038');
+      info.eyes = [[16, 8], [20, 8]]; info.glow = '#7fe3ff'; info.cracks = true;
+    });
+  }
+  if (boss === 'herald' && design === 'A'){ // Half-Faced: Hel's split face, black-blue robes, ember staff
+    return pxBuild(26, 34, [
+      { m: ['#1a1620', '#2e2838', '#0e0b12'], draw: a => a.poly([[8, 4], [16.6, 4], [17.6, 18], [6.6, 18]]) },
+      { m: ['#1f2a44', '#33456a', '#121a2c'], draw: a => { a.poly([[8, 11], [16.4, 11], [20.6 + f * .4, 33], [3.4 - f * .4, 33]]); a.poly([[16, 12], [19.6, 13], [20.6, 19], [18.4, 19.6]]); } },
+      { m: ['#e6d6c8', '#fff2e6', '#b8a898'], draw: a => a.clip(0, 0, 12.5, 34, () => a.ell(12.4, 7, 3.2, 3.8)) },
+      { m: ['#8e8474', '#b2a890', '#5e5648'], draw: a => { a.clip(12.5, 0, 14, 34, () => a.ell(12.4, 7, 3.2, 3.8)); a.ell(20, 19.6, 1.3, 1.2); } },
+      { m: ['#3a2a1e', '#523c2a', '#24180e'], draw: a => a.line(21, 31.6, 21.4, 4, 1.4) },
+    ], (put, at, info) => {
+      put(11, 7, '#1a1620'); put(14, 7, '#ff5b2e'); put(13, 10, '#1a1620'); put(14, 10, '#e8e3d6'); put(15, 9, '#e8e3d6');
+      [[5, 31], [8, 31], [11, 31], [14, 31], [17, 31], [19, 31]].forEach(([x, y]) => put(x, y, '#ff5b2e'));         // ember hem
+      for (let y = 12; y <= 30; y += 3) put(12, y, '#33456a');
+      put(21, 3, '#ff8a3c'); put(22, 3, '#ff5b2e'); put(21, 2, '#ffd27a');
+      info.eyes = [[14, 7]]; info.glow = '#ff5b2e'; info.orb = [21.5, 3];
+    });
+  }
+  // Hel's Valkyrie: corrupted valkyrie with torn wings, winged helm and a spear
+  return pxBuild(32, 34, [
+    { m: ['#2a2e2e', '#454b4a', '#161919'], draw: a => { a.poly([[12, 11], [2, 2 + f], [0, 10], [3, 12], [1, 16], [5, 16], [3, 21], [9, 18], [12, 16]]); a.poly([[17, 11], [27, 3 - f], [30, 9], [27, 12], [29, 16], [24, 15], [25, 20], [18, 16]]); } },
+    { m: ['#2e3a3a', '#46585a', '#1c2424'], draw: a => { a.poly([[11, 24], [14, 24], [14 + f, 33], [10.6 + f, 33]]); a.poly([[15, 24], [18, 24], [18.6 - f, 33], [15 - f, 33]]); } },
+    { m: ['#3a5a5a', '#5a8080', '#223838'], draw: a => { a.poly([[10.6, 11], [18.4, 11], [19, 22], [10, 22]]); a.poly([[9, 20], [20, 20], [21, 27], [8, 27]]); a.poly([[18, 12], [21, 12.6], [22.6, 18], [20.6, 19]]); } },
+    { m: ['#b8c0bc', '#dfe6e2', '#848c88'], draw: a => a.ell(14.6, 7.4, 2.9, 3.3) },
+    { m: ['#5a6466', '#7e8a8c', '#3a4244'], draw: a => { a.poly([[11.4, 4], [17.8, 4], [17.8, 6.4], [11.4, 6.4]]); a.poly([[11.6, 5], [8.4, 1.6], [11.8, 3.6]]); a.poly([[17.6, 5], [20.8, 1.4], [17.4, 3.6]]); } },
+    { m: ['#4a3a28', '#64503a', '#30241a'], draw: a => a.line(20, 31, 26.6, 4, 1.3) },
+    { m: ['#6aff9a', '#d8ffe4', '#2a9a54'], draw: a => a.poly([[26.2, 5], [27.6, -.4], [28.2, 5.2]]) },
+  ], (put, at, info) => {
+    put(13, 7, '#6aff9a'); put(16, 7, '#6aff9a'); put(14, 10, '#5a6466');
+    [[3, 11], [5, 15], [2, 8], [26, 8], [24, 13]].forEach(([x, y]) => put(x, y, '#0e1010'));                         // torn holes in the wings
+    for (let y = 21; y <= 26; y++) for (let x = 9; x <= 20; x++) if (at(x, y) === 2 && (x + y) % 2) put(x, y, '#2c4646');
+    info.eyes = [[13, 7], [16, 7]]; info.glow = '#6aff9a'; info.orb = [27.2, 2];
+  });
+}
+// per-frame effects on top of a boss sprite; (ox, oy) = top-left on the target, sc = pixel size
+function bossFX(g, boss, design, spr, ox, oy, sc, face, t){
+  const W = spr.width, I = spr.info;
+  const X = x => face < 0 ? ox + (W - 1 - x) * sc : ox + x * sc;
+  const glow = (x, y, r, col, a) => {
+    const cx = X(x) + sc / 2, cy = oy + y * sc + sc / 2, gr = g.createRadialGradient(cx, cy, 0, cx, cy, r * sc);
+    gr.addColorStop(0, col); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g.globalAlpha = a; g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, r * sc, 0, 6.283); g.fill();
+  };
+  const px = (x, y, col, a) => { g.globalAlpha = a == null ? 1 : a; g.fillStyle = col; g.fillRect(Math.round(X(x)), Math.round(oy + y * sc), sc, sc); };
+  const prev = g.globalCompositeOperation;
+  g.globalCompositeOperation = 'lighter';
+  const hex = I.glow, rgb = `${parseInt(hex.slice(1, 3), 16)},${parseInt(hex.slice(3, 5), 16)},${parseInt(hex.slice(5, 7), 16)}`;
+  for (const [x, y] of I.eyes) glow(x, y, 2.4, `rgba(${rgb},.9)`, .5 + .2 * Math.sin(t * 5));
+  if (I.orb) glow(I.orb[0], I.orb[1], 4, `rgba(${rgb},.9)`, .55 + .25 * Math.sin(t * 7));
+  if (I.cracks) glow(18, 19, 9, 'rgba(127,227,255,.35)', .3 + .25 * Math.sin(t * 2.5));
+  g.globalCompositeOperation = prev;
+  if (boss === 'jarl' && design === 'A') for (let k = 0; k < 3; k++){ const s = (t * 1.3 + k / 3) % 1; px(12 + k, 6 - s * 5, '#7dff8a', .7 * (1 - s)); }          // ghost-fire wisps
+  if (boss === 'jarl' && design === 'B') for (let k = 0; k < 3; k++){ const s = (t * .8 + k / 3) % 1; px(26 + k, 31 - s * 3, '#6a5240', 1 - s); }            // dirt kicked up by the axe
+  if (boss === 'giant' && design === 'A') for (let k = 0; k < 4; k++){ const s = (t * .9 + k / 4) % 1; px(21 + s * 4, 10 - s * 3, '#e6fbff', .6 * (1 - s)); } // frost breath
+  if (boss === 'herald' && design === 'A') for (let k = 0; k < 5; k++){ const s = (t * .7 + k / 5) % 1; px(4 + k * 3.6, 32 - s * 4, '#ff5b2e', .8 * (1 - s)); } // embers off the hem
+  if (boss === 'herald' && design === 'B') for (let k = 0; k < 3; k++){ const s = (t * .5 + k / 3) % 1; px(3 + k * 11, 14 + s * 16, '#454b4a', 1 - s); }      // falling feathers
+  g.globalAlpha = 1; g.globalCompositeOperation = prev;
+}
+// which look each mini-boss uses on its normal wave and when it returns in Endless
+const BOSS_LOOK = { jarl: { main: 'A', endless: 'B' }, giant: { main: 'A', endless: 'B' }, herald: { main: 'A', endless: 'B' } };
 const SPR = {};
 function buildSprites(){
   const H = (m, extra) => makeSprite(HUM, m, extra);
@@ -865,6 +1045,9 @@ function buildSprites(){
   SPR.fenrirA0 = buildFenrirSprite('A', 0); SPR.fenrirA1 = buildFenrirSprite('A', 1);
   SPR.axe = makeSprite(['....SS.', '...SSSs', '....BSs', '...B.s.', '..B....', '.B.....', 'B......'], { S: '#d3d8e2', s: '#7d8494', B: '#8a5a34' });
   SPR.raven = makeSprite(RAVEN, { E: '#d84a3a', Y: '#5a5a66' });
+  for (const b of ['jarl', 'giant', 'herald']) for (const d of ['A', 'B']) for (const f of [0, 1]) SPR[b + d + f] = buildBossSprite(b, d, f);
+  SPR.wight = makeSprite(['..XXX..', '.XXXXX.', '.XeXeX.', '.XXXXX.', 'XXXXXXX', 'X.XXX.X', '..X.X..'], { X: '#6fc7a0', e: '#e6fff2' });
+  SPR.wisp = makeSprite(['..XXX..', '.XwwwX.', 'XwwWwwX', 'XwWWWwX', 'XwwWwwX', '.XwwwX.', '..XXX..'], { X: '#4fa88a', w: '#a8f0d4', W: '#ffffff' });
   for (const k of Object.keys(SPR)) { SPR[k + '_f'] = flip(SPR[k]); SPR[k + '_w'] = whiteOf(SPR[k]); SPR[k + '_wf'] = flip(SPR[k + '_w']); }
   for (const k in POWERUPS) SPR['pu_' + k] = makeSprite(GEM, { X: POWERUPS[k].col, w: '#ffffff' });
   // decor
@@ -898,7 +1081,7 @@ function newRun(R){
     wave: 1, gold: 5 + meta.gold, level: 1, xp: 0,
     hero: { x: 0, y: 0, hp: 100, maxHp: 100, inv: 0, dashSlots: 1, dashCh: 1, dashRt: 0, dashT: 0, dx: 0, dy: 1, face: 1, walk: 0 },
     bench: Array(8).fill(null), board: Array(8).fill(null), shop: [],
-    enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [],
+    enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], halfDeath: null, breath: null, chill: 0,
     souls: 0, kills: 0, bosses: 0, waveT: 0, spawnAcc: 0, shake: 0, boss: null, endDelay: 0, sel: null,
     debugUsed: dbgUsed, submitted: false,
     tr: { cls: {}, mod: {} }, regen: 0, dmgTaken: 1, hurt: 0, time: 0, puT: 8, fury: 0, magnet: 0, bind: null, eclipse: 0, eclipseMax: 1,
@@ -1125,10 +1308,14 @@ function spawnBoss(type, design){
   if (type === 'fenrir'){
     const d = design || (dbg.fenrir !== 'auto' ? dbg.fenrir : S.wave > WAVES.length ? 'A' : 'B');
     S.boss.design = d; S.boss.title = d === 'A' ? 'Fenrir, Gleipnir-Bound' : 'Fenrir, the World-Eater';
+  } else if (BOSS_LOOK[type]){
+    const b = S.boss, d = design || (S.wave > WAVES.length ? BOSS_LOOK[type].endless : BOSS_LOOK[type].main);
+    b.design = d; b.spr = type + d + '0'; b.w = SPR[b.spr].width * b.sc; b.h = SPR[b.spr].height * b.sc;
+    b.title = `${ENEMIES[type].name}, ${BOSS_DESIGNS[type][d]}`;
   }
   $('#bossName').textContent = S.boss.title || ENEMIES[type].name;
 }
-function clearBossFx(){ S.chains = []; S.lunges = []; S.eclipse = 0; S.bind = null; }
+function clearBossFx(){ S.chains = []; S.lunges = []; S.eclipse = 0; S.bind = null; S.bossAxes = []; S.boulders = []; S.ice = []; S.halfDeath = null; S.breath = null; S.chill = 0; }
 // Endless mode: waves roll straight into the next one, with no shop in between
 function endlessNext(){
   const W = waveDef(S.wave);
@@ -1235,6 +1422,7 @@ function nearest(x, y, range){
 }
 function hit(e, raw, dtype, u, opt){
   if (!e || e.dead) return;
+  if (e.immune){ if (Math.random() < .04) addText(e.x, e.y - e.h / 2, 'Immune', '#6fc7a0', false); return; }
   opt = opt || {};
   const crit = Math.random() < .05 + meta.crit * .04;
   let d = raw * (crit ? 1.5 + meta.critdmg * .2 : 1);
@@ -1372,6 +1560,44 @@ function startDevour(e){
 }
 function updateBossFx(dt){
   const h = S.hero;
+  S.chill = Math.max(0, S.chill - dt);
+  for (const A of S.bossAxes){
+    A.t += dt; const k = A.t - A.wind; if (k < 0) continue;
+    const ex = Math.cos(A.ang), ey = Math.sin(A.ang);
+    const dist = k < A.out ? A.len * (1 - (1 - k / A.out) ** 2) : A.len * (1 - Math.min(1, (k - A.out) / A.back) ** 2);
+    A.x = A.x0 + ex * dist; A.y = A.y0 + ey * dist;
+    if (dist2(A.x, A.y, h.x, h.y) < 10 * 10){ if (k < A.out && !A.hitOut){ A.hitOut = true; heroDamage(A.dmg); } else if (k >= A.out && !A.hitBack){ A.hitBack = true; heroDamage(A.dmg); } }
+    if (k >= A.out + A.back) A.done = true;
+  }
+  S.bossAxes = S.bossAxes.filter(A => !A.done);
+  for (const B of S.boulders){
+    B.t += dt;
+    if (B.t >= B.dur && !B.done){
+      B.done = true;
+      if (dist2(h.x, h.y, B.tx, B.ty) < B.r * B.r) heroDamage(B.dmg);
+      for (let k = 0; k < 8; k++){ const a = k * Math.PI / 4 + .3; S.eprojs.push({ x: B.tx + Math.cos(a) * B.r * .8, y: B.ty + Math.sin(a) * B.r * .8, vx: Math.cos(a) * 115, vy: Math.sin(a) * 115, dmg: B.dmg * .45, r: 2.5, life: 1.3, col: '#bfe9ff' }); }
+      burst(B.tx, B.ty, 34, ['#e6fbff', '#9fe6ff', '#5fb8de'], 120); S.rings.push({ x: B.tx, y: B.ty, r: B.r, life: .3, max: .3, col: '#bfe9ff' }); S.shake = Math.min(8, S.shake + 4);
+    }
+  }
+  S.boulders = S.boulders.filter(B => !B.done);
+  if (S.breath){
+    const Bz = S.breath, e = Bz.e; Bz.t += dt;
+    Bz.x = e.x + 10 * Math.cos(Bz.ang); Bz.y = e.y - e.h * .25;
+    if (Bz.t >= Bz.wind){
+      const rx = h.x - Bz.x, ry = h.y - Bz.y, dd = Math.hypot(rx, ry), da = Math.abs(((Math.atan2(ry, rx) - Bz.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+      if (dd < Bz.len && da < Bz.half){ S.chill = Math.max(S.chill, 2.5); if (!Bz.hit){ Bz.hit = true; heroDamage(Bz.dmg); } }
+      for (let k = 0; k < 3; k++){ const a = Bz.ang + rand(-Bz.half, Bz.half), v = rand(120, 220); S.parts.push({ x: Bz.x, y: Bz.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: Bz.len / v * .9, max: Bz.len / v, col: pick(['#dff4ff', '#86d4ff', '#ffffff']), s: 2, add: true }); }
+      if (!Bz.iced){ Bz.iced = true; for (let k = 0; k < 4; k++){ const a = Bz.ang + rand(-Bz.half * .8, Bz.half * .8), r = rand(40, Bz.len - 10); S.ice.push({ x: Bz.x + Math.cos(a) * r, y: Bz.y + Math.sin(a) * r, rx: 16, ry: 7, life: 5, max: 5 }); } }
+    }
+    if (Bz.t >= Bz.wind + Bz.dur || e.dead) S.breath = null;
+  }
+  for (const I of S.ice){ I.life -= dt; if (((h.x - I.x) / I.rx) ** 2 + ((h.y - I.y) / I.ry) ** 2 < 1) S.chill = Math.max(S.chill, .35); }
+  S.ice = S.ice.filter(I => I.life > 0);
+  if (S.halfDeath){
+    const H = S.halfDeath; H.t += dt;
+    if (H.t >= H.warn && !H.hit && (h.x - H.x0) * H.side > 0){ H.hit = true; heroDamage(H.dmg); }
+    if (H.t >= H.warn + H.fog) S.halfDeath = null;
+  }
   for (const c of S.chains){
     c.t += dt;
     if (!c.snapped && c.t >= c.wind){
@@ -1436,7 +1662,7 @@ function update(dt){
   h.inv = Math.max(0, h.inv - dt);
   if (h.dashT > 0){ h.dashT -= dt; h.x += h.dx * 270 * dt; h.y += h.dy * 270 * dt; if (Math.random() < .8) S.parts.push({ x: h.x, y: h.y, vx: 0, vy: 0, life: .25, max: .25, col: '#86d4ff', s: 2, add: true }); }
   else {
-    let spd = 78;
+    let spd = 78 * (S.chill > 0 ? .5 : 1);
     if (S.bind){
       const b = S.bind.e; S.bind.t -= dt;
       if (S.bind.t <= 0 || !b || b.dead) S.bind = null;
@@ -1491,7 +1717,7 @@ function update(dt){
     u.anim = Math.max(0, u.anim - dt);
     u.cd -= dt * furyM; if (u.cd > 0) return;
     let t = null;
-    if (S.boss && !S.boss.dead && dist2(u.x, u.y, S.boss.x, S.boss.y) < (u.st.range + S.boss.r) ** 2) t = S.boss;
+    if (S.boss && !S.boss.dead && !S.boss.immune && dist2(u.x, u.y, S.boss.x, S.boss.y) < (u.st.range + S.boss.r) ** 2) t = S.boss;
     if (!t) t = nearest(u.x, u.y, u.st.range);
     if (!t){ u.cd = .08; return; }
     u.cd = 1 / u.st.as;
@@ -1526,6 +1752,7 @@ function update(dt){
   for (const e of S.enemies){
     if (e.dead) continue;
     e.t += dt; e.flash = Math.max(0, e.flash - dt);
+    if (e.burn > 0 && e.immune) e.burn = 0;
     if (e.burn > 0){ e.burn -= dt; e.hp -= e.burnD * dt; if (Math.random() < .25) S.parts.push({ x: e.x + rand(-3, 3), y: e.y - rand(0, e.h / 2), vx: 0, vy: -20, life: .35, max: .35, col: pick(['#ff5b2e', '#ffb05a']), s: 1, add: true }); if (e.hp <= 0){ kill(e); continue; } }
     if (e.slowT > 0) e.slowT -= dt;
     if (e.frz > 0){ e.frz -= dt; continue; }
@@ -1544,7 +1771,10 @@ function update(dt){
     }
     e.x += e.kx * dt * 6; e.y += e.ky * dt * 6; e.kx *= .82; e.ky *= .82;
     if (Math.abs(dx) > 1) e.face = dx < 0 ? -1 : 1;
-    if (d < e.r + 6) heroDamage(e.dmg);
+    if (d < e.r + 6){
+      if (e.d.wisp){ const hp0 = h.hp; heroDamage(e.dmg); if (h.hp < hp0 && S.boss && !S.boss.dead){ const heal = S.boss.max * .03; S.boss.hp = Math.min(S.boss.max, S.boss.hp + heal); addText(S.boss.x, S.boss.y - S.boss.h / 2 - 6, '+' + Math.round(heal), '#7dc46a', true); S.bolts.push({ pts: [[h.x, h.y], [S.boss.x, S.boss.y]], life: .25 }); } e.dead = true; burst(e.x, e.y, 10, ['#a8f0d4', '#4fa88a'], 50); continue; }
+      heroDamage(e.dmg);
+    }
     if (!e.d.boss){ const key = ((e.x / 14) | 0) + ',' + ((e.y / 14) | 0); let c = grid.get(key); if (!c) grid.set(key, c = []); c.push(e); }
   }
   // light separation inside each cell
@@ -1586,23 +1816,54 @@ function update(dt){
 function bossAI(e, dt, dx, dy, d, sp){
   const h = S.hero, phase2 = e.hp < e.max * .5;
   e.atkT -= dt;
+  const next = seq => seq[e.combo++ % seq.length];
+  if (e.d.boss !== 'fenrir' && e.state === 'cast'){ e.st -= dt; if (e.st <= 0) e.state = 'walk'; return; }
   if (e.d.boss === 'jarl'){
+    if (e.immune){ // Barrow Rise: buried until both wights fall
+      if (e.wights.every(w => w.dead)){ e.immune = false; e.state = 'walk'; e.atkT = 1.5; burst(e.x, e.y, 40, ['#6a4428', '#3d2818', '#6fc7a0'], 90, false); addText(e.x, e.y - e.h / 2 - 8, 'He rises!', '#6fc7a0', true); S.shake = Math.min(8, S.shake + 5); }
+      return;
+    }
+    if (phase2 && !e.rose){ e.rose = true; e.immune = true; e.wights = [];
+      for (const s2 of [-1, 1]) e.wights.push(spawnEnemy('wight', e.x + s2 * 50, e.y - 20));
+      burst(e.x, e.y, 30, ['#6a4428', '#3d2818'], 70, false); addText(e.x, e.y - e.h / 2 - 8, 'Barrow Rise', '#6fc7a0', true); return; }
     e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
-    if (e.atkT <= 0){ e.atkT = phase2 ? 4 : 5.5; if (S.enemies.length < 30) for (let k = 0; k < 3; k++){ const a = rand(0, 6.28); spawnEnemy('draugr', e.x + Math.cos(a) * 22, e.y + Math.sin(a) * 22); } burst(e.x, e.y, 20, ['#6f9479', '#bfe9ff'], 60); addText(e.x, e.y - e.h / 2 - 6, 'Rise!', '#bfe9ff', true); }
+    if (e.atkT <= 0){
+      const m = next(phase2 ? ['raise', 'axe', 'axe'] : ['axe', 'raise', 'axe']);
+      if (m === 'raise'){ e.atkT = phase2 ? 3 : 4; if (S.enemies.length < 30) for (let k = 0; k < 3; k++){ const a2 = rand(0, 6.28); spawnEnemy('draugr', e.x + Math.cos(a2) * 22, e.y + Math.sin(a2) * 22); } burst(e.x, e.y, 20, ['#6f9479', '#bfe9ff'], 60); addText(e.x, e.y - e.h / 2 - 6, 'Rise!', '#bfe9ff', true); }
+      else { // Axe Hurl: out along a marked line, then back the same way
+        const base = Math.atan2(dy, dx), angs = phase2 ? [base - .28, base + .28] : [base];
+        for (const ang of angs) S.bossAxes.push({ x0: e.x, y0: e.y - 4, ang, t: 0, wind: .8, out: .7, back: .7, len: 175, dmg: e.dmg * 1.1, hitOut: false, hitBack: false });
+        e.state = 'cast'; e.st = .8; e.atkT = 2.6; addText(e.x, e.y - e.h / 2 - 6, 'Axe Hurl', '#ffb7a3', true);
+      }
+    }
   } else if (e.d.boss === 'giant'){
     e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
     if (e.atkT <= 0){
-      e.atkT = phase2 ? 2.4 : 3.4;
-      const n = phase2 ? 3 : 1;
-      for (let k = 0; k < n; k++) S.tele.push({ x: h.x + (k ? rand(-50, 50) : 0), y: h.y + (k ? rand(-40, 40) : 0), r: 40, t: 0, dur: 1.1, dmg: e.dmg * 1.4 });
+      const m = next(phase2 ? ['stomp', 'breath', 'hurl'] : ['stomp', 'hurl', 'stomp']);
+      if (m === 'stomp'){ e.atkT = phase2 ? 2.4 : 3; const n = phase2 ? 3 : 1; for (let k = 0; k < n; k++) S.tele.push({ x: h.x + (k ? rand(-50, 50) : 0), y: h.y + (k ? rand(-40, 40) : 0), r: 40, t: 0, dur: 1.1, dmg: e.dmg * 1.4 }); }
+      else if (m === 'hurl'){ // Glacier Hurl: a boulder lands on a marked spot and shatters
+        S.boulders.push({ sx: e.x + 12 * e.face, sy: e.y - e.h / 2, tx: h.x, ty: h.y, t: 0, dur: 1.3, r: 26, dmg: e.dmg * 1.3 });
+        e.state = 'cast'; e.st = .6; e.atkT = 2.6; addText(e.x, e.y - e.h / 2 - 6, 'Glacier Hurl', '#bfe9ff', true);
+      } else { // Fimbulwinter Breath: a marked cone, then frost that slows and leaves ice behind
+        S.breath = { e, ang: Math.atan2(dy, dx), half: .45, len: 160, t: 0, wind: 1.1, dur: .9, dmg: e.dmg * .8, hit: false };
+        e.state = 'cast'; e.st = 2.1; e.atkT = 3.2; addText(e.x, e.y - e.h / 2 - 6, 'Fimbulwinter Breath', '#bfe9ff', true);
+      }
     }
   } else if (e.d.boss === 'herald'){
     const dir = d > 110 ? 1 : d < 80 ? -1 : .3;
     e.x += dx / d * sp * dir * dt + Math.cos(e.t) * 10 * dt; e.y += dy / d * sp * dir * dt;
     if (e.atkT <= 0){
-      e.atkT = phase2 ? 1.6 : 2.3;
-      const n = phase2 ? 14 : 10, off = rand(0, 1);
-      for (let k = 0; k < n; k++){ const a = (k + off) / n * Math.PI * 2; S.eprojs.push({ x: e.x, y: e.y, vx: Math.cos(a) * 70, vy: Math.sin(a) * 70, dmg: e.dmg, r: 3.5, life: 4, col: '#ff5b2e' }); }
+      const m = next(phase2 ? ['rings', 'half', 'wisps', 'rings'] : ['rings', 'rings', 'half']);
+      if (m === 'rings'){ e.atkT = phase2 ? 1.6 : 2.3; const n = phase2 ? 14 : 10, off = rand(0, 1); for (let k = 0; k < n; k++){ const a2 = (k + off) / n * Math.PI * 2; S.eprojs.push({ x: e.x, y: e.y, vx: Math.cos(a2) * 70, vy: Math.sin(a2) * 70, dmg: e.dmg, r: 3.5, life: 4, col: '#ff5b2e' }); } }
+      else if (m === 'half'){ // Half-Death: one side of the arena fills with deadly fog
+        const hdx = h.x - e.x, side = Math.abs(hdx) < 90 ? Math.sign(hdx || 1) : -Math.sign(hdx);
+        S.halfDeath = { x0: e.x, side, t: 0, warn: 1.6, fog: .6, dmg: e.dmg * 1.6, hit: false };
+        e.state = 'cast'; e.st = .9; e.atkT = 2.8; addText(e.x, e.y - e.h / 2 - 6, 'Half-Death', '#d6b8ff', true);
+      } else { // Soul Wisps: slow souls that drain the hero and heal her
+        const alive = S.enemies.filter(o => o.d.wisp && !o.dead).length;
+        for (let k = alive; k < 3; k++){ const a2 = k * 2.1 + rand(0, .5); spawnEnemy('wisp', e.x + Math.cos(a2) * 18, e.y + Math.sin(a2) * 18); }
+        e.state = 'cast'; e.st = .7; e.atkT = 2.4; addText(e.x, e.y - e.h / 2 - 6, 'Soul Wisps', '#bfffe6', true);
+      }
     }
   } else if (e.d.boss === 'fenrir'){
     if (e.state === 'walk'){
@@ -1673,7 +1934,7 @@ function drawSprite(name, x, y, sc, face, white){
 function shadow(x, y, w){ ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), w, w * .35, 0, 0, 6.283); ctx.fill(); }
 
 function render(dt){
-  const st = S || { hero: { x: 0, y: 0, face: 1, walk: 0 }, board: [], enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], eclipse: 0, eclipseMax: 1, shake: 0, hurt: 0, time: performance.now() / 1000 };
+  const st = S || { hero: { x: 0, y: 0, face: 1, walk: 0 }, board: [], enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], halfDeath: null, breath: null, chill: 0, eclipse: 0, eclipseMax: 1, shake: 0, hurt: 0, time: performance.now() / 1000 };
   const h = st.hero;
   let sx = 0, sy = 0;
   if (st.shake > 0){ sx = rand(-st.shake, st.shake); sy = rand(-st.shake, st.shake); st.shake = Math.max(0, st.shake - dt * 30); }
@@ -1728,6 +1989,18 @@ function render(dt){
       ctx.globalAlpha = 1;
     }
   }
+  // mini-boss telegraphs drawn on the ground
+  for (const I of st.ice || []){ ctx.globalAlpha = clamp(I.life / I.max, 0, 1) * .55; ctx.fillStyle = '#c8ecff'; ctx.beginPath(); ctx.ellipse(I.x, I.y, I.rx, I.ry, 0, 0, 6.283); ctx.fill(); ctx.globalAlpha = 1; }
+  for (const A of st.bossAxes || []) if (A.t < A.wind){ const ex = Math.cos(A.ang), ey = Math.sin(A.ang); ctx.strokeStyle = `rgba(255,59,43,${.25 + .55 * A.t / A.wind})`; ctx.lineWidth = 1; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(A.x0, A.y0); ctx.lineTo(A.x0 + ex * A.len, A.y0 + ey * A.len); ctx.stroke(); ctx.setLineDash([]); }
+  for (const B of st.boulders || []){ const k = B.t / B.dur; ctx.strokeStyle = 'rgba(191,233,255,.75)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(B.tx, B.ty, B.r, 0, 6.283); ctx.stroke(); ctx.fillStyle = `rgba(134,212,255,${.08 + k * .25})`; ctx.beginPath(); ctx.arc(B.tx, B.ty, B.r * k, 0, 6.283); ctx.fill(); }
+  if (st.breath && st.breath.t < st.breath.wind && st.breath.x != null){ const Bz = st.breath, k = Bz.t / Bz.wind; ctx.fillStyle = `rgba(134,212,255,${.06 + .16 * k})`; ctx.beginPath(); ctx.moveTo(Bz.x, Bz.y); ctx.arc(Bz.x, Bz.y, Bz.len, Bz.ang - Bz.half, Bz.ang + Bz.half); ctx.closePath(); ctx.fill(); ctx.strokeStyle = 'rgba(191,233,255,.6)'; ctx.setLineDash([3, 3]); ctx.stroke(); ctx.setLineDash([]); }
+  if (st.halfDeath){
+    const H = st.halfDeath, warn = H.t < H.warn;
+    ctx.fillStyle = warn ? `rgba(90,30,120,${.12 + .14 * Math.abs(Math.sin(H.t * 8))})` : 'rgba(40,12,60,.82)';
+    ctx.fillRect(H.side > 0 ? H.x0 : H.x0 - 3000, camY - 50, 3000, VH + 100);
+    ctx.strokeStyle = 'rgba(255,59,43,.8)'; ctx.lineWidth = 1; ctx.setLineDash([4, 3]); ctx.beginPath(); ctx.moveTo(H.x0, camY - 50); ctx.lineTo(H.x0, camY + VH + 50); ctx.stroke(); ctx.setLineDash([]);
+    if (!warn) for (let i = 0; i < 50; i++){ ctx.fillStyle = i % 3 ? '#7a45c8' : '#3a1a5c'; ctx.fillRect(Math.round(H.x0 + H.side * ((i * 37 + H.t * 60) % (VW * .8))), Math.round(camY + (i * 53) % VH), 2, 2); }
+  }
   // power-ups: light pillar + gem
   for (const p of st.pups){
     const col = POWERUPS[p.type].col, blink = p.life < 5 && Math.floor(p.t * 8) % 2 === 0;
@@ -1763,8 +2036,19 @@ function render(dt){
         ctx.strokeStyle = 'rgba(255,59,43,.55)'; ctx.lineWidth = e.r * 1.2; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.cx * 160, e.y + e.cy * 160); ctx.stroke();
       }
       const bob = e.frz > 0 || e.stun > 0 ? 0 : e.d.fly ? Math.sin(e.t * 8) * 2 - 4 : Math.abs(Math.sin(e.t * 7)) * -1;
-      const isF = e.d.boss === 'fenrir', sname = isF ? 'fenrir' + (e.design || 'B') + (e.state !== 'cast' && Math.floor(e.t * 6) % 2 ? 1 : 0) : e.spr;
+      const isF = e.d.boss === 'fenrir', isMB = !!BOSS_LOOK[e.d.boss] && !!e.design;
+      const sname = isF ? 'fenrir' + (e.design || 'B') + (e.state !== 'cast' && Math.floor(e.t * 6) % 2 ? 1 : 0) : isMB ? e.d.boss + e.design + (e.state !== 'cast' && !e.immune && Math.floor(e.t * 3) % 2 ? 1 : 0) : e.spr;
+      if (isMB && e.immune){ // buried in the barrow: only the top of him shows above the mound
+        ctx.fillStyle = '#3d2818'; ctx.beginPath(); ctx.ellipse(Math.round(e.x), Math.round(e.y + e.h / 2 - 4), 22, 8, 0, 0, 6.283); ctx.fill();
+        ctx.fillStyle = '#3a4434'; for (let i = -3; i <= 3; i++) ctx.fillRect(Math.round(e.x + i * 5), Math.round(e.y + e.h / 2 - 10 + Math.abs(i)), 1, 2);
+        ctx.save(); ctx.beginPath(); ctx.rect(e.x - 40, e.y - 200, 80, 200 + e.h / 2 - 8); ctx.clip();
+        drawSprite(sname, e.x, e.y + 18, e.sc, e.face, false); ctx.restore();
+        ctx.strokeStyle = `rgba(111,199,160,${.4 + .3 * Math.sin(st.time * 6)})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(e.x, e.y + 6, e.r + 10, 0, 6.283); ctx.stroke();
+        continue;
+      }
       drawSprite(sname, e.x, e.y + bob, e.sc, e.face, e.flash > 0);
+      if (isMB && e.flash <= 0){ const sp = SPR[sname]; bossFX(ctx, e.d.boss, e.design, sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
+      if (e.d.wisp){ ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 10); gr.addColorStop(0, 'rgba(190,255,230,.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(e.x, e.y, 10, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over'; }
       if (isF && e.flash <= 0){ const sp = SPR[sname]; fenrirFX(ctx, e.design || 'B', sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
       if (e.frz > 0){ ctx.globalAlpha = .55; drawSprite(sname, e.x, e.y + bob, e.sc, e.face, true); ctx.globalAlpha = 1; }
       if (e.stun > 0){ ctx.fillStyle = '#ffe066'; for (let k = 0; k < 3; k++){ const a = st.time * 8 + k * 2.09; ctx.fillRect(Math.round(e.x + Math.cos(a) * 5), Math.round(e.y - e.h / 2 - 3 + Math.sin(a) * 1.5), 1, 1); } }
@@ -1788,6 +2072,9 @@ function render(dt){
   }
 
   // the chain binding the hero to Fenrir
+  for (const A of st.bossAxes || []) if (A.t >= A.wind && A.x != null){ ctx.save(); ctx.translate(Math.round(A.x), Math.round(A.y)); ctx.rotate(A.t * 18); ctx.drawImage(SPR.axe, -7, -7, 14, 14); ctx.restore(); }
+  for (const B of st.boulders || []){ const k = B.t / B.dur, x = B.sx + (B.tx - B.sx) * k, y = B.sy + (B.ty - B.sy) * k - Math.sin(k * Math.PI) * 60; ctx.fillStyle = '#5fb8de'; ctx.beginPath(); ctx.arc(x, y, 8, 0, 6.283); ctx.fill(); ctx.fillStyle = '#9fe6ff'; ctx.beginPath(); ctx.arc(x - 1, y - 1, 6, 0, 6.283); ctx.fill(); ctx.fillStyle = '#e6fbff'; ctx.fillRect(Math.round(x - 3), Math.round(y - 4), 2, 2); }
+  if (S && S.chill > 0){ ctx.globalAlpha = .35; ctx.fillStyle = '#86d4ff'; ctx.beginPath(); ctx.arc(h.x, h.y, 8, 0, 6.283); ctx.fill(); ctx.globalAlpha = 1; }
   if (S && S.bind && S.bind.e){
     const b = S.bind.e, dx = b.x - h.x, dy = b.y - h.y, dd = Math.hypot(dx, dy) || 1;
     for (let d = 4; d < dd - 10; d += 4){ ctx.fillStyle = (d / 4) % 2 ? '#b4bccb' : '#5d6372'; ctx.fillRect(Math.round(h.x + dx / dd * d) - 1, Math.round(h.y + dy / dd * d) - 1, 2, 2); }
@@ -1816,7 +2103,7 @@ function render(dt){
     }
   }
   for (const p of st.eprojs){
-    ctx.fillStyle = p.col === '#ff5b2e' ? 'rgba(255,60,30,.45)' : 'rgba(190,120,255,.45)'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 2, 0, 6.283); ctx.fill();
+    ctx.fillStyle = p.col === '#ff5b2e' ? 'rgba(255,60,30,.45)' : p.col === '#bfe9ff' ? 'rgba(134,212,255,.45)' : 'rgba(190,120,255,.45)'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 2, 0, 6.283); ctx.fill();
     ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * .6, 0, 6.283); ctx.fill();
   }
   // particles
@@ -2207,7 +2494,7 @@ function dbgJump(n){
   n = clamp(Math.round(n) || 1, 1, 99);
   if (!S) newRun();
   if (!S.board.some(Boolean) && !S.bench.some(Boolean)) S.bench[0] = { id: ++uid, cls: 'warrior', mod: 'jern', star: 1, mana: 0, cd: 0, x: 0, y: 0, face: 1, anim: 0 };
-  S.enemies = []; S.eprojs = []; S.projs = []; S.tele = []; S.pups = []; S.orbs = []; clearBossFx(); S.boss = null; S.endDelay = 0;
+  S.enemies = []; S.eprojs = []; S.projs = []; S.tele = []; S.pups = []; S.orbs = []; S.texts = []; S.parts = []; S.rings = []; clearBossFx(); S.boss = null; S.endDelay = 0;
   S.wave = n; S.endless = n > WAVES.length; S.won = S.won || S.endless; S.midBattle = false; S.endlessStart = S.endless; S.shopCd = 0;
   toggleDbg(false);
   rollShop(); openShop();
