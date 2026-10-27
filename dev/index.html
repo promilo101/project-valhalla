@@ -596,8 +596,12 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="r"><select id="dbgCls" aria-label="Class"></select><select id="dbgMod" aria-label="Modifier"></select><select id="dbgStar" aria-label="Stars"><option value="1">★</option><option value="2">★★</option><option value="3">★★★</option></select><button type="button" id="dbgGive">Give unit</button></div>
       <div class="r"><button type="button" id="dbgMana">Fill mana</button></div>
     </fieldset>
+    <fieldset><legend>Autoplay</legend>
+      <div class="r"><label for="dbgBot"><input type="checkbox" id="dbgBot"> Bot plays the game</label><label for="dbgBotLoop"><input type="checkbox" id="dbgBotLoop" checked> New raid after death</label></div>
+      <div class="r" style="color:var(--muted);font-size:15px">Moves, dodges, dashes, casts and shops. Press a movement key to take over. Combine with Speed below.</div>
+    </fieldset>
     <fieldset><legend>Game</legend>
-      <div class="r" id="dbgSpeed"><span>Speed</span><button type="button" data-sp=".5">0.5×</button><button type="button" data-sp="1" class="on">1×</button><button type="button" data-sp="2">2×</button><button type="button" data-sp="4">4×</button></div>
+      <div class="r" id="dbgSpeed"><span>Speed</span><button type="button" data-sp=".5">0.5×</button><button type="button" data-sp="1" class="on">1×</button><button type="button" data-sp="2">2×</button><button type="button" data-sp="4">4×</button><button type="button" data-sp="8">8×</button></div>
       <div class="r"><label for="dbgHit"><input type="checkbox" id="dbgHit"> Hitboxes and ranges</label></div>
       <div class="r"><label for="dbgFenrir">Fenrir look</label><select id="dbgFenrir"><option value="auto">Auto (B, then A in endless)</option><option value="A">Always A</option><option value="B">Always B</option></select></div>
     </fieldset>
@@ -3019,7 +3023,7 @@ const abilDmg = (base, l) => base * [1, 1.4, 1.9][l - 1] * abilScale();
 // aiming: a point on the battlefield under the mouse (later: a tap or thumb stick on Android)
 let mouseX = 0, mouseY = 0, mouseSeen = false;
 addEventListener('mousemove', e => { const r = cv.getBoundingClientRect(); mouseX = e.clientX - r.left; mouseY = e.clientY - r.top; mouseSeen = true; });
-function aimPoint(){ const h = S.hero; return mouseSeen ? { x: lastCamX + mouseX / SCALE, y: lastCamY + mouseY / SCALE } : { x: h.x + h.face * 60, y: h.y }; }
+function aimPoint(){ const h = S.hero; if (dbg.bot && botAim) return botAim; return mouseSeen ? { x: lastCamX + mouseX / SCALE, y: lastCamY + mouseY / SCALE } : { x: h.x + h.face * 60, y: h.y }; }
 function aimDir(){ const h = S.hero, A = aimPoint(); let dx = A.x - h.x, dy = A.y - h.y; const d = Math.hypot(dx, dy); if (d < 1){ dx = h.face; dy = 0; return { dx, dy, A }; } return { dx: dx / d, dy: dy / d, A }; }
 function castAbility(i){
   if (!S || mode !== 'combat' || paused || picking) return;
@@ -3416,6 +3420,7 @@ function gameOver(win, quit){
 function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; if (!paused || !$('#bestiary').hidden) showBestiary(false); }
 
 addEventListener('keydown', e => {
+  if (dbg.bot && e.isTrusted && !e.ctrlKey && !e.metaKey && !e.altKey && MOVE_KEYS.includes(e.code) && !(e.target && e.target.closest && e.target.closest('input, textarea, select'))){ setBot(false); toast('Autoplay off. You have control.'); }
   if (e.ctrlKey && e.shiftKey && e.code === 'KeyD'){ e.preventDefault(); toggleDbg(); return; }
   const digit = { Digit1: 0, Digit2: 1, Digit3: 2, Numpad1: 0, Numpad2: 1, Numpad3: 2 }[e.code];
   if (picking){ if (digit != null && !e.repeat){ e.preventDefault(); choosePick(digit); } else if (e.code === 'Space') e.preventDefault(); return; }
@@ -3500,9 +3505,77 @@ function updateHud(dt){
 /* ================= LOOP ================= */
 let last = performance.now(), acc = 0;
 const STEP = 1 / 60;
+/* ================= AUTOPLAY BOT (debug menu only) ================= */
+let botAim = null, botT = 0, botCast = 0;
+const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+function setBot(on){
+  dbg.bot = !!on; $('#dbgBot').checked = dbg.bot; botT = 0; botAim = null;
+  for (const k in keys) keys[k] = false;
+}
+function botShop(){
+  const own = c => [...S.board, ...S.bench].filter(u => u && u.cls === c.cls && u.mod === c.mod).length;
+  for (let pass = 0; pass < 6; pass++){
+    if (S.level < MAX_LVL && S.gold >= 12) buyXp();
+    const order = S.shop.map((c, i) => [c, i]).filter(x => x[0]).sort((a, b) => own(b[0]) - own(a[0]));
+    for (const [c, i] of order){
+      const free = S.bench.indexOf(null) >= 0, n = own(c);
+      if ((free || n >= 2) && (n > 0 || S.board.filter(Boolean).length + S.bench.filter(Boolean).length < 7 + S.level)) buy(i);
+    }
+    if (S.gold >= 8) reroll(); else break;
+  }
+  if (S.hero.hp < S.hero.maxHp * .6 && S.gold >= 10) buyHeal();
+  const units = [...S.board, ...S.bench].filter(Boolean).sort((a, b) => b.star - a.star);
+  S.board.fill(null); S.bench.fill(null);
+  const slots = slotCount();
+  units.forEach((u, i) => { if (i < slots) S.board[i] = u; else S.bench[i - slots] = u; });
+  renderShop();
+}
+// runs before every simulation step while the bot is on
+function botCombat(dt){
+  const h = S.hero;
+  if (S.endless && S.shopCd <= 0){ openEndlessShop(); return; }
+  let fx = 0, fy = 0, near = null, nd = 1e9;
+  for (const e of S.enemies){
+    const dx = h.x - e.x, dy = h.y - e.y, d2 = dx * dx + dy * dy + 1;
+    if (d2 < nd && !e.rise){ nd = d2; near = e; }
+    if (e.d.boss){ const d = Math.sqrt(d2), pull = d > 100 ? -.03 : d < 60 ? .05 : 0; fx += dx / d * pull; fy += dy / d * pull; }
+    else if (d2 < 90 * 90){ fx += dx / d2; fy += dy / d2; }
+    if ((e.mst === 'crouch' || e.mst === 'mark') && d2 < 130 * 130){ // step sideways out of a pounce or dive line
+      const side = Math.sign(-dx * e.ly + dy * e.lx) || 1; fx += -e.ly * side * .03; fy += e.lx * side * .03;
+    }
+  }
+  for (const p of S.eprojs){ const dx = h.x - p.x, dy = h.y - p.y, d2 = dx * dx + dy * dy + 1; if (d2 < 40 * 40){ fx += dx / d2 * 2; fy += dy / d2 * 2; } }
+  for (const t of S.tele){ const dx = h.x - t.x, dy = h.y - t.y, d2 = dx * dx + dy * dy + 1; if (d2 < (t.r + 26) ** 2){ fx += dx / d2 * 8; fy += dy / d2 * 8; } }
+  for (const z of S.haz) if (z.kind === 'curse'){ const dx = h.x - z.x, dy = h.y - z.y, d2 = dx * dx + dy * dy + 1; if (d2 < 40 * 40){ fx += dx / d2 * 4; fy += dy / d2 * 4; } }
+  fx += -h.y * .00002 - h.x * .00001; fy += h.x * .00002 - h.y * .00001; // drift in slow circles around the start
+  keys.KeyA = fx < -.002; keys.KeyD = fx > .002; keys.KeyW = fy < -.002; keys.KeyS = fy > .002;
+  const dash = (nx, ny) => { if (h.dashCh <= 0 || h.dashT > 0) return; h.dx = nx; h.dy = ny; h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; S.bind = null; };
+  if (S.bind) dash(-h.dx, -h.dy);
+  for (const c of S.chains) if (!c.snapped && c.t > c.wind - .12){ const ex = Math.cos(c.a), ey = Math.sin(c.a), rx = h.x - c.x, ry = h.y - c.y; if (Math.abs(rx * ey - ry * ex) < 10 && rx * ex + ry * ey > 0) dash(-ey, ex); }
+  for (const L of S.lunges) if (L.state === 'wind' && L.t > L.wind - .1) dash(-L.uy, L.ux);
+  botCast -= dt;
+  if (botCast <= 0 && near){
+    botCast = .5; const tgt = S.boss && !S.boss.dead ? S.boss : near;
+    botAim = { x: tgt.x, y: tgt.y };
+    for (let i = 0; i < 3; i++) if (S.abil[i] && S.abil[i].cd <= 0){ castAbility(i); break; }
+  }
+}
+// menus, shop and picks, paced so you can follow along
+function botMeta(dt){
+  botT -= dt * Math.max(1, dbg.speed);
+  if (botT > 0) return;
+  botT = .9;
+  if (picking){ choosePick(0); return; }
+  if (mode === 'shop'){ if (!S.botShopped){ S.botShopped = true; botShop(); } else { S.botShopped = false; startWave(); } return; }
+  if (mode === 'victory'){ enterEndless(); return; }
+  if (mode === 'over' && $('#dbgBotLoop').checked){ botT = 2.5; newRun(); return; }
+}
+$('#dbgBot').addEventListener('change', e => { setBot(e.target.checked); toast(dbg.bot ? 'Autoplay on' : 'Autoplay off'); });
+
 function frame(now){
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
-  if (mode === 'combat' && !paused && !picking){ acc += dt * dbg.speed; let n = 0; const lim = 4 * Math.ceil(dbg.speed); while (acc >= STEP && n < lim){ update(STEP); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= lim) acc = 0; }
+  if (mode === 'combat' && !paused && !picking){ acc += dt * dbg.speed; let n = 0; const lim = 4 * Math.ceil(dbg.speed); while (acc >= STEP && n < lim){ if (dbg.bot) botCombat(STEP); update(STEP); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= lim) acc = 0; }
+  if (dbg.bot && mode !== 'combat') botMeta(dt);
   dbgTick(dt);
   render(mode === 'combat' && paused ? 0 : dt);
   updateTips();
