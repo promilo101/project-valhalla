@@ -53,10 +53,15 @@ Drag units between the bench and the formation, or right-click a unit to send it
 - Online leaderboard for Endless runs (Supabase); runs where the debug menu was opened can't be submitted
 - Rune Forge with permanent upgrades between raids (saved in the browser)
 
+## Versions
+
+The game uses major.minor.patch numbers (for example 0.8.0). A new feature batch raises the minor number, a bug fix raises the patch number. The change notes live in the game under "What's new" on the title screen.
+
 ## Ideas for later
 
 - More heroes, each with their own sprite and ability pool (the ability system is already built per hero)
 - Android app: touch controls, with abilities aimed by tap or a second thumb stick
+- Android HUD: the health, dash and ability bars may crowd small screens and need a compact layout
 
 ## Branches
 
