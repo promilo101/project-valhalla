@@ -372,7 +372,7 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="btn" id="btnHeal" type="button">Heal 30% · <span id="healCost">10</span>g <kbd>G</kbd></button>
       </div>
       <div class="cards" id="cards"></div>
-      <div class="head"><h3>Bench</h3><button class="btn sm" id="btnSort" type="button">Sort <kbd>Q</kbd></button></div>
+      <div class="head"><h3>Bench</h3><button class="btn sm" id="btnSort" type="button" title="Sort the bench: highest stars first, then by class (Warrior, Archer, Mage, Priest), then rarer elements first (Lightning and Rune, then Fire and Blood, then Iron and Frost). Matching units end up side by side.">Sort <kbd>Q</kbd></button></div>
       <div class="bench" id="bench"></div>
       <div class="row" style="margin-top:12px;align-items:center">
         <button class="btn primary" id="btnStart" type="button">Start wave 1 <kbd>Space</kbd></button>
@@ -390,7 +390,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.8.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
+      <div class="eyebrow">Prototype <span id="verTxt">0.8.1</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
@@ -2599,6 +2599,7 @@ $('#btnShopOpen').onclick = e => { openEndlessShop(); e.currentTarget.blur(); };
 $('#btnEndless').onclick = enterEndless;
 $('#btnClaim').onclick = () => gameOver(true);
 $('#btnXp').onclick = buyXp; $('#btnRoll').onclick = reroll; $('#btnSell').onclick = sellSel; $('#btnStart').onclick = startWave; $('#btnSort').onclick = sortBench;
+$('#btnSort').addEventListener('mouseenter', () => { $('#info').innerHTML = '<strong>Sort bench · Q</strong><br>Highest stars first, then by class: Warrior, Archer, Mage, Priest. Within a class, rarer elements come first: Lightning and Rune, then Fire and Blood, then Iron and Frost.<br><span style="color:var(--gold)">Matching units end up side by side.</span>'; });
 $('#btnNew').onclick = requestNewRun; $('#btnMetaGo').onclick = requestNewRun; $('#btnAgain').onclick = requestNewRun;
 $('#btnContinue').onclick = continueRaid; $('#btnSaveQuit').onclick = saveAndQuit;
 $('#btnMeta').onclick = () => setMode('meta'); $('#btnOverMeta').onclick = () => setMode('meta');
@@ -2607,7 +2608,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () =
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.8.0'; // major.minor.patch
+const VERSION = '0.8.1'; // major.minor.patch
 const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3040,6 +3041,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.8.1', 'Small fixes', ['The Sort button explains how it sorts the bench']],
   ['0.8.0', 'Hero abilities and a new look', ['Hero abilities on 1, 2 and 3, aimed with the mouse. Pick 1 of 2 at the start of a raid and 1 of 3 after every boss', '8 Viking abilities with three levels each', 'Every card has its own look: 24 class and element sprites. Priests carry a gold sceptre', 'Rearrange your abilities in the shop', 'Health and dashes sit under the hero and the ability bar', 'The shop shows your warband resting around a campfire']],
   ['0.7.0', 'Leaderboard, saves and mini-bosses', ['Online leaderboard for Endless runs', 'Save and quit from the shop, and cloud save with a save code', 'The Draugr Jarl, Frost Giant and Herald of Hel have new looks and two new abilities each']],
   ['0.6.1', 'Clearer battles', ['Element icons on cards and units. Blood is now crimson', 'A countdown at the end of waves 1 to 20', 'The Endless shop opens every 2 minutes, with a countdown']],
