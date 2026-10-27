@@ -190,6 +190,12 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .pips i.on{background:var(--frost)}
 .up .d{color:var(--muted);font-size:18px}
 .runes{color:var(--frost)}
+.cloud{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:12px;display:grid;gap:8px}
+.cloud h3{font-family:var(--font-display);font-weight:600;font-size:20px;margin:0}
+.cloud .code{font-family:var(--font-body);font-size:24px;letter-spacing:.08em;color:var(--gold);background:var(--bg);border:1px solid var(--line);padding:2px 10px;border-radius:2px;user-select:all}
+.cloud-load{align-items:center}
+.cloud-load input{font:inherit;font-size:20px;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:2px;padding:4px 8px;min-width:0;flex:1 1 180px;text-transform:uppercase;letter-spacing:.06em}
+.cloud-load input:focus{outline:2px solid var(--frost);outline-offset:1px}
 .pu-list{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;color:var(--muted);font-size:19px;margin:0}
 .pu-list dt{color:var(--fg)}
 .pu-list dd{margin:0}
@@ -313,6 +319,7 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="row" style="margin-top:12px;align-items:center">
         <button class="btn primary" id="btnStart" type="button">Start wave 1 <kbd>Space</kbd></button>
         <button class="btn" id="btnSell" type="button" disabled>Sell <kbd>E</kbd></button>
+        <button class="btn" id="btnSaveQuit" type="button">Save and quit</button>
       </div>
       <p class="next" id="nextTxt"></p>
     </div>
@@ -329,6 +336,7 @@ a.btn{text-decoration:none;display:inline-block}
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
+        <button class="btn primary" id="btnContinue" type="button" hidden>Continue raid</button>
         <button class="btn primary" id="btnNew" type="button">Start a new raid</button>
         <button class="btn" id="btnMeta" type="button">Rune Forge · <span class="runes" id="tRunes">0</span> runes</button>
         <button class="btn" id="btnLb" type="button">Leaderboard</button>
@@ -366,6 +374,24 @@ a.btn{text-decoration:none;display:inline-block}
       <h2>Rune Forge</h2>
       <p class="note">You earn runes for every wave and boss. Upgrades apply to all future raids. You have <span class="runes" id="mRunes">0</span> runes.</p>
       <div class="ups" id="ups"></div>
+      <section class="cloud" aria-labelledby="cloudTitle">
+        <h3 id="cloudTitle">Cloud save</h3>
+        <div id="cloudOff">
+          <p class="note">Keep your Rune Forge progress and your saved raid on any computer. You get a code, and typing it in on another device picks up where you left off.</p>
+          <button class="btn" id="cloudOn" type="button">Turn on cloud save</button>
+        </div>
+        <div id="cloudOnBox" hidden>
+          <div class="row" style="align-items:center"><span>Your save code</span><code class="code" id="cloudCode"></code><button class="btn sm" id="cloudCopy" type="button">Copy</button></div>
+          <p class="note">Write it down. Anyone with this code can load your progress.</p>
+          <div class="row"><button class="btn sm" id="cloudForget" type="button">Stop syncing on this browser</button></div>
+        </div>
+        <form class="row cloud-load" id="cloudLoad" novalidate>
+          <label for="cloudIn">Load from code</label>
+          <input id="cloudIn" type="text" autocomplete="off" spellcheck="false" placeholder="RAVEN-7K2Q-FJ4M">
+          <button class="btn" id="cloudLoadBtn" type="submit">Load</button>
+        </form>
+        <p class="note" id="cloudMsg" role="status"></p>
+      </section>
       <div class="row"><button class="btn" id="btnMetaBack" type="button">Back</button><button class="btn primary" id="btnMetaGo" type="button">Start a new raid</button></div>
     </div>
   </section>
@@ -503,7 +529,12 @@ function weighted(o){ let t = 0; for (const k in o) t += o[k]; let r = Math.rand
 const META_KEY = 'valhalla.meta.v1';
 const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, dash: 0, best: 0, runs: 0, wins: 0, bestEndless: 0 };
 try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.parse(s)); } catch (e) {}
-function saveMeta(){ try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch (e) {} }
+const RUN_KEY = 'valhalla.run', STAMP_KEY = 'valhalla.stamp';
+function bumpStamp(){ try { localStorage.setItem(STAMP_KEY, String(Date.now())); } catch (e) {} try { cloudQueue(); } catch (e) {} }
+function localStamp(){ try { return +localStorage.getItem(STAMP_KEY) || 0; } catch (e) { return 0; } }
+function saveMeta(){ try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch (e) {} bumpStamp(); }
+function readRunSave(){ try { const r = JSON.parse(localStorage.getItem(RUN_KEY) || 'null'); return r && r.v === 1 ? r : null; } catch (e) { return null; } }
+function writeRunSave(r){ try { if (r) localStorage.setItem(RUN_KEY, JSON.stringify(r)); else localStorage.removeItem(RUN_KEY); } catch (e) {} bumpStamp(); }
 const UPGRADES = [
   { k: 'atkspd',  name: 'Attack Speed',    max: 5, d: l => `+${l*5}% attack speed` },
   { k: 'crit',    name: 'Critical Chance', max: 5, d: l => `${5 + l*4}% chance to crit` },
@@ -861,7 +892,8 @@ let S = null, uid = 0, mode = 'title', paused = false;
 const keys = {};
 const SLOT_OFF = Array.from({ length: 8 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 4; return { x: Math.cos(a) * 24, y: Math.sin(a) * 20 }; });
 
-function newRun(){
+function newRun(R){
+  if (R && R.v !== 1) R = null; // called from a click handler: no save to restore
   S = {
     wave: 1, gold: 5 + meta.gold, level: 1, xp: 0,
     hero: { x: 0, y: 0, hp: 100, maxHp: 100, inv: 0, dashSlots: 1, dashCh: 1, dashRt: 0, dashT: 0, dx: 0, dy: 1, face: 1, walk: 0 },
@@ -872,11 +904,56 @@ function newRun(){
     tr: { cls: {}, mod: {} }, regen: 0, dmgTaken: 1, hurt: 0, time: 0, puT: 8, fury: 0, magnet: 0, bind: null, eclipse: 0, eclipseMax: 1,
     endless: false, won: false, midBattle: false, endlessStart: false, shopCd: 0,
   };
+  if (R) applyRun(R);
   computeTraits();
-  S.hero.maxHp = heroMaxHp(); S.hero.hp = S.hero.maxHp;
-  rollShop();
-  meta.runs++; saveMeta();
+  S.hero.maxHp = heroMaxHp(); S.hero.hp = R ? clamp(R.hp, 1, S.hero.maxHp) : S.hero.maxHp;
+  if (!R){ rollShop(); meta.runs++; saveMeta(); }
   openShop();
+  if (R){ S.rollN = R.rollN || 0; S.xpN = R.xpN || 0; S.healN = R.healN || 0; renderShop(); toast(`Raid continued on wave ${S.wave}`); }
+}
+/* ---------- save and quit (from the shop only, so a run can't be rewound mid-battle) ---------- */
+function runSnapshot(){
+  const U = u => u && { cls: u.cls, mod: u.mod, star: u.star };
+  return { v: 1, wave: S.wave, gold: S.gold, level: S.level, xp: S.xp, souls: S.souls, kills: S.kills, bosses: S.bosses,
+    endless: S.endless, won: S.won, debugUsed: S.debugUsed, hp: Math.ceil(S.hero.hp), dashSlots: S.hero.dashSlots,
+    board: S.board.map(U), bench: S.bench.map(U), shop: S.shop.map(c => c && { cls: c.cls, mod: c.mod, locked: !!c.locked }),
+    rollN: S.rollN || 0, xpN: S.xpN || 0, healN: S.healN || 0, savedAt: Date.now() };
+}
+function applyRun(R){
+  const okU = u => u && CLASSES[u.cls] && MODS[u.mod] && [1, 2, 3].includes(u.star);
+  const mkU = u => okU(u) ? { id: ++uid, cls: u.cls, mod: u.mod, star: u.star, mana: 0, cd: 0, x: 0, y: 0, face: 1, anim: 0 } : null;
+  const num = (v, lo, hi, d) => Number.isFinite(v) ? clamp(Math.round(v), lo, hi) : d;
+  S.wave = num(R.wave, 1, 999, 1); S.gold = num(R.gold, 0, 1e6, 0); S.level = num(R.level, 1, MAX_LVL, 1); S.xp = num(R.xp, 0, 999, 0);
+  S.souls = num(R.souls, 0, 9, 0); S.kills = num(R.kills, 0, 1e7, 0); S.bosses = num(R.bosses, 0, 999, 0);
+  S.endless = !!R.endless; S.won = !!R.won; S.debugUsed = !!R.debugUsed || dbgUsed;
+  S.endlessStart = S.endless; S.midBattle = false;
+  S.hero.dashSlots = num(R.dashSlots, 1, dashCap(), 1); S.hero.dashCh = S.hero.dashSlots;
+  S.board = Array.from({ length: 8 }, (_, i) => mkU((R.board || [])[i]));
+  S.bench = Array.from({ length: 8 }, (_, i) => mkU((R.bench || [])[i]));
+  S.shop = Array.from({ length: 5 }, (_, i) => { const c = (R.shop || [])[i]; return c && CLASSES[c.cls] && MODS[c.mod] ? { cls: c.cls, mod: c.mod, locked: !!c.locked } : null; });
+}
+function saveAndQuit(){
+  if (!S || mode !== 'shop') return;
+  writeRunSave(runSnapshot());
+  toast(`Raid saved on wave ${S.wave}`);
+  S = null; setMode('title');
+}
+function continueRaid(){
+  const R = readRunSave(); if (!R){ renderTitle(); return; }
+  writeRunSave(null); // a save is used up when it is loaded, so it can't undo a death
+  newRun(R);
+}
+function requestNewRun(e){
+  const b = e && e.currentTarget;
+  if (readRunSave() && b){
+    if (b.dataset.armed !== '1'){
+      b.dataset.armed = '1'; b.dataset.label = b.textContent; b.textContent = 'Replace your saved raid?';
+      setTimeout(() => { if (b.dataset.armed === '1'){ b.dataset.armed = ''; b.textContent = b.dataset.label; } }, 3000);
+      return;
+    }
+    b.dataset.armed = ''; b.textContent = b.dataset.label; writeRunSave(null);
+  }
+  newRun();
 }
 
 /* ================= TRAITS & STATS ================= */
@@ -2032,7 +2109,8 @@ $('#btnShopOpen').onclick = e => { openEndlessShop(); e.currentTarget.blur(); };
 $('#btnEndless').onclick = enterEndless;
 $('#btnClaim').onclick = () => gameOver(true);
 $('#btnXp').onclick = buyXp; $('#btnRoll').onclick = reroll; $('#btnSell').onclick = sellSel; $('#btnStart').onclick = startWave; $('#btnSort').onclick = sortBench;
-$('#btnNew').onclick = newRun; $('#btnMetaGo').onclick = newRun; $('#btnAgain').onclick = newRun;
+$('#btnNew').onclick = requestNewRun; $('#btnMetaGo').onclick = requestNewRun; $('#btnAgain').onclick = requestNewRun;
+$('#btnContinue').onclick = continueRaid; $('#btnSaveQuit').onclick = saveAndQuit;
 $('#btnMeta').onclick = () => setMode('meta'); $('#btnOverMeta').onclick = () => setMode('meta');
 $('#btnMetaBack').onclick = () => setMode('title'); $('#btnHome').onclick = () => setMode('title');
 $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () => { togglePause(false); gameOver(false, true); };
@@ -2242,11 +2320,93 @@ $('#btnLb').onclick = openLeaderboard;
 $('#btnLbRefresh').onclick = openLeaderboard;
 $('#btnLbBack').onclick = () => setMode('title');
 
+/* ================= CLOUD SAVE (Supabase, keyed by a save code) ================= */
+const CLOUD_RPC = 'https://zgzvhcwzrtjoapnozroo.supabase.co/rest/v1/rpc/';
+const CODE_RE = /^[A-Z]{3,6}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+let cloudCode = '', cloudTimer = 0, cloudBusy = false, cloudArm = 0;
+try { cloudCode = localStorage.getItem('valhalla.cloud') || ''; } catch (e) {}
+const onPages = () => location.protocol === 'https:' && location.hostname.endsWith('github.io');
+function genCode(){
+  const words = ['RAVEN', 'WOLF', 'ODIN', 'THOR', 'FREYA', 'LOKI', 'TYR', 'HEL', 'SKADI', 'BALDR', 'FRIGG', 'ULLR', 'VIDAR', 'HUGINN'];
+  const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', r = new Uint32Array(9); crypto.getRandomValues(r);
+  const part = o => Array.from({ length: 4 }, (_, i) => A[r[o + i] % A.length]).join('');
+  return `${words[r[8] % words.length]}-${part(0)}-${part(4)}`;
+}
+const normCode = t => t.toUpperCase().trim().replace(/[\s_]+/g, '-').replace(/[^A-Z0-9-]/g, '');
+async function rpc(fn, body){
+  const r = await fetch(CLOUD_RPC + fn, { method: 'POST', headers: { apikey: LB_KEY, 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  const t = await r.text(); return t ? JSON.parse(t) : null;
+}
+function cloudMsg(t){ const el = $('#cloudMsg'); if (el) el.textContent = t; }
+function cloudPayload(){ return { v: 1, stamp: localStamp() || Date.now(), meta: { ...meta }, run: readRunSave() }; }
+async function cloudPush(){
+  if (!cloudCode || cloudBusy) return;
+  cloudBusy = true;
+  try { await rpc('save_game', { code: cloudCode, data: cloudPayload() }); cloudMsg('Saved to the cloud just now.'); }
+  catch (e){ cloudMsg(onPages() ? 'Could not reach the cloud. Your progress is still saved in this browser.' : 'Cloud save only works in the version hosted on GitHub Pages.'); }
+  cloudBusy = false;
+}
+function cloudQueue(){ if (!cloudCode) return; clearTimeout(cloudTimer); cloudTimer = setTimeout(cloudPush, 1500); }
+function applyCloud(d){
+  if (!d || d.v !== 1 || !d.meta) return false;
+  for (const k of Object.keys(meta)) if (Number.isFinite(d.meta[k])) meta[k] = Math.max(0, Math.round(d.meta[k]));
+  try {
+    localStorage.setItem(META_KEY, JSON.stringify(meta));
+    if (d.run && d.run.v === 1) localStorage.setItem(RUN_KEY, JSON.stringify(d.run)); else localStorage.removeItem(RUN_KEY);
+    localStorage.setItem(STAMP_KEY, String(d.stamp || Date.now()));
+  } catch (e) {}
+  return true;
+}
+function setCloudCode(c){ cloudCode = c; try { if (c) localStorage.setItem('valhalla.cloud', c); else localStorage.removeItem('valhalla.cloud'); } catch (e) {} renderCloud(); }
+function renderCloud(){
+  $('#cloudOff').hidden = !!cloudCode; $('#cloudOnBox').hidden = !cloudCode;
+  $('#cloudCode').textContent = cloudCode;
+}
+$('#cloudOn').onclick = () => { setCloudCode(genCode()); cloudMsg('Cloud save is on. Saving…'); cloudPush(); };
+$('#cloudCopy').onclick = () => {
+  const done = () => cloudMsg('Code copied.');
+  const fail = () => { const r = document.createRange(); r.selectNodeContents($('#cloudCode')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); cloudMsg('Copying is blocked here. The code is selected, so press Ctrl+C.'); };
+  try { navigator.clipboard.writeText(cloudCode).then(done, fail); } catch (e){ fail(); }
+};
+$('#cloudForget').onclick = () => { setCloudCode(''); cloudMsg('This browser no longer syncs. Your cloud save is kept, and your code still loads it.'); };
+$('#cloudLoad').addEventListener('submit', async e => {
+  e.preventDefault();
+  const code = normCode($('#cloudIn').value), btn = $('#cloudLoadBtn');
+  if (!CODE_RE.test(code)){ cloudMsg('That does not look like a save code. It looks like RAVEN-7K2Q-FJ4M.'); return; }
+  if (performance.now() > cloudArm){
+    cloudArm = performance.now() + 4000; btn.textContent = 'Replace this browser’s progress?';
+    setTimeout(() => { btn.textContent = 'Load'; }, 4000);
+    return;
+  }
+  cloudArm = 0; btn.textContent = 'Load'; btn.disabled = true; cloudMsg('Loading…');
+  try {
+    const res = await rpc('load_game', { code });
+    if (!res || !applyCloud(res.data)){ cloudMsg('No save found for that code. Check the spelling.'); }
+    else { setCloudCode(code); $('#cloudIn').value = ''; renderMeta(); cloudMsg('Cloud save loaded.'); }
+  } catch (err){ cloudMsg(onPages() ? 'Could not reach the cloud. Check your connection and try again.' : 'Cloud save only works in the version hosted on GitHub Pages.'); }
+  btn.disabled = false;
+});
+// on start: the newest save wins, whether it is in this browser or in the cloud
+async function cloudStartup(){
+  if (!cloudCode) return;
+  try {
+    const res = await rpc('load_game', { code: cloudCode });
+    const remote = res && res.data && res.data.stamp || 0;
+    if (remote > localStamp() && applyCloud(res.data)){ if (mode === 'title') renderTitle(); if (mode === 'meta') renderMeta(); toast('Progress loaded from your cloud save'); }
+    else if (localStamp() > remote) cloudPush();
+  } catch (e) {}
+}
+
 function renderTitle(){
+  const R = readRunSave(), bc = $('#btnContinue');
+  bc.hidden = !R; if (R) bc.textContent = `Continue raid · wave ${R.wave}${R.endless ? ' (endless)' : ''}`;
+  $('#btnNew').classList.toggle('primary', !R);
   $('#tRunes').textContent = meta.runes;
   $('#bestTxt').textContent = meta.runs ? `Best result: wave ${meta.best} of 20${meta.wins ? ` · ${meta.wins} win${meta.wins > 1 ? 's' : ''}` : ''}${meta.bestEndless ? ` · endless wave ${meta.bestEndless}` : ''}. Requires a keyboard.` : 'Requires a keyboard. Made for desktop browsers.';
 }
 function renderMeta(){
+  renderCloud();
   $('#mRunes').textContent = meta.runes;
   $('#ups').innerHTML = UPGRADES.map(u => {
     const l = meta[u.k], max = l >= u.max, cost = max ? 0 : costOf(u, l);
@@ -2373,9 +2533,10 @@ function frame(now){
 }
 setMode('title');
 requestAnimationFrame(frame);
+cloudStartup();
 
 // small hook for automated playtesting
-window.VALHALLA = { dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss };
+window.VALHALLA = { saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss };
 })();
 </script>
 

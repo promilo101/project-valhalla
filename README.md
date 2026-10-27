@@ -44,6 +44,7 @@ Drag units between the bench and the formation, or right-click a unit to send it
 - Minimap with power-ups, elites and bosses
 - 6 power-ups: Mead Horn, Rune of Fury, Thor's Wrath, Huginn's Call, Dwarven Hoard, Frost Rune
 - Shop card locks, rising reroll/XP/heal prices within a shop phase, healing bought in the shop
+- Save and quit from the shop, and cloud save with a save code (Supabase)
 - In-game feedback form
 - Online leaderboard for Endless runs (Supabase); runs where the debug menu was opened can't be submitted
 - Rune Forge with permanent upgrades between raids (saved in the browser)
