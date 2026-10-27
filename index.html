@@ -93,6 +93,12 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #banner.show{animation:bannerIn 2.6s ease forwards}
 @keyframes bannerIn{0%{opacity:0;transform:translateY(8px)}12%{opacity:1;transform:none}75%{opacity:1}100%{opacity:0}}
 #tips{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.shop-open{position:absolute;left:10px;bottom:10px;display:grid;gap:2px;justify-items:start;min-width:200px;padding:10px 18px 12px;background:var(--ember);border:1px solid #ff8a5c;color:#1a0702;border-radius:2px;font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1;box-shadow:0 0 18px rgba(255,91,46,.35);overflow:hidden;text-align:left}
+.shop-open .so-s{font-family:var(--font-body);font-weight:400;font-size:20px}
+.shop-open:hover:not(:disabled){background:#ff7246}
+.shop-open:disabled{background:rgba(11,13,19,.86);border-color:var(--line);color:var(--muted);box-shadow:none;cursor:not-allowed}
+.shop-open .cd{position:absolute;left:0;bottom:0;height:3px;width:var(--p,0%);background:var(--ember)}
+.shop-open:not(:disabled) .cd{display:none}
 .pu-tip{position:absolute;transform:translate(-50%,-100%);background:rgba(11,13,19,.9);border:1px solid var(--c);padding:2px 8px 3px;font-size:18px;line-height:1;text-align:center;white-space:nowrap;border-radius:2px;color:#c9cfdb}
 .pu-tip i{display:block;height:2px;margin:3px -5px 0;background:rgba(255,255,255,.12);position:relative}
 .pu-tip i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w,100%);background:var(--c)}
@@ -239,6 +245,8 @@ a.btn{text-decoration:none;display:inline-block}
     </div>
   </div>
 
+  <button class="shop-open" id="btnShopOpen" type="button" hidden><span>Open shop</span><span class="so-s" id="shopOpenSub">Ready · press B</span><span class="cd" aria-hidden="true"></span></button>
+
   <div id="banner" hidden><div class="big" id="bannerBig"></div><div class="small" id="bannerSmall"></div></div>
 
   <section id="shop" hidden aria-label="Shop and formation">
@@ -274,7 +282,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.4</span> · Norse dark fantasy</div>
+      <div class="eyebrow">Prototype <span id="verTxt">0.5</span> · Norse dark fantasy</div>
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
@@ -287,6 +295,7 @@ a.btn{text-decoration:none;display:inline-block}
         <dt><kbd>Space</kbd></dt><dd>Dash in battle · start the next wave in the shop</dd>
         <dt><kbd>P</kbd></dt><dd>Pause</dd>
         <dt><kbd>T</kbd></dt><dd>Show or hide power-up tooltips</dd>
+        <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 3 minutes)</dd>
         <dt>Shop</dt><dd><kbd>R</kbd> reroll · <kbd>F</kbd> buy XP · <kbd>E</kbd> sell · <kbd>Q</kbd> sort bench · <kbd>G</kbd> heal</dd>
         <dt>Units</dt><dd>Drag to move · right-click to swap between bench and formation</dd>
       </dl>
@@ -301,6 +310,20 @@ a.btn{text-decoration:none;display:inline-block}
       <p class="note">You earn runes for every wave and boss. Upgrades apply to all future raids. You have <span class="runes" id="mRunes">0</span> runes.</p>
       <div class="ups" id="ups"></div>
       <div class="row"><button class="btn" id="btnMetaBack" type="button">Back</button><button class="btn primary" id="btnMetaGo" type="button">Start a new raid</button></div>
+    </div>
+  </section>
+
+  <section id="victory" class="screen" hidden>
+    <div class="screen-inner">
+      <div class="eyebrow">Victory</div>
+      <h2>Fenrir has fallen</h2>
+      <p class="lead">The wolf is dead, but the night is not over. Claim your victory now, or march into Endless mode and see how long your warband lasts.</p>
+      <dl class="keys" id="vStats"></dl>
+      <div class="row">
+        <button class="btn primary" id="btnEndless" type="button">Enter Endless mode</button>
+        <button class="btn" id="btnClaim" type="button">Claim victory</button>
+      </div>
+      <p class="note">In Endless mode the waves never stop, enemies grow stronger every wave and the bosses come back. The shop opens only when you choose, at most once every 3 minutes of battle.</p>
     </div>
   </section>
 
@@ -383,7 +406,7 @@ function weighted(o){ let t = 0; for (const k in o) t += o[k]; let r = Math.rand
 
 /* ================= META (persists between runs) ================= */
 const META_KEY = 'valhalla.meta.v1';
-const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, best: 0, runs: 0, wins: 0 };
+const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, best: 0, runs: 0, wins: 0, bestEndless: 0 };
 try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.parse(s)); } catch (e) {}
 function saveMeta(){ try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch (e) {} }
 const UPGRADES = [
@@ -399,7 +422,7 @@ const upCost = l => 4 + l * 4;
 
 /* ================= DATA ================= */
 const CLASSES = {
-  warrior: { name: 'Warrior', dtype: 'phys',  range: 30,  atk: 13, as: 1.0,  rangeTxt: 'melee',  ability: 'Whirlwind',     abDesc: 'hits every nearby enemy and knocks them back' },
+  warrior: { name: 'Warrior', dtype: 'phys',  range: 95,  atk: 12, as: .95,  rangeTxt: 'short',  ability: 'Berserker Leap', abDesc: 'leaps into the biggest group of enemies and lands with a quake that stuns and knocks them back. Attacks throw an axe that cuts through enemies and flies back' },
   archer:  { name: 'Archer',  dtype: 'phys',  range: 150, atk: 8,  as: 1.35, rangeTxt: 'long',   ability: 'Arrow Rain',    abDesc: 'fires seven piercing arrows in a fan' },
   mage:    { name: 'Mage',    dtype: 'magic', range: 125, atk: 11, as: 0.75, rangeTxt: 'medium', ability: "Muspel's Fire", abDesc: 'hurls a huge crimson fireball that explodes and burns' },
   priest:  { name: 'Priest',  dtype: 'magic', range: 115, atk: 6,  as: 0.9,  rangeTxt: 'medium', ability: "Eir's Light",   abDesc: 'heals the hero and sends out a holy wave' },
@@ -442,7 +465,7 @@ const ENEMIES = {
   jarl:    { name: 'The Draugr Jarl', hp: 650,  spd: 24, dmg: 14, r: 11, armor: 40, ward: 30,  spr: 'jarl',   boss: 'jarl',   scale: 2 },
   giant:   { name: 'The Frost Giant', hp: 2800, spd: 15, dmg: 22, r: 15, armor: 70, ward: 50,  spr: 'giant',  boss: 'giant',  scale: 3 },
   herald:  { name: 'Herald of Hel',   hp: 4600, spd: 26, dmg: 16, r: 11, armor: 30, ward: 70, spr: 'herald', boss: 'herald', scale: 2 },
-  fenrir:  { name: 'Fenrir',          hp: 15000, spd: 34, dmg: 26, r: 20, armor: 60, ward: 60, spr: 'fenrir', boss: 'fenrir', scale: 4 },
+  fenrir:  { name: 'Fenrir',          hp: 15000, spd: 34, dmg: 26, r: 22, armor: 60, ward: 60, spr: 'fenrir', boss: 'fenrir', scale: 2 },
 };
 const WAVES = [
   { name: 'The Barrows Wake', d: 'The first draugr claw their way out of the earth.', mix: { draugr: 1 } },
@@ -464,9 +487,34 @@ const WAVES = [
   { name: 'The Iron Wall', d: 'Armor and seiðr side by side.', mix: { armored: 4, witch: 2 } },
   { name: 'Omens of Ragnarök', d: 'Everything Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2 }, rate: 1.6 },
   { name: 'The Last Night', d: 'More elites than ever.', mix: { draugr: 2, wolf: 2, armored: 2, witch: 2 }, rate: 1.4, elite: .2 },
-  { name: 'Fenrir', d: 'Final boss. He leaps when his eyes glow.', mix: { wolf: 1 }, boss: 'fenrir' },
+  { name: 'Fenrir', d: "Final boss. He charges when his eyes glow, snaps Gleipnir's chains and, when wounded, devours the sun.", mix: { wolf: 1 }, boss: 'fenrir' },
 ];
 const WAVE_DUR = 40;
+const SHOP_CD = 180; // seconds of battle between shop visits in Endless mode
+const ENDLESS_WAVES = [
+  { name: 'Fimbulwinter', d: 'Three winters with no summer. Wolves and ravens ride the cold.', mix: { wolf: 3, raven: 2, draugr: 2 }, spd: 1.15 },
+  { name: "Naglfar's Crew", d: 'The ship of dead men\u2019s nails lands its crew.', mix: { draugr: 4, armored: 3 }, rate: 1.2 },
+  { name: 'The Wild Hunt', d: 'Fast hunters close in from every side.', mix: { wolf: 5, raven: 3 }, spd: 1.3 },
+  { name: "Hel's Tide", d: 'Seiðkonur behind a wall of iron.', mix: { witch: 3, armored: 3, draugr: 2 } },
+  { name: "Garm's Howl", d: 'The hound of Hel calls his pack. More elites.', mix: { wolf: 4, draugr: 2, armored: 1 }, elite: .12 },
+  { name: "Surtr's Embers", d: 'Everything burns and runs faster.', mix: { draugr: 3, wolf: 2, witch: 2, raven: 1 }, spd: 1.25, rate: 1.2 },
+  { name: 'Night Without End', d: 'Every enemy Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2 }, rate: 1.4 },
+  { name: 'Children of Loki', d: 'Witches and ravens swarm the field.', mix: { witch: 3, raven: 4 }, rate: 1.3 },
+];
+const ENDLESS_BOSSES = ['jarl', 'giant', 'herald', 'fenrir'];
+const BOSS_HOME = { jarl: 5, giant: 10, herald: 15, fenrir: 20 };
+const endlessCache = {};
+function waveDef(n){
+  if (n <= WAVES.length) return WAVES[n - 1];
+  if (endlessCache[n]) return endlessCache[n];
+  const k = n - WAVES.length;
+  let w;
+  if (k % 5 === 0){
+    const b = ENDLESS_BOSSES[(k / 5 - 1) % ENDLESS_BOSSES.length];
+    w = { name: `${ENEMIES[b].name} returns`, d: 'Boss. Stronger every time it comes back.', mix: { draugr: 2, wolf: 2, armored: 1, witch: 1 }, boss: b, endless: true };
+  } else w = Object.assign({ endless: true }, ENDLESS_WAVES[(k - 1 - Math.floor(k / 5)) % ENDLESS_WAVES.length]);
+  return endlessCache[n] = w;
+}
 const hpScale = w => 1 + 0.12 * (w - 1) + 0.006 * (w - 1) ** 2;
 
 /* ================= PIXEL SPRITES ================= */
@@ -520,6 +568,129 @@ function makeSprite(rows, map, extra){
 function flip(c){ const f = document.createElement('canvas'); f.width = c.width; f.height = c.height; const g = f.getContext('2d'); g.translate(c.width, 0); g.scale(-1, 1); g.drawImage(c, 0, 0); return f; }
 function whiteOf(c){ const f = document.createElement('canvas'); f.width = c.width; f.height = c.height; const g = f.getContext('2d'); g.drawImage(c, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); return f; }
 const STAFF = (col, top) => [[9,2,col],[9,3,col],[9,4,col],[9,5,col],[9,6,col],[9,7,col],[9,8,col],[9,9,col],[9,10,col],[9,1,top],[8,1,top]];
+/* ---- Fenrir: two designs, built from shapes, then shaded and detailed pixel by pixel ---- */
+const FENRIR_DESIGNS = {
+  A: { name: 'Gleipnir-Bound', base: '#2e2c38', hi: '#4a4756', lo: '#1c1b23', ol: '#09080c' },
+  B: { name: 'World-Eater',    base: '#251e34', hi: '#3d3354', lo: '#15101f', ol: '#07050b' },
+};
+function buildFenrirSprite(design, frame){
+  const W = 40, H = 24, P = FENRIR_DESIGNS[design];
+  const c = document.createElement('canvas'); c.width = W; c.height = H;
+  const g = c.getContext('2d');
+  const poly = pts => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fill(); };
+  const ell = (x, y, rx, ry, r) => { g.beginPath(); g.ellipse(x, y, rx, ry, r || 0, 0, 7); g.fill(); };
+  const f = frame ? 1 : 0;
+  const maskOf = () => { const d = g.getImageData(0, 0, W, H).data, m = new Uint8Array(W * H); for (let i = 0; i < W * H; i++) m[i] = d[i * 4 + 3] > 110 ? 1 : 0; return m; };
+  g.fillStyle = '#fff';
+  let spikes, mouthPoly = null;
+  if (design === 'A'){
+    ell(25, 10.2, 5.6, 5.4);                                                                     // deep chest
+    ell(17, 10.6, 7.4, 3.5);                                                                     // lean torso
+    ell(9, 10.2, 4.7, 4.3);                                                                      // haunch
+    poly([[27, 5.6], [31, 4.6], [34, 6.6], [39.4, 8.8], [39.4, 10.6], [34, 10.9], [31, 12.2], [27.4, 11.8]]); // head, lowered snout
+    poly([[29, 5.6], [30.2, 1], [31.9, 5]]); poly([[31, 5.3], [33.4, 1.8], [33.8, 6.6]]);           // ears
+    poly([[31, 12.4], [38.6, 11.9], [37.4, 13.8], [32, 14.2]]);                                    // open lower jaw
+    poly([[22.8, 13.6], [25.4, 13.6], [25 + f, 20.6], [26.6 + f, 23], [23.2 + f, 23], [23.1, 17]]); // front legs
+    poly([[26.4, 13], [28.8, 13], [28.9 - f, 20.4], [30.2 - f, 23], [27 - f, 23], [26.8, 17]]);
+    poly([[5.8, 12], [9.6, 12.4], [8.6 - f, 17.6], [9.8 - f, 20.6], [9.4 - f, 23], [6.4 - f, 23], [6.8, 20], [5.4, 16]]); // back legs with hocks
+    poly([[10.6, 12.6], [13.2, 12.6], [13.5 + f, 17.6], [14.8 + f, 20.6], [14.4 + f, 23], [11.6 + f, 23], [11.9, 20], [10.7, 16]]);
+    poly([[5.5, 7.6], [2.4, 8.6], [.4, 11.4], [0, 14.4], [1.8, 13.6], [4, 11.6], [6.4, 10.4]]);     // drooping bushy tail
+    spikes = () => { [[11, 3.6], [14, 2.8], [17, 2.4], [20, 1.8], [23, 1], [26, 1.4], [28.6, 2.6]].forEach(([x, y]) => poly([[x - 1.8, 8], [x, y], [x + 1.8, 8]])); };
+  } else {
+    ell(25, 9.4, 5.6, 5.9, -.3);                                                                 // raised chest
+    ell(17, 10.6, 7.6, 3.3);
+    ell(9, 10.4, 4.5, 4.1);
+    poly([[26.4, 4.2], [30, 2.4], [33.2, 2.6], [39.2, 3.4], [38.4, 5.6], [33, 6.6], [31.2, 9.2], [27.6, 9.8]]); // head thrown up, upper jaw
+    poly([[30.4, 9.8], [34, 8.6], [39.4, 11], [38.4, 12.8], [32, 12.4]]);                          // lower jaw dropped wide
+    poly([[27.4, 3.8], [26.2, -.6], [29.8, 2.6]]); poly([[29.2, 2.8], [29.6, -.8], [31.4, 2.6]]);   // swept-back ears
+    poly([[22.8, 13.4], [25.2, 13.4], [24.9 + f, 20.8], [26.5 + f, 23], [23.2 + f, 23], [23.1, 17]]);
+    poly([[26.3, 12.6], [28.6, 12.6], [28.8 - f, 20.6], [30.1 - f, 23], [27 - f, 23], [26.7, 17]]);
+    poly([[5.8, 12], [9.4, 12.4], [8.5 - f, 17.6], [9.7 - f, 20.6], [9.3 - f, 23], [6.4 - f, 23], [6.8, 20], [5.4, 16]]);
+    poly([[10.6, 12.6], [13, 12.6], [13.4 + f, 17.6], [14.6 + f, 20.6], [14.2 + f, 23], [11.6 + f, 23], [11.9, 20], [10.7, 16]]);
+    poly([[5, 8.6], [2.4, 7.6], [.8, 5.6], [3.4, 6], [6.2, 7.6]]);                                 // raised tail stub, flames add the rest
+    mouthPoly = [[31, 8.6], [33, 6.6], [38.4, 5.6], [40, 5.6], [40, 11.2], [34, 8.6]];
+  }
+  const body = maskOf();
+  if (spikes) spikes();
+  const m = maskOf();
+  const at = (x, y) => x >= 0 && y >= 0 && x < W && y < H && m[y * W + x] === 1;
+  const inBody = (x, y) => x >= 0 && y >= 0 && x < W && y < H && body[y * W + x] === 1;
+  const out = g.createImageData(W, H);
+  const put = (x, y, hex) => {
+    if (x < 0 || y < 0 || x >= W || y >= H) return;
+    const i = (y * W + x) * 4, n = parseInt(hex.slice(1), 16);
+    out.data[i] = n >> 16; out.data[i + 1] = n >> 8 & 255; out.data[i + 2] = n & 255; out.data[i + 3] = 255;
+  };
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    if (at(x, y)) put(x, y, !at(x, y - 1) ? P.hi : (!at(x, y + 1) || y >= 17) ? P.lo : P.base);
+    else if (at(x - 1, y) || at(x + 1, y) || at(x, y - 1) || at(x, y + 1)) put(x, y, P.ol);
+  }
+  const top = []; for (let x = 0; x < W; x++){ let y = 0; while (y < H && !at(x, y)) y++; top.push(y); }
+  const info = { top, eye: null, maw: null };
+  if (design === 'A'){
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (at(x, y) && !inBody(x, y)) put(x, y, inBody(x, y + 1) || inBody(x, y + 2) ? '#9c2a16' : '#ff5b2e'); // ember mane
+    put(33, 7, '#ff2a1a'); put(34, 7, '#ff2a1a'); put(34, 6, '#ffb08f');                         // eye
+    put(39, 9, '#09080c'); put(39, 10, '#09080c');                                               // nose
+    for (let x = 32; x <= 38; x++) if (!at(x, 12) || x > 33) put(x, 12, '#4a0808');               // open mouth
+    [[33, 11], [35, 11], [37, 11], [34, 13], [36, 13]].forEach(([x, y]) => put(x, y, '#e8e3d6')); // fangs
+    for (let y = 5; y <= 14; y++) if (at(27, y) || at(28, y)){ put(27, y, y % 2 ? '#b4bccb' : '#5d6372'); put(28, y, y % 2 ? '#5d6372' : '#b4bccb'); } // Gleipnir collar
+    [[26, 15, '#5d6372'], [25, 16, '#b4bccb'], [25, 17, '#5d6372'], [24, 18, '#b4bccb'], [23, 19, '#5d6372'], [23, 20, '#b4bccb']].forEach(([x, y, cl]) => put(x, y, cl)); // snapped chain
+    for (let x = 6 - f; x <= 9 - f; x++) put(x, 20, '#b4bccb');                                // shackle
+    [[5 - f, 21, '#5d6372'], [4 - f, 22, '#b4bccb'], [3 - f, 23, '#5d6372']].forEach(([x, y, cl]) => put(x, y, cl));
+    info.eye = [33.5, 7];
+  } else {
+    const inP = (px, py, pts) => { let r = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++){ const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > py) !== (yj > py) && px < (xj - xi) * (py - yi) / (yj - yi) + xi) r = !r; } return r; };
+    for (let y = 0; y < H; y++) for (let x = 28; x < W; x++) if (!at(x, y) && inP(x + .5, y + .5, mouthPoly)){ const d = Math.hypot(x - 35, y - 8); put(x, y, d < 1.4 ? '#fff0b0' : d < 2.8 ? '#ffb347' : '#ff5b2e'); }
+    [[33, 7], [35, 6], [37, 6], [33, 9], [35, 10], [37, 11]].forEach(([x, y]) => put(x, y, '#e8e3d6')); // fangs
+    put(30, 4, '#ffe066'); put(31, 4, '#fff6c0'); put(30, 5, '#a0680f');                          // sun-gold eye
+    // glowing rune-veins across the flank
+    [[11, 11], [12, 10], [13, 10], [14, 9], [15, 9], [16, 10], [17, 10], [18, 9], [19, 8], [20, 8], [21, 9], [22, 8], [23, 7], [24, 6]].forEach(([x, y]) => put(x, y, '#7fe3ff'));
+    [[14, 11], [15, 12], [18, 11], [19, 12], [21, 10], [22, 11], [25, 8], [26, 9], [12, 12], [20, 7]].forEach(([x, y]) => put(x, y, '#3a7f9c'));
+    info.eye = [30.5, 4]; info.maw = [35, 8];
+  }
+  g.clearRect(0, 0, W, H); g.putImageData(out, 0, 0);
+  c.info = info;
+  return c;
+}
+// Per-frame effects drawn on top of the sprite. (ox, oy) = top-left of the sprite on the target, sc = pixel size.
+function fenrirFX(g, design, spr, ox, oy, sc, face, t){
+  const W = spr.width, I = spr.info;
+  const X = x => face < 0 ? ox + (W - 1 - x) * sc : ox + x * sc;
+  const px = (x, y, col, a) => { g.globalAlpha = a == null ? 1 : a; g.fillStyle = col; g.fillRect(Math.round(X(x)), Math.round(oy + y * sc), sc, sc); };
+  const glow = (x, y, r, inner, a) => {
+    const cx = X(x) + sc / 2, cy = oy + y * sc + sc / 2, gr = g.createRadialGradient(cx, cy, 0, cx, cy, r * sc);
+    gr.addColorStop(0, inner); gr.addColorStop(1, 'rgba(0,0,0,0)');
+    g.globalAlpha = a; g.fillStyle = gr; g.beginPath(); g.arc(cx, cy, r * sc, 0, 6.283); g.fill();
+  };
+  const prev = g.globalCompositeOperation;
+  if (design === 'A'){
+    g.globalCompositeOperation = 'lighter';
+    glow(I.eye[0], I.eye[1], 4.5, 'rgba(255,40,20,.9)', .55 + .25 * Math.sin(t * 5));
+    g.globalCompositeOperation = prev;
+    for (let x = 7; x <= 27; x += 2){
+      const s = Math.sin(t * 7 + x * 1.9);
+      if (s > .55) px(x, I.top[x] - 1 - (s > .85 ? 1 : 0), s > .85 ? '#ffd27a' : '#ff8a3c', .9);
+    }
+  } else {
+    g.globalCompositeOperation = 'lighter';
+    glow(I.maw[0], I.maw[1], 7, 'rgba(255,160,60,.95)', .55 + .2 * Math.sin(t * 9));
+    glow(I.eye[0], I.eye[1], 3.5, 'rgba(255,224,102,.9)', .6);
+    g.globalCompositeOperation = prev;
+    for (let x = 6; x <= 27; x++){
+      const base = I.top[x]; if (base >= 23) continue;
+      const hgt = 1 + Math.round((Math.sin(t * 10 + x * 1.35) + 1) * 1.4 + (Math.sin(t * 4.3 + x * .7) + 1) * .8);
+      for (let k = 1; k <= hgt; k++) px(x, base - k, k === hgt ? '#c9a6ff' : k > hgt / 2 ? '#7a45c8' : '#3a1a5c', k === hgt ? .85 : 1);
+    }
+    for (let k = 0; k < 6; k++){ // flame tail
+      const y = 7 - k + Math.round(Math.sin(t * 9 + k) * .6), x = 1 - Math.round(k * .5) + Math.round(Math.sin(t * 6 + k * 1.4));
+      px(x, y, k > 3 ? '#c9a6ff' : '#7a45c8', 1 - k * .1);
+    }
+    // runes pulse
+    g.globalAlpha = .25 + .25 * Math.sin(t * 3);
+  }
+  g.globalAlpha = 1; g.globalCompositeOperation = prev;
+}
+const FENRIR_DESIGN = 'A'; // 'A' = Gleipnir-Bound, 'B' = World-Eater
 const SPR = {};
 function buildSprites(){
   const H = (m, extra) => makeSprite(HUM, m, extra);
@@ -538,7 +709,9 @@ function buildSprites(){
   SPR.giant = H({ H:'#e3edf5', h:'#9db7cc', F:'#8fb8d4', E:PAL.C, T:'#e3edf5', A:'#3b5c80', a:'#26405d' });
   SPR.herald = H({ H:'#1b0f20', h:PAL.K, F:PAL.W, E:PAL.O, T:PAL.R, A:'#2a1530', a:PAL.K }, STAFF('#2a1530', PAL.O));
   SPR.wolf = makeSprite(WOLF, { E: '#e8e080' });
-  SPR.fenrir = makeSprite(WOLF, { L:'#3b3b48', l:'#25252f', E:'#ff3b2b' });
+  SPR.fenrir = buildFenrirSprite(FENRIR_DESIGN, 0);
+  SPR.fenrir1 = buildFenrirSprite(FENRIR_DESIGN, 1);
+  SPR.axe = makeSprite(['....SS.', '...SSSs', '....BSs', '...B.s.', '..B....', '.B.....', 'B......'], { S: '#d3d8e2', s: '#7d8494', B: '#8a5a34' });
   SPR.raven = makeSprite(RAVEN, { E: '#d84a3a', Y: '#5a5a66' });
   for (const k of Object.keys(SPR)) { SPR[k + '_f'] = flip(SPR[k]); SPR[k + '_w'] = whiteOf(SPR[k]); SPR[k + '_wf'] = flip(SPR[k + '_w']); }
   for (const k in POWERUPS) SPR['pu_' + k] = makeSprite(GEM, { X: POWERUPS[k].col, w: '#ffffff' });
@@ -572,9 +745,10 @@ function newRun(){
     wave: 1, gold: 5 + meta.gold, level: 1, xp: 0,
     hero: { x: 0, y: 0, hp: 100, maxHp: 100, inv: 0, dashCd: 0, dashT: 0, dx: 0, dy: 1, face: 1, walk: 0 },
     bench: Array(8).fill(null), board: Array(8).fill(null), shop: [],
-    enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [],
+    enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [],
     souls: 0, kills: 0, bosses: 0, waveT: 0, spawnAcc: 0, shake: 0, boss: null, endDelay: 0, sel: null,
-    tr: { cls: {}, mod: {} }, regen: 0, dmgTaken: 1, hurt: 0, time: 0, puT: 8, fury: 0, magnet: 0,
+    tr: { cls: {}, mod: {} }, regen: 0, dmgTaken: 1, hurt: 0, time: 0, puT: 8, fury: 0, magnet: 0, bind: null, eclipse: 0, eclipseMax: 1,
+    endless: false, won: false, midBattle: false, endlessStart: false, shopCd: 0,
   };
   computeTraits();
   S.hero.maxHp = heroMaxHp(); S.hero.hp = S.hero.maxHp;
@@ -733,23 +907,59 @@ function startWave(){
   const ratio = S.hero.hp / S.hero.maxHp; S.hero.maxHp = heroMaxHp(); S.hero.hp = Math.max(1, Math.round(S.hero.maxHp * ratio));
   S.board.forEach(u => { if (u){ u.st = calcStats(u); u.cd = rand(0, .4); u.mana = 0; } });
   S.sel = null;
-  S.waveT = 0; S.spawnAcc = 0; S.endDelay = 0; S.boss = null; S.fury = 0; S.magnet = 0; S.puT = rand(6, 10);
-  const W = WAVES[S.wave - 1];
-  if (W.boss){
-    const a = rand(0, Math.PI * 2);
-    S.boss = spawnEnemy(W.boss, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110);
-    $('#bossName').textContent = ENEMIES[W.boss].name;
+  if (S.midBattle){ // Endless: the battle was only paused while the shop was open
+    S.midBattle = false; S.shopCd = SHOP_CD;
+    setMode('combat'); toast('Back to battle');
+    return;
   }
+  if (S.endlessStart){ S.endlessStart = false; S.shopCd = SHOP_CD; }
+  S.waveT = 0; S.spawnAcc = 0; S.endDelay = 0; S.boss = null; S.fury = 0; S.magnet = 0; S.puT = rand(6, 10);
+  const W = waveDef(S.wave);
+  if (W.boss) spawnBoss(W.boss);
   setMode('combat');
   banner(`Wave ${S.wave} · ${W.name}`, W.d);
   if (moved) toast(`${moved} unit${moved > 1 ? 's' : ''} moved from the bench into formation`);
 }
+function spawnBoss(type){
+  const a = rand(0, Math.PI * 2);
+  S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110);
+  $('#bossName').textContent = ENEMIES[type].name;
+}
+function clearBossFx(){ S.chains = []; S.lunges = []; S.eclipse = 0; S.bind = null; }
+// Endless mode: waves roll straight into the next one, with no shop in between
+function endlessNext(){
+  const W = waveDef(S.wave);
+  const interest = Math.min(5, Math.floor(S.gold / 10));
+  const reward = 5 + interest + (W.boss ? 5 : 0);
+  S.gold += reward; addXp(WAVE_XP);
+  if (W.boss) S.hero.hp = S.hero.maxHp;
+  S.wave++; S.waveT = 0; S.endDelay = 0; S.boss = null;
+  const N = waveDef(S.wave);
+  if (N.boss) spawnBoss(N.boss);
+  banner(`Wave ${S.wave} · ${N.name}`, `+${reward} gold${W.boss ? ' · fully healed' : ''} · ${N.d}`);
+}
+function showVictory(){
+  S.won = true; meta.wins++; saveMeta();
+  $('#vStats').innerHTML = `<dt>Enemies slain</dt><dd>${S.kills}</dd><dt>Bosses slain</dt><dd>${S.bosses}</dd><dt>Best endless wave</dt><dd>${meta.bestEndless ? meta.bestEndless : 'not tried yet'}</dd>`;
+  setMode('victory');
+}
+function enterEndless(){
+  S.endless = true; S.endlessStart = true; S.wave = WAVES.length + 1;
+  S.gold += 10; S.hero.hp = S.hero.maxHp;
+  rollShop(); openShop();
+  banner('Endless mode', 'Prepare your warband. After this, the shop opens only from its button.');
+}
+function openEndlessShop(){
+  if (!S || !S.endless || mode !== 'combat' || paused || S.shopCd > 0) return;
+  S.midBattle = true; S.bind = null;
+  rollShop(); openShop();
+}
 function endWave(){
-  const W = WAVES[S.wave - 1];
+  const W = waveDef(S.wave);
   S.enemies.forEach(e => burst(e.x, e.y, 6, ['#6f9479', '#bfe9ff'], 40));
-  S.enemies = []; S.eprojs = []; S.tele = []; S.pups = [];
+  S.enemies = []; S.eprojs = []; S.tele = []; S.pups = []; clearBossFx();
   S.orbs.forEach(o => gainSouls(o.v)); S.orbs = [];
-  if (S.wave >= WAVES.length) return gameOver(true);
+  if (S.wave >= WAVES.length) return showVictory();
   const interest = Math.min(5, Math.floor(S.gold / 10));
   const reward = 5 + interest + (W.boss ? 5 : 0);
   S.gold += reward;
@@ -760,23 +970,24 @@ function endWave(){
   openShop();
   banner(`Wave ${S.wave - 1} cleared`, `+${reward} gold${interest ? ` (${interest} interest)` : ''}${W.boss ? ' · fully healed' : ''}`);
 }
-function waveRate(){ const W = WAVES[S.wave - 1]; return (0.6 + S.wave * 0.2) * (W.rate || 1) * (W.boss ? .3 : 1); }
+function waveRate(){ const W = waveDef(S.wave); return (0.6 + S.wave * 0.2) * (W.rate || 1) * (W.boss ? (W.endless ? .5 : .3) : 1); }
 function spawnFromWave(){
-  const W = WAVES[S.wave - 1];
+  const W = waveDef(S.wave);
   const type = weighted(W.mix);
   const a = rand(0, Math.PI * 2), d = Math.hypot(VW, VH) / 2 + 24;
   const elite = Math.random() < (W.elite || 0) + 0.015 + S.wave * 0.005;
   spawnEnemy(type, S.hero.x + Math.cos(a) * d, S.hero.y + Math.sin(a) * d, elite);
 }
 function spawnEnemy(type, x, y, elite){
-  const d = ENEMIES[type], W = WAVES[S.wave - 1];
-  const hs = d.boss ? 1 : hpScale(S.wave) * (W.hp || 1);
+  const d = ENEMIES[type], W = waveDef(S.wave);
+  const ek = Math.max(0, S.wave - WAVES.length); // endless waves past Fenrir
+  const hs = d.boss ? (ek ? hpScale(S.wave) / hpScale(BOSS_HOME[type]) * .8 : 1) : hpScale(S.wave) * (W.hp || 1) * 1.06 ** ek;
   const sc = d.scale || 1, spr = SPR[d.spr];
   const e = {
     type, d, x, y, hp: d.hp * hs * (elite ? 4 : 1), spd: d.spd * (W.spd || 1) * rand(.9, 1.1),
-    dmg: d.dmg * (1 + .05 * (S.wave - 1)) * (elite ? 1.5 : 1), r: d.r * (elite ? 1.3 : 1), armor: d.armor, ward: d.ward,
+    dmg: d.dmg * (1 + .05 * (S.wave - 1)) * (1 + .04 * ek) * (elite ? 1.5 : 1), r: d.r * (elite ? 1.3 : 1), armor: d.armor, ward: d.ward,
     spr: d.spr, sc, w: spr.width * sc, h: spr.height * sc, elite, t: rand(0, 6), atkT: rand(1.2, 2.6), flash: 0,
-    burn: 0, burnD: 0, slowT: 0, slow: 0, frz: 0, face: 1, state: 'walk', st: 0, cx: 0, cy: 0, kx: 0, ky: 0,
+    burn: 0, burnD: 0, slowT: 0, slow: 0, frz: 0, stun: 0, combo: 0, face: 1, state: 'walk', st: 0, cx: 0, cy: 0, kx: 0, ky: 0,
   };
   e.max = e.hp;
   S.enemies.push(e);
@@ -852,7 +1063,7 @@ function kill(e){
   const n = e.d.boss ? 12 : 1;
   for (let i = 0; i < n; i++) S.orbs.push({ x: e.x + rand(-6, 6) * (n > 1), y: e.y + rand(-6, 6) * (n > 1), v: Math.ceil(v / n), big: e.elite || e.d.boss, t: 0 });
   if (e.elite) S.gold += 1;
-  if (e.d.boss){ S.bosses++; S.shake = 10; S.endDelay = 1.6; S.boss = null; S.enemies.forEach(o => { if (!o.d.boss && !o.dead){ o.dead = true; burst(o.x, o.y, 5, ['#6f9479', '#bfe9ff'], 40); } }); }
+  if (e.d.boss){ S.bosses++; S.shake = 10; S.endDelay = 1.6; S.boss = null; clearBossFx(); S.enemies.forEach(o => { if (!o.d.boss && !o.dead){ o.dead = true; burst(o.x, o.y, 5, ['#6f9479', '#bfe9ff'], 40); } }); }
 }
 function gainSouls(v){ S.souls += v; while (S.souls >= 10){ S.souls -= 10; S.gold++; } }
 function healHero(n){ const h = S.hero; h.hp = Math.min(h.maxHp, h.hp + n); }
@@ -867,11 +1078,9 @@ function heroDamage(d){
 function attack(u, t){
   const st = u.st, c = u.cls;
   u.anim = .12; u.face = t.x < u.x ? -1 : 1;
-  if (c === 'warrior'){
-    hit(t, st.dmg, 'phys', u);
-    for (const e of S.enemies) if (e !== t && !e.dead && dist2(e.x, e.y, t.x, t.y) < 18 * 18) hit(e, st.dmg * .5, 'phys', u);
-    const a = Math.atan2(t.y - u.y, t.x - u.x);
-    S.rings.push({ x: u.x, y: u.y, a, arc: true, r: 16, life: .14, max: .14, col: MODS[u.mod].col });
+  if (c === 'warrior'){ // a spinning axe that cuts through enemies, then flies back
+    const a = Math.atan2(t.y - u.y, t.x - u.x), sp = 210;
+    S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: st.dmg, dtype: 'phys', u, kind: 'axe', r: 4, life: 2.4, aoe: 0, pierce: 2, hits: new Set(), dist: 0, maxd: st.range + 20, ret: false, spin: 0 });
   } else {
     const a = Math.atan2(t.y - u.y, t.x - u.x);
     const kind = c === 'archer' ? 'arrow' : c === 'mage' ? 'fire' : 'holy';
@@ -882,13 +1091,16 @@ function attack(u, t){
 }
 function ability(u, t){
   const st = u.st;
-  if (u.cls === 'warrior'){
-    for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, u.x, u.y) < 48 * 48){
-      const a = Math.atan2(e.y - u.y, e.x - u.x);
-      hit(e, st.dmg * 2.5, 'phys', u, e.d.boss ? {} : { kx: Math.cos(a) * 26, ky: Math.sin(a) * 26 });
+  if (u.cls === 'warrior'){ // Berserker Leap: jump into the biggest group nearby
+    let best = null, bn = 0;
+    for (const e of S.enemies){
+      if (e.dead || dist2(u.x, u.y, e.x, e.y) > 150 * 150) continue;
+      let n = 0; for (const o of S.enemies) if (!o.dead && dist2(e.x, e.y, o.x, o.y) < 40 * 40) n++;
+      if (n > bn){ bn = n; best = e; }
     }
-    S.rings.push({ x: u.x, y: u.y, r: 48, life: .3, max: .3, col: '#e9e4d8' });
-    burst(u.x, u.y, 16, ['#e9e4d8', MODS[u.mod].col], 90);
+    best = best || t;
+    u.leap = { t: 0, dur: .42, sx: u.x, sy: u.y, tx: best.x, ty: best.y, dmg: st.dmg * 3 };
+    addText(u.x, u.y - 14, 'Berserker Leap', '#ffb7a3', true);
   } else if (u.cls === 'archer'){
     const a0 = Math.atan2(t.y - u.y, t.x - u.x);
     for (let k = -3; k <= 3; k++){ const a = a0 + k * .14; S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * 300, vy: Math.sin(a) * 300, dmg: st.dmg * 1.2, dtype: 'phys', u, kind: 'arrow', r: 2.5, life: 1, aoe: 0, pierce: 2, hits: new Set() }); }
@@ -904,6 +1116,87 @@ function ability(u, t){
     burst(h.x, h.y, 22, ['#fff2b0', '#ffd27a'], 70);
   }
 }
+function leapLand(u, L){
+  for (const e of S.enemies){
+    if (e.dead || dist2(e.x, e.y, u.x, u.y) > (46 + e.r) ** 2) continue;
+    const a = Math.atan2(e.y - u.y, e.x - u.x);
+    if (e.d.boss){ hit(e, L.dmg, 'phys', u); e.stun = Math.max(e.stun, .3); }
+    else { hit(e, L.dmg, 'phys', u, { kx: Math.cos(a) * 30, ky: Math.sin(a) * 30 }); e.stun = Math.max(e.stun, .9); }
+  }
+  S.rings.push({ x: u.x, y: u.y, r: 46, life: .35, max: .35, col: '#ffb7a3' });
+  S.rings.push({ x: u.x, y: u.y, r: 24, life: .25, max: .25, col: MODS[u.mod].col });
+  burst(u.x, u.y, 26, ['#e9e4d8', '#8a7a66', MODS[u.mod].col], 110, false);
+  S.cracks.push({ x: u.x, y: u.y, life: 2.5, max: 2.5, seed: Math.random() * 1000 });
+  S.shake = Math.min(8, S.shake + 4);
+}
+function updateAxe(p, dt){
+  p.life -= dt; p.spin += dt * 20;
+  if (!p.ret){
+    p.x += p.vx * dt; p.y += p.vy * dt; p.dist += Math.hypot(p.vx, p.vy) * dt;
+    if (p.dist >= p.maxd){ p.ret = true; p.hits = new Set(); p.pierce = 2; }
+  } else {
+    const dx = p.u.x - p.x, dy = p.u.y - 3 - p.y, d = Math.hypot(dx, dy) || 1;
+    if (d < 7 || !S.board.includes(p.u)){ p.life = 0; return; }
+    p.x += dx / d * 270 * dt; p.y += dy / d * 270 * dt;
+  }
+  if (p.pierce < 0) return;
+  for (const e of S.enemies){
+    if (e.dead || p.hits.has(e) || dist2(p.x, p.y, e.x, e.y) > (p.r + e.r) ** 2) continue;
+    p.hits.add(e); hit(e, p.dmg * (p.ret ? .7 : 1), 'phys', p.u);
+    if (--p.pierce < 0){ if (!p.ret){ p.ret = true; p.hits = new Set(); p.pierce = 2; } break; }
+  }
+}
+
+/* ================= FENRIR'S NEW ABILITIES ================= */
+// Gleipnir's Snap: chains whip out from Fenrir. A chain that catches the hero binds him and drags him in. Dashing breaks free.
+function startChains(e, p2){
+  const h = S.hero, n = p2 ? 7 : 5, a0 = Math.atan2(h.y - e.y, h.x - e.x);
+  for (let k = 0; k < n; k++) S.chains.push({ e, x: e.x, y: e.y, a: a0 + k * Math.PI * 2 / n, len: 260, t: 0, wind: 1, hold: .45, snapped: false, dmg: e.dmg * 1.1 });
+  e.state = 'cast'; e.st = 1.6;
+  addText(e.x, e.y - e.h / 2 - 8, "Gleipnir's Snap", '#b4bccb', true);
+}
+// Devour the Sun: darkness falls, and shadow wolves lunge at the hero from the dark. Their eyes show where they come from.
+function startDevour(e){
+  if (S.eclipse > 0) return startChains(e, true);
+  S.eclipse = S.eclipseMax = 5.4;
+  e.state = 'cast'; e.st = 1;
+  addText(e.x, e.y - e.h / 2 - 8, 'Devour the Sun', '#ffb347', true);
+  for (let k = 0; k < 4; k++) S.lunges.push({ delay: .9 + k * 1.05, wind: .8, state: 'wait', t: 0, dmg: e.dmg * 1.3 });
+}
+function updateBossFx(dt){
+  const h = S.hero;
+  for (const c of S.chains){
+    c.t += dt;
+    if (!c.snapped && c.t >= c.wind){
+      c.snapped = true; S.shake = Math.min(8, S.shake + 2);
+      const ex = Math.cos(c.a), ey = Math.sin(c.a), rx = h.x - c.x, ry = h.y - c.y;
+      const along = rx * ex + ry * ey, perp = Math.abs(rx * ey - ry * ex);
+      if (along > 0 && along < c.len && perp < 8 && h.dashT <= 0 && h.inv <= 0){
+        heroDamage(c.dmg);
+        if (mode === 'combat'){ S.bind = { t: 1.8, e: c.e }; addText(h.x, h.y - 14, 'Bound! Dash to break free', '#b4bccb', true); }
+      }
+    }
+  }
+  S.chains = S.chains.filter(c => c.t < c.wind + c.hold);
+  for (const L of S.lunges){
+    L.t += dt;
+    if (L.state === 'wait' && L.t >= L.delay){
+      L.state = 'wind'; L.t = 0;
+      const a = rand(0, Math.PI * 2); L.sx = h.x + Math.cos(a) * 150; L.sy = h.y + Math.sin(a) * 110;
+      const dx = h.x - L.sx, dy = h.y - L.sy, dd = Math.hypot(dx, dy) || 1;
+      L.ux = dx / dd; L.uy = dy / dd; L.len = dd + 140;
+    } else if (L.state === 'wind' && L.t >= L.wind){ L.state = 'run'; L.t = 0; L.x = L.sx; L.y = L.sy; }
+    else if (L.state === 'run'){
+      L.x += L.ux * 420 * dt; L.y += L.uy * 420 * dt;
+      if (!L.hitDone && dist2(L.x, L.y, h.x, h.y) < 12 * 12){ L.hitDone = true; heroDamage(L.dmg); }
+      if (Math.random() < .9) S.parts.push({ x: L.x + rand(-4, 4), y: L.y + rand(-3, 3), vx: 0, vy: 0, life: .35, max: .35, col: pick(['#3a1a5c', '#2a1240', '#7a45c8']), s: 2, add: false });
+      if (L.t * 420 >= L.len) L.state = 'done';
+    }
+  }
+  S.lunges = S.lunges.filter(L => L.state !== 'done');
+  if (S.eclipse > 0) S.eclipse = Math.max(0, S.eclipse - dt);
+}
+
 function explode(p){
   const big = p.kind === 'bigfire';
   for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, p.x, p.y) < (p.aoe + e.r) ** 2) hit(e, p.dmg, p.dtype, p.u, { burn: p.burn });
@@ -934,19 +1227,33 @@ function update(dt){
   const ml = Math.hypot(mx, my); if (ml){ mx /= ml; my /= ml; h.dx = mx; h.dy = my; if (mx) h.face = mx < 0 ? -1 : 1; h.walk += dt; }
   h.dashCd = Math.max(0, h.dashCd - dt); h.inv = Math.max(0, h.inv - dt);
   if (h.dashT > 0){ h.dashT -= dt; h.x += h.dx * 270 * dt; h.y += h.dy * 270 * dt; if (Math.random() < .8) S.parts.push({ x: h.x, y: h.y, vx: 0, vy: 0, life: .25, max: .25, col: '#86d4ff', s: 2, add: true }); }
-  else { h.x += mx * 78 * dt; h.y += my * 78 * dt; }
+  else {
+    let spd = 78;
+    if (S.bind){
+      const b = S.bind.e; S.bind.t -= dt;
+      if (S.bind.t <= 0 || !b || b.dead) S.bind = null;
+      else { spd *= .45; const bx = b.x - h.x, by = b.y - h.y, bd = Math.hypot(bx, by) || 1; if (bd > 30){ h.x += bx / bd * 55 * dt; h.y += by / bd * 55 * dt; } }
+    }
+    h.x += mx * spd * dt; h.y += my * spd * dt;
+  }
   if (S.regen) healHero(S.regen * dt);
   S.hurt = Math.max(0, S.hurt - dt);
   S.fury = Math.max(0, S.fury - dt); S.magnet = Math.max(0, S.magnet - dt);
 
   // wave timing & spawns
-  const W = WAVES[S.wave - 1];
+  const W = waveDef(S.wave);
   S.waveT += dt;
-  if (S.endDelay > 0){ S.endDelay -= dt; if (S.endDelay <= 0) return endWave(); }
-  else if (!W.boss && S.waveT >= WAVE_DUR) return endWave();
+  if (S.endless) S.shopCd = Math.max(0, S.shopCd - dt);
+  // a returning boss enrages after 75 seconds so no fight can stall forever
+  if (S.endless && S.boss && !S.boss.dead && !S.boss.enraged && S.waveT > 75){
+    const b = S.boss; b.enraged = true; b.dmg *= 1.5; b.spd *= 1.3; b.armor *= .6; b.ward *= .6;
+    addText(b.x, b.y - b.h / 2 - 8, 'Enraged!', '#ff3b2b', true); S.shake = Math.min(8, S.shake + 4);
+  }
+  if (S.endDelay > 0){ S.endDelay -= dt; if (S.endDelay <= 0) return S.endless ? endlessNext() : endWave(); }
+  else if (!W.boss && S.waveT >= WAVE_DUR) return S.endless ? endlessNext() : endWave();
   if (S.endDelay <= 0 && (W.boss || S.waveT < WAVE_DUR - 1.5)){
     S.spawnAcc += waveRate() * dt * (1 + S.waveT / WAVE_DUR * .5);
-    const cap = W.boss ? 40 : 340;
+    const cap = W.boss ? (W.endless ? 120 : 40) : 340;
     while (S.spawnAcc >= 1){ S.spawnAcc--; if (S.enemies.length < cap) spawnFromWave(); }
   }
 
@@ -964,10 +1271,18 @@ function update(dt){
   S.board.forEach((u, i) => {
     if (!u || i >= slotCount()) return;
     const o = SLOT_OFF[i], tx = h.x + o.x, ty = h.y + o.y, k = Math.min(1, dt * 9);
-    u.x += (tx - u.x) * k; u.y += (ty - u.y) * k; u.anim = Math.max(0, u.anim - dt);
+    if (u.leap){
+      const L = u.leap; L.t += dt; const q = Math.min(1, L.t / L.dur);
+      u.x = L.sx + (L.tx - L.sx) * q; u.y = L.sy + (L.ty - L.sy) * q; u.hz = Math.sin(q * Math.PI) * 28;
+      if (q >= 1){ u.leap = null; u.hz = 0; u.hold = .35; leapLand(u, L); }
+      return;
+    }
+    if (u.hold > 0) u.hold -= dt;
+    else { u.x += (tx - u.x) * k; u.y += (ty - u.y) * k; }
+    u.anim = Math.max(0, u.anim - dt);
     u.cd -= dt * furyM; if (u.cd > 0) return;
     let t = null;
-    if (u.cls !== 'warrior' && S.boss && !S.boss.dead && dist2(u.x, u.y, S.boss.x, S.boss.y) < (u.st.range + S.boss.r) ** 2) t = S.boss;
+    if (S.boss && !S.boss.dead && dist2(u.x, u.y, S.boss.x, S.boss.y) < (u.st.range + S.boss.r) ** 2) t = S.boss;
     if (!t) t = nearest(u.x, u.y, u.st.range);
     if (!t){ u.cd = .08; return; }
     u.cd = 1 / u.st.as;
@@ -978,6 +1293,7 @@ function update(dt){
 
   // projectiles
   for (const p of S.projs){
+    if (p.kind === 'axe'){ updateAxe(p, dt); continue; }
     p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt;
     if (p.kind === 'fire' || p.kind === 'bigfire'){
       const n = p.kind === 'bigfire' ? 4 : 1;
@@ -1004,6 +1320,7 @@ function update(dt){
     if (e.burn > 0){ e.burn -= dt; e.hp -= e.burnD * dt; if (Math.random() < .25) S.parts.push({ x: e.x + rand(-3, 3), y: e.y - rand(0, e.h / 2), vx: 0, vy: -20, life: .35, max: .35, col: pick(['#ff5b2e', '#ffb05a']), s: 1, add: true }); if (e.hp <= 0){ kill(e); continue; } }
     if (e.slowT > 0) e.slowT -= dt;
     if (e.frz > 0){ e.frz -= dt; continue; }
+    if (e.stun > 0){ e.stun -= dt; continue; }
     const sp = e.spd * (e.slowT > 0 ? 1 - e.slow : 1);
     const dx = h.x - e.x, dy = h.y - e.y, d = Math.hypot(dx, dy) || 1;
     if (e.d.boss) bossAI(e, dt, dx, dy, d, sp);
@@ -1046,6 +1363,7 @@ function update(dt){
     }
   }
   S.tele = S.tele.filter(t => !t.done);
+  updateBossFx(dt);
   // orbs
   for (const o of S.orbs){
     o.t += dt;
@@ -1080,7 +1398,15 @@ function bossAI(e, dt, dx, dy, d, sp){
   } else if (e.d.boss === 'fenrir'){
     if (e.state === 'walk'){
       e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
-      if (e.atkT <= 0){ e.state = 'wind'; e.st = phase2 ? .6 : .85; e.cx = dx / d; e.cy = dy / d; }
+      if (e.atkT <= 0){
+        const seq = phase2 ? ['charge', 'chains', 'charge', 'devour'] : ['charge', 'chains', 'charge'];
+        const next = seq[e.combo++ % seq.length];
+        if (next === 'chains') startChains(e, phase2);
+        else if (next === 'devour') startDevour(e);
+        else { e.state = 'wind'; e.st = phase2 ? .6 : .85; e.cx = dx / d; e.cy = dy / d; }
+      }
+    } else if (e.state === 'cast'){
+      e.st -= dt; if (e.st <= 0){ e.state = 'walk'; e.atkT = phase2 ? 2.2 : 3.2; }
     } else if (e.state === 'wind'){
       e.st -= dt; if (e.st <= 0){ e.state = 'charge'; e.st = .55; }
     } else if (e.state === 'charge'){
@@ -1138,7 +1464,7 @@ function drawSprite(name, x, y, sc, face, white){
 function shadow(x, y, w){ ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), w, w * .35, 0, 0, 6.283); ctx.fill(); }
 
 function render(dt){
-  const st = S || { hero: { x: 0, y: 0, face: 1, walk: 0 }, board: [], enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], shake: 0, hurt: 0, time: performance.now() / 1000 };
+  const st = S || { hero: { x: 0, y: 0, face: 1, walk: 0 }, board: [], enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], eclipse: 0, eclipseMax: 1, shake: 0, hurt: 0, time: performance.now() / 1000 };
   const h = st.hero;
   let sx = 0, sy = 0;
   if (st.shake > 0){ sx = rand(-st.shake, st.shake); sy = rand(-st.shake, st.shake); st.shake = Math.max(0, st.shake - dt * 30); }
@@ -1167,6 +1493,30 @@ function render(dt){
     ctx.strokeStyle = 'rgba(191,233,255,.7)'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.arc(t.x, t.y, t.r, 0, 6.283); ctx.stroke();
     ctx.fillStyle = `rgba(134,212,255,${.08 + k * .22})`; ctx.beginPath(); ctx.arc(t.x, t.y, t.r * k, 0, 6.283); ctx.fill();
+  }
+  // ground cracks left by Berserker Leap
+  for (const c of st.cracks){
+    c.life -= dt; ctx.globalAlpha = clamp(c.life / c.max, 0, 1) * .8; ctx.strokeStyle = '#05060a'; ctx.lineWidth = 1;
+    for (let k = 0; k < 6; k++){
+      let a = c.seed + k * 1.05, x = c.x, y = c.y; ctx.beginPath(); ctx.moveTo(Math.round(x), Math.round(y));
+      for (let j = 0; j < 3; j++){ a += Math.sin(c.seed * (j + 2) + k) * .5; x += Math.cos(a) * 6; y += Math.sin(a) * 4; ctx.lineTo(Math.round(x), Math.round(y)); }
+      ctx.stroke();
+    }
+  }
+  ctx.globalAlpha = 1;
+  st.cracks = st.cracks.filter(c => c.life > 0);
+  // Gleipnir's chains: dashed warning first, then solid links when they snap
+  for (const c of st.chains){
+    const ex = Math.cos(c.a), ey = Math.sin(c.a);
+    if (!c.snapped){
+      const k = c.t / c.wind;
+      ctx.strokeStyle = `rgba(255,59,43,${.25 + .5 * k})`; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(c.x, c.y); ctx.lineTo(c.x + ex * c.len * Math.min(1, k * 1.5), c.y + ey * c.len * Math.min(1, k * 1.5)); ctx.stroke(); ctx.setLineDash([]);
+    } else {
+      ctx.globalAlpha = clamp(1 - (c.t - c.wind) / c.hold, 0, 1);
+      for (let d = 12; d < c.len; d += 4){ ctx.fillStyle = (d / 4) % 2 ? '#b4bccb' : '#5d6372'; ctx.fillRect(Math.round(c.x + ex * d) - 1, Math.round(c.y + ey * d) - 1, 2, 2); }
+      ctx.globalAlpha = 1;
+    }
   }
   // power-ups: light pillar + gem
   for (const p of st.pups){
@@ -1198,21 +1548,26 @@ function render(dt){
       const e = o.e;
       shadow(e.x, e.y + e.h / 2 - 1, e.w * .35);
       if (e.elite){ ctx.fillStyle = 'rgba(226,178,76,.25)'; ctx.beginPath(); ctx.arc(e.x, e.y, e.r + 4, 0, 6.283); ctx.fill(); }
+      if (e.enraged){ ctx.fillStyle = `rgba(255,59,43,${.18 + .1 * Math.sin(st.time * 8)})`; ctx.beginPath(); ctx.arc(e.x, e.y, e.r + 8, 0, 6.283); ctx.fill(); }
       if (e.d.boss === 'fenrir' && e.state === 'wind'){
         ctx.strokeStyle = 'rgba(255,59,43,.55)'; ctx.lineWidth = e.r * 1.2; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.cx * 160, e.y + e.cy * 160); ctx.stroke();
       }
-      const bob = e.frz > 0 ? 0 : e.d.fly ? Math.sin(e.t * 8) * 2 - 4 : Math.abs(Math.sin(e.t * 7)) * -1;
-      drawSprite(e.spr, e.x, e.y + bob, e.sc, e.face, e.flash > 0);
+      const bob = e.frz > 0 || e.stun > 0 ? 0 : e.d.fly ? Math.sin(e.t * 8) * 2 - 4 : Math.abs(Math.sin(e.t * 7)) * -1;
+      const isF = e.d.boss === 'fenrir', sname = isF && e.state !== 'cast' && Math.floor(e.t * 6) % 2 ? 'fenrir1' : e.spr;
+      drawSprite(sname, e.x, e.y + bob, e.sc, e.face, e.flash > 0);
+      if (isF && e.flash <= 0){ const sp = SPR[sname]; fenrirFX(ctx, FENRIR_DESIGN, sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
       if (e.frz > 0){ ctx.globalAlpha = .55; drawSprite(e.spr, e.x, e.y + bob, e.sc, e.face, true); ctx.globalAlpha = 1; }
+      if (e.stun > 0){ ctx.fillStyle = '#ffe066'; for (let k = 0; k < 3; k++){ const a = st.time * 8 + k * 2.09; ctx.fillRect(Math.round(e.x + Math.cos(a) * 5), Math.round(e.y - e.h / 2 - 3 + Math.sin(a) * 1.5), 1, 1); } }
       if (e.slowT > 0){ ctx.fillStyle = 'rgba(134,212,255,.35)'; ctx.fillRect(Math.round(e.x - e.w / 2), Math.round(e.y + e.h / 2 - 2), e.w, 2); }
       if (e.elite && !e.d.boss){ ctx.fillStyle = '#000'; ctx.fillRect(Math.round(e.x - 7), Math.round(e.y - e.h / 2 - 5), 14, 2); ctx.fillStyle = '#e2b24c'; ctx.fillRect(Math.round(e.x - 7), Math.round(e.y - e.h / 2 - 5), Math.max(0, 14 * e.hp / e.max), 2); }
     } else if (o.u){
       const u = o.u, col = MODS[u.mod].col;
       ctx.globalAlpha = .35; ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(Math.round(u.x), Math.round(u.y + 6), 6, 2, 0, 0, 6.283); ctx.fill(); ctx.globalAlpha = 1;
       const lunge = u.anim > 0 ? u.face : 0;
-      drawSprite(u.cls, u.x + lunge, u.y + Math.sin(st.time * 5 + u.id) * .6, 1, u.face);
+      const hz = u.hz || 0;
+      drawSprite(u.cls, u.x + lunge, u.y + Math.sin(st.time * 5 + u.id) * .6 - hz, 1, u.face);
       ctx.fillStyle = '#e2b24c';
-      for (let s = 0; s < u.star; s++) ctx.fillRect(Math.round(u.x) - u.star + s * 2, Math.round(u.y) - 9, 1, 1);
+      for (let s = 0; s < u.star; s++) ctx.fillRect(Math.round(u.x) - u.star + s * 2, Math.round(u.y - hz) - 9, 1, 1);
       if (u.st && mode === 'combat'){ ctx.fillStyle = '#10131b'; ctx.fillRect(Math.round(u.x) - 5, Math.round(u.y) + 8, 10, 1); ctx.fillStyle = '#86d4ff'; ctx.fillRect(Math.round(u.x) - 5, Math.round(u.y) + 8, Math.round(10 * u.mana / 100), 1); }
     } else {
       shadow(h.x, h.y + 6, 5);
@@ -1222,9 +1577,17 @@ function render(dt){
     }
   }
 
+  // the chain binding the hero to Fenrir
+  if (S && S.bind && S.bind.e){
+    const b = S.bind.e, dx = b.x - h.x, dy = b.y - h.y, dd = Math.hypot(dx, dy) || 1;
+    for (let d = 4; d < dd - 10; d += 4){ ctx.fillStyle = (d / 4) % 2 ? '#b4bccb' : '#5d6372'; ctx.fillRect(Math.round(h.x + dx / dd * d) - 1, Math.round(h.y + dy / dd * d) - 1, 2, 2); }
+  }
   // projectiles
   for (const p of st.projs){
-    if (p.kind === 'arrow'){
+    if (p.kind === 'axe'){
+      ctx.save(); ctx.translate(Math.round(p.x), Math.round(p.y)); ctx.rotate(p.spin); ctx.drawImage(SPR.axe, -3.5, -3.5); ctx.restore();
+      ctx.fillStyle = MODS[p.u.mod].col; ctx.globalAlpha = .6; ctx.fillRect(Math.round(p.x - p.vx * .02), Math.round(p.y - p.vy * .02), 1, 1); ctx.globalAlpha = 1;
+    } else if (p.kind === 'arrow'){
       const l = Math.hypot(p.vx, p.vy); const ux = p.vx / l, uy = p.vy / l;
       ctx.strokeStyle = '#d9cfb3'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x - ux * 6, p.y - uy * 6); ctx.lineTo(p.x, p.y); ctx.stroke();
       ctx.fillStyle = MODS[p.u.mod].col; ctx.fillRect(Math.round(p.x), Math.round(p.y), 1, 1);
@@ -1301,6 +1664,28 @@ function render(dt){
   g.addColorStop(0, 'rgba(5,6,10,0)'); g.addColorStop(1, 'rgba(5,6,10,.7)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
   if (st.hurt > 0){ ctx.fillStyle = `rgba(196,33,63,${st.hurt * .9})`; ctx.fillRect(0, 0, VW, VH); }
+  // Devour the Sun: darkness with a small circle of light around the hero; the shadow wolves' eyes show where they will strike
+  if (st.eclipse > 0){
+    const k = Math.min(1, (st.eclipseMax - st.eclipse) / .6, st.eclipse / .6);
+    const gr = ctx.createRadialGradient(hx, hy, 24, hx, hy, 80);
+    gr.addColorStop(0, 'rgba(3,2,7,0)'); gr.addColorStop(1, `rgba(3,2,7,${.95 * k})`);
+    ctx.fillStyle = gr; ctx.fillRect(0, 0, VW, VH);
+    const sx = Math.round(VW * .2), sy = 56, sr = 13; // the swallowed sun
+    ctx.globalAlpha = k; ctx.fillStyle = '#05030a'; ctx.beginPath(); ctx.arc(sx, sy, sr, 0, 6.283); ctx.fill();
+    ctx.strokeStyle = '#ff8a3c'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(sx, sy, sr, 0, 6.283); ctx.stroke(); ctx.globalAlpha = 1;
+    for (const L of st.lunges){
+      if (L.state === 'wind'){
+        const ex = L.sx - camX, ey = L.sy - camY, a = Math.min(1, L.t / L.wind);
+        ctx.strokeStyle = `rgba(255,42,26,${.15 + .45 * a})`; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
+        ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex + L.ux * L.len, ey + L.uy * L.len); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = '#ff2a1a'; ctx.fillRect(Math.round(ex - 3), Math.round(ey), 2, 1); ctx.fillRect(Math.round(ex + 2), Math.round(ey), 2, 1);
+      } else if (L.state === 'run'){
+        const ex = L.x - camX, ey = L.y - camY;
+        ctx.globalAlpha = .9; ctx.drawImage(L.ux < 0 ? SPR.wolf_f : SPR.wolf, Math.round(ex - 12), Math.round(ey - 7), 24, 14); ctx.globalAlpha = 1;
+        ctx.fillStyle = '#ff2a1a'; ctx.fillRect(Math.round(ex + (L.ux < 0 ? -9 : 7)), Math.round(ey - 4), 2, 1);
+      }
+    }
+  }
   ctx.fillStyle = 'rgba(210,222,236,.35)';
   for (const f of flakes){
     f.y += f.v * dt / VH; f.x += Math.sin(performance.now() / 1500 + f.v) * dt * .004;
@@ -1370,6 +1755,8 @@ function setMode(m){
   $('#title').hidden = m !== 'title';
   $('#meta').hidden = m !== 'meta';
   $('#over').hidden = m !== 'over';
+  $('#victory').hidden = m !== 'victory';
+  $('#btnShopOpen').hidden = !(m === 'combat' && S && S.endless);
   $('#bossbar').hidden = true;
   if (m !== 'combat'){ paused = false; $('#pause').hidden = true; }
   if (m === 'title') renderTitle();
@@ -1412,9 +1799,9 @@ function renderShop(){
   $('#healCost').textContent = healCost();
   $('#btnHeal').disabled = S.gold < healCost() || S.hero.hp >= S.hero.maxHp;
   $('#btnSort').disabled = !S.bench.some(Boolean);
-  $('#btnStart').innerHTML = `Start wave ${S.wave} <kbd>Space</kbd>`;
-  const W = WAVES[S.wave - 1];
-  $('#nextTxt').innerHTML = `Next: <b>Wave ${S.wave}/20 · ${W.name}</b>. ${W.d}`;
+  $('#btnStart').innerHTML = `${S.midBattle ? 'Return to battle' : S.endless ? `Begin endless · wave ${S.wave}` : `Start wave ${S.wave}`} <kbd>Space</kbd>`;
+  const W = waveDef(S.wave);
+  $('#nextTxt').innerHTML = S.endless ? `<b>Endless · wave ${S.wave} · ${W.name}</b>. ${W.d} The shop opens again after 3 minutes of battle.` : `Next: <b>Wave ${S.wave}/20 · ${W.name}</b>. ${W.d}`;
   // upgrade bookkeeping
   const counts = {};
   allUnits().forEach(u => { counts[gkey(u)] = (counts[gkey(u)] || 0) + 1; });
@@ -1506,6 +1893,9 @@ shopEl.addEventListener('dragend', () => { if (drag){ drag = null; renderShop();
 
 $('#btnTips').onclick = e => { toggleTips(); e.currentTarget.blur(); }; syncTipsBtn();
 $('#btnHeal').onclick = buyHeal;
+$('#btnShopOpen').onclick = e => { openEndlessShop(); e.currentTarget.blur(); };
+$('#btnEndless').onclick = enterEndless;
+$('#btnClaim').onclick = () => gameOver(true);
 $('#btnXp').onclick = buyXp; $('#btnRoll').onclick = reroll; $('#btnSell').onclick = sellSel; $('#btnStart').onclick = startWave; $('#btnSort').onclick = sortBench;
 $('#btnNew').onclick = newRun; $('#btnMetaGo').onclick = newRun; $('#btnAgain').onclick = newRun;
 $('#btnMeta').onclick = () => setMode('meta'); $('#btnOverMeta').onclick = () => setMode('meta');
@@ -1514,7 +1904,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () =
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.4';
+const VERSION = '0.5';
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
 const FEEDBACK_REPO = (() => {
@@ -1584,7 +1974,7 @@ $('#btnFbPause').onclick = () => openFeedback('pause');
 
 function renderTitle(){
   $('#tRunes').textContent = meta.runes;
-  $('#bestTxt').textContent = meta.runs ? `Best result: wave ${meta.best} of 20${meta.wins ? ` · ${meta.wins} win${meta.wins > 1 ? 's' : ''}` : ''}. Requires a keyboard.` : 'Requires a keyboard. Made for desktop browsers.';
+  $('#bestTxt').textContent = meta.runs ? `Best result: wave ${meta.best} of 20${meta.wins ? ` · ${meta.wins} win${meta.wins > 1 ? 's' : ''}` : ''}${meta.bestEndless ? ` · endless wave ${meta.bestEndless}` : ''}. Requires a keyboard.` : 'Requires a keyboard. Made for desktop browsers.';
 }
 function renderMeta(){
   $('#mRunes').textContent = meta.runes;
@@ -1603,15 +1993,17 @@ $('#ups').addEventListener('click', e => {
 });
 
 function gameOver(win, quit){
-  lastRun = runSummary(win ? 'Won the raid' : quit ? `Gave up on wave ${S.wave}` : `Fell on wave ${S.wave}`);
-  const cleared = win ? 20 : S.wave - 1;
-  const runes = cleared + S.bosses * 3 + (win ? 15 : 0);
-  meta.runes += runes; meta.best = Math.max(meta.best, win ? 20 : S.wave); if (win) meta.wins++;
+  const won = win || S.won, ew = S.endless ? Math.max(0, S.wave - WAVES.length - 1) : 0;
+  lastRun = runSummary(S.endless ? `Endless, ${quit ? 'left' : 'fell'} on wave ${S.wave}` : win ? 'Won the raid' : quit ? `Gave up on wave ${S.wave}` : `Fell on wave ${S.wave}`);
+  const cleared = won ? 20 : S.wave - 1;
+  const runes = cleared + S.bosses * 3 + (won ? 15 : 0) + ew * 2;
+  meta.runes += runes; meta.best = Math.max(meta.best, won ? 20 : S.wave);
+  if (S.endless) meta.bestEndless = Math.max(meta.bestEndless || 0, S.wave);
   saveMeta();
-  $('#oEye').textContent = win ? 'Victory' : quit ? 'Raid abandoned' : 'The raid is over';
-  $('#oTitle').textContent = win ? 'Fenrir has fallen' : `You fell on wave ${S.wave}`;
-  $('#oText').textContent = win ? 'The valkyries carry your warband to Valhalla. Your runes await in the forge.' : 'The runes from this raid are yours. Spend them in the forge and try again.';
-  $('#oStats').innerHTML = `<dt>Waves cleared</dt><dd>${cleared} of 20</dd><dt>Enemies slain</dt><dd>${S.kills}</dd><dt>Bosses slain</dt><dd>${S.bosses}</dd><dt>Runes earned</dt><dd class="runes">+${runes}</dd>`;
+  $('#oEye').textContent = S.endless ? 'Endless mode' : win ? 'Victory' : quit ? 'Raid abandoned' : 'The raid is over';
+  $('#oTitle').textContent = S.endless ? (quit ? `You left on wave ${S.wave}` : `The endless night took you on wave ${S.wave}`) : win ? 'Fenrir has fallen' : `You fell on wave ${S.wave}`;
+  $('#oText').textContent = S.endless ? `You survived ${ew} endless wave${ew === 1 ? '' : 's'} after Fenrir. Your best is wave ${meta.bestEndless}.` : win ? 'The valkyries carry your warband to Valhalla. Your runes await in the forge.' : 'The runes from this raid are yours. Spend them in the forge and try again.';
+  $('#oStats').innerHTML = `<dt>Waves cleared</dt><dd>${S.endless ? `20 + ${ew} endless` : `${cleared} of 20`}</dd><dt>Enemies slain</dt><dd>${S.kills}</dd><dt>Bosses slain</dt><dd>${S.bosses}</dd><dt>Runes earned</dt><dd class="runes">+${runes}</dd>`;
   setMode('over');
 }
 function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; }
@@ -1622,9 +2014,10 @@ addEventListener('keydown', e => {
   keys[e.code] = true;
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (mode === 'combat' || mode === 'shop')) e.preventDefault();
   if (mode === 'combat'){
-    if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCd <= 0){ h.dashT = .16; h.dashCd = 2.5; } }
+    if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCd <= 0){ h.dashT = .16; h.dashCd = 2.5; if (S.bind){ S.bind = null; addText(h.x, h.y - 14, 'Broke free!', '#b4bccb', true); } } }
     if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
     if (e.code === 'KeyT' && !e.repeat) toggleTips();
+    if (e.code === 'KeyB' && !e.repeat) openEndlessShop();
   } else if (mode === 'shop' && !e.repeat && performance.now() >= shopReadyAt){
     if (e.code === 'Space') startWave();
     else if (e.code === 'KeyR') reroll();
@@ -1644,7 +2037,7 @@ function updateHud(dt){
   if (mode !== 'combat') return;
   miniAcc += dt; if (miniAcc >= 1 / 20){ miniAcc = 0; drawMinimap(); }
   hudAcc += dt; if (hudAcc < .1) return; hudAcc = 0;
-  const h = S.hero, W = WAVES[S.wave - 1];
+  const h = S.hero, W = waveDef(S.wave);
   $('#hpTxt').textContent = `${Math.ceil(h.hp)}/${h.maxHp}`;
   $('#hpBar').style.width = (h.hp / h.maxHp * 100) + '%';
   $('#dashTxt').textContent = h.dashCd > 0 ? `Dash in ${h.dashCd.toFixed(1)} s` : 'Dash ready · Space';
@@ -1653,7 +2046,15 @@ function updateHud(dt){
   if (S.fury > 0) buffs.push(`Fury ${Math.ceil(S.fury)} s`);
   if (S.magnet > 0) buffs.push("Huginn's Call");
   $('#buffTxt').hidden = !buffs.length; $('#buffTxt').textContent = buffs.join(' · ');
-  $('#waveTxt').textContent = `Wave ${S.wave}/20 · ${W.name}`;
+  $('#waveTxt').textContent = S.endless ? `Endless · wave ${S.wave} · ${W.name}` : `Wave ${S.wave}/20 · ${W.name}`;
+  const sb = $('#btnShopOpen');
+  sb.hidden = !S.endless;
+  if (S.endless){
+    const ready = S.shopCd <= 0, m = Math.floor(S.shopCd / 60), sec = Math.ceil(S.shopCd % 60);
+    sb.disabled = !ready;
+    $('#shopOpenSub').textContent = ready ? 'Ready · press B' : `Ready in ${sec === 60 ? m + 1 : m}:${String(sec === 60 ? 0 : sec).padStart(2, '0')}`;
+    sb.style.setProperty('--p', ((1 - S.shopCd / SHOP_CD) * 100) + '%');
+  }
   if (W.boss) $('#timeTxt').textContent = S.boss ? 'Boss' : 'Slain';
   else { const r = Math.max(0, Math.ceil(WAVE_DUR - S.waveT)); $('#timeTxt').textContent = `0:${String(r).padStart(2, '0')}`; }
   $('#goldTxt').textContent = S.gold;
@@ -1667,7 +2068,7 @@ function updateHud(dt){
 let last = performance.now(), acc = 0;
 const STEP = 1 / 60;
 function frame(now){
-  const dt = Math.min(.05, (now - last) / 1000); last = now;
+  const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
   if (mode === 'combat' && !paused){ acc += dt; let n = 0; while (acc >= STEP && n < 4){ update(STEP); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= 4) acc = 0; }
   render(mode === 'combat' && paused ? 0 : dt);
   updateTips();
@@ -1678,7 +2079,7 @@ setMode('title');
 requestAnimationFrame(frame);
 
 // small hook for automated playtesting
-window.VALHALLA = { get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap };
+window.VALHALLA = { get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss };
 })();
 </script>
 

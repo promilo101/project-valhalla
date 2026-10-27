@@ -25,12 +25,16 @@ Use **Send feedback** in the game (title screen, pause menu or after a raid). It
 | E | Sell the selected unit |
 | Q | Sort the bench |
 | G | Heal 30% of the hero's health (10 gold) |
+| B | Open the shop in Endless mode (once every 3 minutes) |
 
 Drag units between the bench and the formation, or right-click a unit to send it across. Drop a unit on the Sell button to sell it.
 
-## Prototype 0.4
+## Prototype 0.5
 
 - 20 waves in about 15 minutes, with mini-bosses on waves 5, 10 and 15 and Fenrir on wave 20
+- Endless mode after Fenrir: waves that keep getting harder, returning bosses every 5 waves that enrage after 75 seconds, and a shop you open yourself at most once every 3 minutes
+- Fenrir reworked: new sprite, Gleipnir's Snap (chains that bind and pull) and Devour the Sun (an eclipse with shadow-wolf lunges)
+- Warrior throws returning axes and has a new ability, Berserker Leap
 - 4 classes: Warrior and Archer (physical), Mage and Priest (magic)
 - 6 card modifiers: Iron, Frost, Fire, Blood, Lightning and Rune
 - Class synergies (2/4) and modifier synergies (2/3)
