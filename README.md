@@ -35,6 +35,7 @@ Drag units between the bench and the formation, or right-click a unit to send it
 - Endless mode after Fenrir: waves that keep getting harder, returning bosses every 5 waves that enrage after 75 seconds, and a shop you open yourself at most once every 2 minutes
 - Fenrir reworked: new sprite, Gleipnir's Snap (chains that bind and pull) and Devour the Sun (an eclipse with shadow-wolf lunges)
 - Warrior throws returning axes and has a new ability, Berserker Leap
+- Mini-boss rework: new sprites (two looks each) and new abilities: Draugr Jarl (Axe Hurl, Barrow Rise), Frost Giant (Glacier Hurl, Fimbulwinter Breath), Herald of Hel (Half-Death, Soul Wisps)
 - Fenrir is the World-Eater on wave 20 and returns Gleipnir-Bound in Endless mode
 - Dash charges: 1 of 3 slots unlocked at the start, the Sleipnir's Stride power-up unlocks more, and the Sleipnir's Hooves rune raises the cap to 5
 - 4 classes: Warrior and Archer (physical), Mage and Priest (magic)
