@@ -107,6 +107,14 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .pu-tip i{display:block;height:2px;margin:3px -5px 0;background:rgba(255,255,255,.12);position:relative}
 .pu-tip i::after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w,100%);background:var(--c)}
 .pu-tip b{display:block;font-weight:400;color:var(--c);font-size:19px;margin-bottom:1px}
+#count{position:absolute;left:0;right:0;top:26%;text-align:center;pointer-events:none;padding:0 16px}
+#count .cn{font-family:var(--font-display);font-weight:700;font-size:clamp(64px,10vw,120px);line-height:1;color:var(--ember);text-shadow:0 4px 0 #3a0e06,0 0 28px rgba(255,91,46,.45)}
+#count .cn.word{font-size:clamp(40px,6vw,64px);color:var(--gold);text-shadow:0 3px 0 #3a2a06,0 0 22px rgba(226,178,76,.4)}
+#count .ct{font-size:22px;color:#c9cfdb;text-shadow:0 2px 0 #000;margin-top:4px}
+#count .ct kbd{font-size:20px}
+#count.pop .cn{animation:countPop .9s ease-out}
+@keyframes countPop{0%{transform:scale(1.5);opacity:0}15%{transform:scale(1);opacity:1}80%{opacity:1}100%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){#count.pop .cn{animation:none}}
 #toast{position:absolute;left:50%;top:46%;transform:translateX(-50%);background:rgba(11,13,19,.92);border:1px solid var(--line);padding:6px 14px;font-size:21px;pointer-events:none;white-space:nowrap;max-width:calc(100% - 32px);overflow:hidden;text-overflow:ellipsis}
 
 /* ---------- shop ---------- */
@@ -132,6 +140,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .card-wrap.locked .lock{color:#0d1018;background:var(--frost);border-color:var(--frost)}
 .card-wrap.locked .card{border-style:dashed;border-color:var(--frost);box-shadow:inset 0 0 0 1px rgba(134,212,255,.25)}
 .card img{width:40px;height:48px}
+.card img.mi{width:16px;height:16px;vertical-align:-3px}
 .card .cn{font-size:19px}
 .card .mn{font-size:18px}
 .card .cost{font-size:18px;color:var(--gold)}
@@ -143,6 +152,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .slot{cursor:pointer;aspect-ratio:1;max-width:100%;background:#10131b;border:1px dashed #333b50;display:grid;place-items:center;position:relative;padding:0;border-radius:2px}
 .slot img{width:70%;height:auto;pointer-events:none}
 .slot:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
+.slot.has{background:linear-gradient(to top, color-mix(in srgb, var(--mod) 30%, #10131b), #10131b 75%)}
 .slot.has{border-style:solid;border-color:var(--mod,#555);cursor:grab}
 .slot.sel{outline:2px solid var(--frost);outline-offset:1px;background:#1a2333}
 .slot.over{outline:2px dashed var(--frost);outline-offset:1px;background:#18202e}
@@ -166,6 +176,9 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .next{font-size:19px;color:#c9cfdb;margin:10px 0 0}
 .next b{font-weight:400;color:#ffb7a3}
 .gem{display:inline-block;width:8px;height:8px;transform:rotate(45deg);margin-right:5px;vertical-align:1px}
+.mi{display:inline-block;width:14px;height:14px;image-rendering:pixelated;image-rendering:crisp-edges;vertical-align:-2px;margin-right:4px}
+.slot .smi{position:absolute;left:1px;bottom:1px;width:16px;height:16px;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
+.formation .slot .smi{width:13px;height:13px}
 
 /* ---------- meta ---------- */
 .ups{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
@@ -264,6 +277,8 @@ a.btn{text-decoration:none;display:inline-block}
 
   <button class="shop-open" id="btnShopOpen" type="button" hidden><span>Open shop</span><span class="so-s" id="shopOpenSub">Ready · press B</span><span class="cd" aria-hidden="true"></span></button>
 
+  <div id="count" hidden aria-live="polite"><div class="cn" id="countNum"></div><div class="ct" id="countTip"></div></div>
+
   <div id="banner" hidden><div class="big" id="bannerBig"></div><div class="small" id="bannerSmall"></div></div>
 
   <section id="shop" hidden aria-label="Shop and formation">
@@ -312,7 +327,7 @@ a.btn{text-decoration:none;display:inline-block}
         <dt><kbd>Space</kbd></dt><dd>Dash in battle · start the next wave in the shop</dd>
         <dt><kbd>P</kbd></dt><dd>Pause</dd>
         <dt><kbd>T</kbd></dt><dd>Show or hide power-up tooltips</dd>
-        <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 3 minutes)</dd>
+        <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 2 minutes)</dd>
         <dt>Shop</dt><dd><kbd>R</kbd> reroll · <kbd>F</kbd> buy XP · <kbd>E</kbd> sell · <kbd>Q</kbd> sort bench · <kbd>G</kbd> heal</dd>
         <dt>Units</dt><dd>Drag to move · right-click to swap between bench and formation</dd>
       </dl>
@@ -340,7 +355,7 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="btn primary" id="btnEndless" type="button">Enter Endless mode</button>
         <button class="btn" id="btnClaim" type="button">Claim victory</button>
       </div>
-      <p class="note">In Endless mode the waves never stop, enemies grow stronger every wave and the bosses come back. The shop opens only when you choose, at most once every 3 minutes of battle.</p>
+      <p class="note">In Endless mode the waves never stop, enemies grow stronger every wave and the bosses come back. The shop opens only when you choose, at most once every 2 minutes of battle.</p>
     </div>
   </section>
 
@@ -484,11 +499,31 @@ const CLS_ORDER = ['warrior', 'archer', 'mage', 'priest'];
 const MODS = {
   jern:  { name: 'Iron',      tier: 1, col: '#a9aeb8', desc: '+30% damage' },
   frost: { name: 'Frost',     tier: 1, col: '#86d4ff', desc: 'attacks slow enemies' },
-  ild:   { name: 'Fire',      tier: 2, col: '#ff5b2e', desc: 'attacks set enemies ablaze' },
-  blod:  { name: 'Blood',     tier: 2, col: '#d42a4a', desc: 'damage heals the hero, +15% attack speed' },
+  ild:   { name: 'Fire',      tier: 2, col: '#ff8a1e', desc: 'attacks set enemies ablaze' },
+  blod:  { name: 'Blood',     tier: 2, col: '#c2185b', desc: 'damage heals the hero, +15% attack speed' },
   lyn:   { name: 'Lightning', tier: 3, col: '#f4e04d', desc: 'chance to chain lightning to two enemies' },
   rune:  { name: 'Rune',      tier: 3, col: '#b98cff', desc: '+50% mana, so the ability fires more often' },
 };
+// small pixel icon per element, so they can be told apart by shape as well as colour
+const MOD_ICONS = {
+  jern:  ['.......', '.XXXXX.', '.XwwXX.', '.XwXXX.', '.XXXXX.', '.XXXXX.', '.......'],
+  frost: ['...X...', '.X.X.X.', '..XwX..', 'XXwwwXX', '..XwX..', '.X.X.X.', '...X...'],
+  ild:   ['...X...', '..XX...', '..XXX.X', '.XXwXXX', '.XwwwX.', '.XwwwX.', '..XXX..'],
+  blod:  ['...X...', '...X...', '..XXX..', '.XXXXX.', '.XwXXX.', '.XwXXX.', '..XXX..'],
+  lyn:   ['....XX.', '...XX..', '..XX...', '.XXXXX.', '...XX..', '..XX...', '.XX....'],
+  rune:  ['.XXX...', '.X..X..', '.X..X..', '.XXX...', '.X.X...', '.X..X..', '.X...X.'],
+};
+function modIcon(rows, col){
+  const c = document.createElement('canvas'); c.width = 9; c.height = 9; const g = c.getContext('2d');
+  const on = (x, y) => y >= 0 && y < 7 && x >= 0 && x < 7 && rows[y][x] !== '.';
+  for (let y = -1; y < 8; y++) for (let x = -1; x < 8; x++){
+    if (on(x, y)){ g.fillStyle = rows[y][x] === 'w' ? '#ffffff' : col; g.fillRect(x + 1, y + 1, 1, 1); }
+    else if (on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1)){ g.fillStyle = '#07080c'; g.fillRect(x + 1, y + 1, 1, 1); }
+  }
+  return c.toDataURL();
+}
+for (const k in MODS) MODS[k].icon = modIcon(MOD_ICONS[k], MODS[k].col);
+const mi = k => `<img class="mi" src="${MODS[k].icon}" alt="">`;
 const MOD_BY_TIER = { 1: ['jern', 'frost'], 2: ['ild', 'blod'], 3: ['lyn', 'rune'] };
 const ODDS = { 1: [1, 0, 0], 2: [1, 0, 0], 3: [.75, .25, 0], 4: [.6, .32, .08], 5: [.45, .38, .17], 6: [.33, .42, .25], 7: [.25, .42, .33], 8: [.18, .40, .42] };
 const XP_COST = 5, XP_GAIN = 4, REROLL_COST = 3, WAVE_XP = 1, HEAL_COST = 10, HEAL_PCT = .3;
@@ -506,7 +541,7 @@ const POWERUPS = {
   thor:  { name: "Thor's Wrath",   col: '#f4e04d', short: 'Strike nearby foes', desc: 'Lightning strikes every enemy nearby' },
   raven: { name: "Huginn's Call",  col: '#b98cff', short: 'Pull in all souls',  desc: 'Pulls in every soul on the field' },
   hoard: { name: 'Dwarven Hoard',  col: '#e2b24c', short: 'Bonus gold',         desc: 'Grants gold right away' },
-  stride: { name: "Sleipnir's Stride", col: '#e6ebf5', short: '+1 dash slot',      desc: 'Unlocks one more dash slot for this raid. With every slot unlocked, it refills your dashes' },
+  stride: { name: "Sleipnir's Stride", col: '#e6ebf5', short: '+1 dash slot',      desc: '+1 dash slot this raid (refills dashes when full)' },
   frost: { name: 'Frost Rune',     col: '#a0f0ff', short: 'Freeze all foes',    desc: 'Freezes every enemy for 3 seconds' },
 };
 
@@ -544,7 +579,7 @@ const WAVES = [
   { name: 'Fenrir', d: "Final boss. He charges when his eyes glow, snaps Gleipnir's chains and, when wounded, devours the sun.", mix: { wolf: 1 }, boss: 'fenrir' },
 ];
 const WAVE_DUR = 40;
-const SHOP_CD = 180; // seconds of battle between shop visits in Endless mode
+const SHOP_CD = 120; // seconds of battle between shop visits in Endless mode
 const ENDLESS_WAVES = [
   { name: 'Fimbulwinter', d: 'Three winters with no summer. Wolves and ravens ride the cold.', mix: { wolf: 3, raven: 2, draugr: 2 }, spd: 1.15 },
   { name: "Naglfar's Crew", d: 'The ship of dead men\u2019s nails lands its crew.', mix: { draugr: 4, armored: 3 }, rate: 1.2 },
@@ -860,8 +895,8 @@ const healCost = () => Math.round(HEAL_COST * 1.5 ** S.healN);
 function buyHeal(){
   const h = S.hero;
   if (h.hp >= h.maxHp) return toast('Already at full health');
-  const c = healCost(); if (S.gold < c) return toast('Not enough gold');
-  S.gold -= c; S.healN++;
+  const c = healCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold');
+  if (!dbg.infGold) S.gold -= c; S.healN++;
   const before = h.hp; healHero(h.maxHp * HEAL_PCT);
   toast(`Healed ${Math.round(h.hp - before)} health`);
   renderShop();
@@ -871,11 +906,11 @@ function sameCount(cls, mod, star){ return allUnits().filter(u => u.cls === cls 
 function buy(i){
   const c = S.shop[i]; if (!c) return;
   const cost = MODS[c.mod].tier;
-  if (S.gold < cost) return toast('Not enough gold');
+  if (!dbg.infGold && S.gold < cost) return toast('Not enough gold');
   const free = S.bench.indexOf(null);
   const same = sameCount(c.cls, c.mod, 1);
   if (free < 0 && same < 2) return toast('The bench is full. Sell a unit first.');
-  S.gold -= cost; S.shop[i] = null;
+  if (!dbg.infGold) S.gold -= cost; S.shop[i] = null;
   const u = { id: ++uid, cls: c.cls, mod: c.mod, star: 1, mana: 0, cd: 0, x: S.hero.x, y: S.hero.y, face: 1, anim: 0 };
   let temp = null;
   if (free >= 0) S.bench[free] = u; else temp = u;
@@ -903,8 +938,8 @@ function sellAt(where, i){
   computeTraits(); renderShop();
 }
 function sellSel(){ if (S.sel) sellAt(S.sel.where, S.sel.i); }
-function reroll(){ const c = rollCost(); if (S.gold < c) return toast('Not enough gold'); S.gold -= c; S.rollN++; rollShop(); renderShop(); }
-function buyXp(){ if (S.level >= MAX_LVL) return; const c = xpCost(); if (S.gold < c) return toast('Not enough gold'); S.gold -= c; S.xpN++; addXp(XP_GAIN); renderShop(); }
+function reroll(){ const c = rollCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.rollN++; rollShop(); renderShop(); }
+function buyXp(){ if (S.level >= MAX_LVL) return; const c = xpCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.xpN++; addXp(XP_GAIN); renderShop(); }
 function addXp(n){
   if (S.level >= MAX_LVL) return;
   S.xp += n;
@@ -1010,7 +1045,7 @@ function enterEndless(){
 }
 function openEndlessShop(){
   if (!S || !S.endless || mode !== 'combat' || paused || S.shopCd > 0) return;
-  S.midBattle = true; S.bind = null;
+  S.midBattle = true; S.bind = null; S.shopMsg = 0;
   rollShop(); openShop();
 }
 function endWave(){
@@ -1307,7 +1342,8 @@ function update(dt){
   // wave timing & spawns
   const W = waveDef(S.wave);
   S.waveT += dt;
-  if (S.endless) S.shopCd = Math.max(0, S.shopCd - dt);
+  if (S.endless){ const was = S.shopCd; S.shopCd = Math.max(0, S.shopCd - dt); if (was > 0 && S.shopCd <= 0) S.shopMsg = 3; }
+  if (S.shopMsg > 0) S.shopMsg -= dt;
   // a returning boss enrages after 75 seconds so no fight can stall forever
   if (S.endless && S.boss && !S.boss.dead && !S.boss.enraged && S.waveT > 75){
     const b = S.boss; b.enraged = true; b.dmg *= 1.5; b.spd *= 1.3; b.armor *= .6; b.ward *= .6;
@@ -1843,7 +1879,7 @@ function describe(x){
   const c = CLASSES[x.cls], m = MODS[x.mod];
   let s = `<strong>${cardName(x)}${x.star ? ' ' + '★'.repeat(x.star) : ''}</strong><br>${c.dtype === 'phys' ? 'Physical' : 'Magic'} damage · ${c.rangeTxt} range`;
   if (x.star){ const st = calcStats(x); s += ` · ${Math.round(st.dmg)} damage · ${st.as.toFixed(2)} attacks/s`; }
-  s += `<br><span class="gem" style="background:${m.col}"></span>${m.name}: ${m.desc}<br>Ability, ${c.ability}: ${c.abDesc}.`;
+  s += `<br>${mi(x.mod)}${m.name}: ${m.desc}<br>Ability, ${c.ability}: ${c.abDesc}.`;
   if (x.star) s += `<br><span style="color:var(--gold)">Sells for ${sellValue(x)} gold</span>`;
   return s;
 }
@@ -1857,16 +1893,17 @@ function renderShop(){
   $('#sXp').textContent = maxed ? 'max' : `${S.xp}/${XPN[S.level]}`;
   $('#sXpBar').style.width = maxed ? '100%' : (S.xp / XPN[S.level] * 100) + '%';
   $('#xpCost').textContent = xpCost(); $('#rollCost').textContent = rollCost();
-  $('#btnXp').disabled = maxed || S.gold < xpCost();
-  $('#btnRoll').disabled = S.gold < rollCost();
+  const broke = c => !dbg.infGold && S.gold < c;
+  $('#btnXp').disabled = maxed || broke(xpCost());
+  $('#btnRoll').disabled = broke(rollCost());
   $('#sHp').textContent = `${Math.ceil(S.hero.hp)}/${S.hero.maxHp}`;
   $('#sHpBar').style.width = (S.hero.hp / S.hero.maxHp * 100) + '%';
   $('#healCost').textContent = healCost();
-  $('#btnHeal').disabled = S.gold < healCost() || S.hero.hp >= S.hero.maxHp;
+  $('#btnHeal').disabled = broke(healCost()) || S.hero.hp >= S.hero.maxHp;
   $('#btnSort').disabled = !S.bench.some(Boolean);
   $('#btnStart').innerHTML = `${S.midBattle ? 'Return to battle' : S.endless ? `Begin endless · wave ${S.wave}` : `Start wave ${S.wave}`} <kbd>Space</kbd>`;
   const W = waveDef(S.wave);
-  $('#nextTxt').innerHTML = S.endless ? `<b>Endless · wave ${S.wave} · ${W.name}</b>. ${W.d} The shop opens again after 3 minutes of battle.` : `Next: <b>Wave ${S.wave}/20 · ${W.name}</b>. ${W.d}`;
+  $('#nextTxt').innerHTML = S.endless ? `<b>Endless · wave ${S.wave} · ${W.name}</b>. ${W.d} The shop opens again after 2 minutes of battle.` : `Next: <b>Wave ${S.wave}/20 · ${W.name}</b>. ${W.d}`;
   // upgrade bookkeeping
   const counts = {};
   allUnits().forEach(u => { counts[gkey(u)] = (counts[gkey(u)] || 0) + 1; });
@@ -1878,8 +1915,8 @@ function renderShop(){
     const n = counts[`${c.cls}|${c.mod}|1`] || 0;
     const chain = n >= 2 && (counts[`${c.cls}|${c.mod}|2`] || 0) >= 2;
     const badge = n >= 2 ? (chain ? '★★★ ready' : '★★ ready') : n === 1 ? 'owned 1/3' : '';
-    return `<div class="card-wrap${c.locked ? ' locked' : ''}"><button class="lock" type="button" data-lock="${i}" aria-pressed="${c.locked}" title="${c.locked ? 'Unlock card' : 'Lock card: it stays through rerolls and into the next shop'}">${c.locked ? '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 5V3.5a3 3 0 0 1 6 0V5" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="5" width="8" height="6" rx="1" fill="currentColor"/></svg>' : '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 5V3.5a3 3 0 0 1 5.8-1" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="5" width="8" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'}</button><button class="card t${m.tier}${n >= 2 ? ' merge' : n === 1 ? ' owned' : ''}" type="button" data-i="${i}" data-key="${c.cls}|${c.mod}|1" ${S.gold < cost ? 'disabled' : ''}>
-      ${badge ? `<span class="badge">${badge}</span>` : ''}${unitImg(c.cls)}<span class="cn">${CLASSES[c.cls].name}</span><span class="mn" style="color:${m.col}"><span class="gem" style="background:${m.col}"></span>${m.name}</span><span class="cost">${cost} gold</span></button></div>`;
+    return `<div class="card-wrap${c.locked ? ' locked' : ''}"><button class="lock" type="button" data-lock="${i}" aria-pressed="${c.locked}" title="${c.locked ? 'Unlock card' : 'Lock card: it stays through rerolls and into the next shop'}">${c.locked ? '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 5V3.5a3 3 0 0 1 6 0V5" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="5" width="8" height="6" rx="1" fill="currentColor"/></svg>' : '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 5V3.5a3 3 0 0 1 5.8-1" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="5" width="8" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'}</button><button class="card t${m.tier}${n >= 2 ? ' merge' : n === 1 ? ' owned' : ''}" type="button" data-i="${i}" data-key="${c.cls}|${c.mod}|1" ${broke(cost) ? 'disabled' : ''}>
+      ${badge ? `<span class="badge">${badge}</span>` : ''}${unitImg(c.cls)}<span class="cn">${CLASSES[c.cls].name}</span><span class="mn" style="color:${m.col}">${mi(c.mod)}${m.name}</span><span class="cost">${cost} gold</span></button></div>`;
   }).join('');
   const slotHTML = (u, where, i, locked, style) => {
     const sel = S.sel && S.sel.where === where && S.sel.i === i;
@@ -1888,7 +1925,7 @@ function renderShop(){
     const n = counts[gkey(u)] || 0;
     const ready = u.star < 3 && ((u.star === 1 && n >= 2 && inShop.has(gkey(u))) || n >= 3);
     const show = u.star < 3 && (n >= 2 || (u.star === 1 && inShop.has(gkey(u))));
-    return `<div class="slot has${sel ? ' sel' : ''}${ready ? ' ready' : ''}"${st} role="button" tabindex="0" draggable="true" data-w="${where}" data-i="${i}" data-key="${gkey(u)}" aria-label="${cardName(u)}, ${u.star} star${u.star > 1 ? 's' : ''}${show ? `, ${n} of 3 for an upgrade` : ''}"><span class="st">${'★'.repeat(u.star)}</span>${unitImg(u.cls)}${show ? `<span class="cnt">${n}/3</span>` : ''}</div>`;
+    return `<div class="slot has${sel ? ' sel' : ''}${ready ? ' ready' : ''}"${st} role="button" tabindex="0" draggable="true" data-w="${where}" data-i="${i}" data-key="${gkey(u)}" aria-label="${cardName(u)}, ${u.star} star${u.star > 1 ? 's' : ''}${show ? `, ${n} of 3 for an upgrade` : ''}"><span class="st">${'★'.repeat(u.star)}</span>${unitImg(u.cls)}<img class="smi" src="${MODS[u.mod].icon}" alt="">${show ? `<span class="cnt">${n}/3</span>` : ''}</div>`;
   };
   $('#bench').innerHTML = S.bench.map((u, i) => slotHTML(u, 'bench', i, false)).join('');
   const R = 66;
@@ -1905,7 +1942,7 @@ function renderShop(){
   });
   const mods = Object.keys(MODS).filter(k => t.mod[k] > 0).map(k => {
     const n = t.mod[k], on = n >= 2;
-    return `<div class="trait${on ? ' on' : ''}" title="2: effect ×1.5 · 3: effect ×2"><span><span class="gem" style="background:${MODS[k].col}"></span>${MODS[k].name}</span><b>${n}/${n >= 2 ? 3 : 2}</b></div>`;
+    return `<div class="trait${on ? ' on' : ''}" title="2: effect ×1.5 · 3: effect ×2"><span>${mi(k)}${MODS[k].name}</span><b>${n}/${n >= 2 ? 3 : 2}</b></div>`;
   });
   $('#traits').innerHTML = rows.join('') + (mods.length ? '<div style="height:4px"></div>' + mods.join('') : '');
   // sell
@@ -2179,8 +2216,26 @@ addEventListener('blur', () => { for (const k in keys) keys[k] = false; if (mode
 
 /* ================= HUD ================= */
 let hudAcc = 0, miniAcc = 0;
+let countShown = '';
+function updateCount(){
+  let num = '', tip = '', word = false;
+  if (mode === 'combat' && S && !paused){
+    const W = waveDef(S.wave);
+    if (!S.endless && !W.boss && S.endDelay <= 0){ const r = WAVE_DUR - S.waveT; if (r > 0 && r <= 5){ num = String(Math.ceil(r)); tip = 'Wave ending'; } }
+    if (S.endless){
+      if (S.shopCd > 0 && S.shopCd <= 5){ num = String(Math.ceil(S.shopCd)); tip = 'Shop opening'; }
+      else if (S.shopMsg > 0){ num = 'Shop open'; word = true; tip = 'Press <kbd>B</kbd> or click Open shop'; }
+    }
+  }
+  const el = $('#count');
+  if (num !== countShown){
+    countShown = num; el.hidden = !num;
+    if (num){ $('#banner').hidden = true; const n = $('#countNum'); n.textContent = num; n.classList.toggle('word', word); $('#countTip').innerHTML = tip; el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+  }
+}
 function updateHud(dt){
   if (toastT > 0){ toastT -= dt; if (toastT <= 0) $('#toast').hidden = true; }
+  updateCount();
   if (mode !== 'combat') return;
   miniAcc += dt; if (miniAcc >= 1 / 20){ miniAcc = 0; drawMinimap(); }
   hudAcc += dt; if (hudAcc < .1) return; hudAcc = 0;
