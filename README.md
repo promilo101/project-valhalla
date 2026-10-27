@@ -45,12 +45,13 @@ Drag units between the bench and the formation, or right-click a unit to send it
 - 6 power-ups: Mead Horn, Rune of Fury, Thor's Wrath, Huginn's Call, Dwarven Hoard, Frost Rune
 - Shop card locks, rising reroll/XP/heal prices within a shop phase, healing bought in the shop
 - In-game feedback form
+- Online leaderboard for Endless runs (Supabase); runs where the debug menu was opened can't be submitted
 - Rune Forge with permanent upgrades between raids (saved in the browser)
 
 ## Branches
 
 - `main` is the public build that GitHub Pages serves.
-- `dev` is the test build. It shows "DEV build" on the title screen and has a hidden debug menu.
+- `dev` is the test build. It shows "DEV build" on the title screen and has a hidden debug menu. A copy is served at `/dev/` on GitHub Pages for testing.
 
 ## Publishing with GitHub Pages
 

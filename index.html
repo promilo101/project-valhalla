@@ -222,6 +222,17 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .fb textarea,.fb input[type=text]{font:inherit;font-size:20px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:6px 8px;width:100%;resize:vertical}
 .fb textarea:focus,.fb input[type=text]:focus{outline:2px solid var(--frost);outline-offset:1px}
 .fb-run summary{color:var(--muted);cursor:pointer;font-size:18px}
+.lb-wrap{overflow-x:auto}
+.lb-table{width:100%;border-collapse:collapse;font-size:20px;font-variant-numeric:tabular-nums}
+.lb-table th{text-align:left;color:var(--muted);font-weight:400;border-bottom:1px solid var(--line);padding:4px 10px 4px 0}
+.lb-table td{padding:4px 10px 4px 0;border-bottom:1px solid #1b2030}
+.lb-table td:nth-child(3),.lb-table td:nth-child(4),.lb-table th:nth-child(3),.lb-table th:nth-child(4){text-align:right}
+.lb-table td:first-child{color:var(--muted);width:2.5em}
+.lb-table tr.top td:first-child{color:var(--gold)}
+.lb-table tr.me td{color:var(--gold)}
+.lb-submit{display:grid;gap:6px;font-size:20px}
+.lb-submit input{font:inherit;font-size:20px;color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:6px 8px;min-width:0;flex:1 1 180px}
+.lb-submit input:focus{outline:2px solid var(--frost);outline-offset:1px}
 .fb-run pre{font:inherit;font-size:17px;color:var(--muted);white-space:pre-wrap;margin:6px 0 0;max-height:9em;overflow:auto}
 a.btn{text-decoration:none;display:inline-block}
 
@@ -320,6 +331,7 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="row">
         <button class="btn primary" id="btnNew" type="button">Start a new raid</button>
         <button class="btn" id="btnMeta" type="button">Rune Forge · <span class="runes" id="tRunes">0</span> runes</button>
+        <button class="btn" id="btnLb" type="button">Leaderboard</button>
         <button class="btn" id="btnFbTitle" type="button">Send feedback</button>
       </div>
       <dl class="keys">
@@ -332,6 +344,19 @@ a.btn{text-decoration:none;display:inline-block}
         <dt>Units</dt><dd>Drag to move · right-click to swap between bench and formation</dd>
       </dl>
       <p class="note" id="bestTxt">Requires a keyboard. Made for desktop browsers.</p>
+    </div>
+  </section>
+
+  <section id="lb" class="screen" hidden aria-labelledby="lbTitle">
+    <div class="screen-inner" style="width:min(720px,100%)">
+      <div class="eyebrow">Endless mode</div>
+      <h2 id="lbTitle">Leaderboard</h2>
+      <p class="note" id="lbStatus" role="status">Loading…</p>
+      <div class="lb-wrap"><table class="lb-table" id="lbTable" hidden>
+        <thead><tr><th scope="col">#</th><th scope="col">Name</th><th scope="col">Wave</th><th scope="col">Kills</th><th scope="col">Date</th></tr></thead>
+        <tbody id="lbBody"></tbody>
+      </table></div>
+      <div class="row"><button class="btn" id="btnLbBack" type="button">Back</button><button class="btn" id="btnLbRefresh" type="button">Refresh</button></div>
     </div>
   </section>
 
@@ -365,6 +390,12 @@ a.btn{text-decoration:none;display:inline-block}
       <h2 id="oTitle">You fell</h2>
       <p class="lead" id="oText"></p>
       <dl class="keys" id="oStats"></dl>
+      <form class="lb-submit" id="lbForm" hidden novalidate>
+        <label for="lbName">Put your run on the leaderboard</label>
+        <div class="row"><input id="lbName" type="text" maxlength="16" autocomplete="nickname" placeholder="Your name"><button class="btn primary" id="lbSend" type="submit">Submit score</button></div>
+        <p class="note" id="lbMsg" role="status"></p>
+      </form>
+      <p class="note" id="lbBlocked" hidden>The debug menu was opened during this session, so this run can't go on the leaderboard. Reload the page to play a run that counts.</p>
       <div class="row">
         <button class="btn primary" id="btnAgain" type="button">Try again</button>
         <button class="btn" id="btnOverMeta" type="button">Rune Forge</button>
@@ -837,6 +868,7 @@ function newRun(){
     bench: Array(8).fill(null), board: Array(8).fill(null), shop: [],
     enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [],
     souls: 0, kills: 0, bosses: 0, waveT: 0, spawnAcc: 0, shake: 0, boss: null, endDelay: 0, sel: null,
+    debugUsed: dbgUsed, submitted: false,
     tr: { cls: {}, mod: {} }, regen: 0, dmgTaken: 1, hurt: 0, time: 0, puT: 8, fury: 0, magnet: 0, bind: null, eclipse: 0, eclipseMax: 1,
     endless: false, won: false, midBattle: false, endlessStart: false, shopCd: 0,
   };
@@ -1855,6 +1887,7 @@ function setMode(m){
   $('#shop').hidden = m !== 'shop';
   $('#title').hidden = m !== 'title';
   $('#meta').hidden = m !== 'meta';
+  $('#lb').hidden = m !== 'lb';
   $('#over').hidden = m !== 'over';
   $('#victory').hidden = m !== 'victory';
   $('#btnShopOpen').hidden = !(m === 'combat' && S && S.endless);
@@ -2078,9 +2111,10 @@ $('#btnFbPause').onclick = () => openFeedback('pause');
 
 /* ================= DEBUG MENU (hidden: Ctrl+Shift+D, or type "odin" on the title screen) ================= */
 const dbg = { open: false, god: false, noSpawn: false, infGold: false, hitbox: false, speed: 1, fenrir: 'auto', fps: 0, fpsAcc: 0, fpsN: 0, statT: 0, resetArm: 0 };
-let titleBuf = '';
+let titleBuf = '', dbgUsed = false; // once the debug menu is opened, runs can't be submitted until the page reloads
 function toggleDbg(v){
   dbg.open = v == null ? !dbg.open : v;
+  if (dbg.open){ dbgUsed = true; if (S) S.debugUsed = true; }
   $('#dbg').hidden = !dbg.open;
 }
 function needRun(){ if (!S){ toast('Start a raid first'); return false; } return true; }
@@ -2154,6 +2188,60 @@ function dbgTick(dt){
   });
 })();
 
+/* ================= LEADERBOARD (Supabase) ================= */
+// These two values are meant to be public. The table only allows reading and adding scores.
+const LB_URL = 'https://zgzvhcwzrtjoapnozroo.supabase.co/rest/v1/leaderboard';
+const LB_KEY = 'sb_publishable_9x8BszWUoD7QCVVFyIDGrw_Vkok4swF';
+const esc = t => String(t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+let lbMine = null;
+async function lbFetch(){
+  const r = await fetch(`${LB_URL}?select=name,wave,kills,created_at&order=wave.desc,kills.desc,created_at.asc&limit=20`, { headers: { apikey: LB_KEY } });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+async function openLeaderboard(){
+  setMode('lb');
+  const st = $('#lbStatus'), tb = $('#lbTable');
+  st.textContent = 'Loading…'; tb.hidden = true;
+  try {
+    const rows = await lbFetch();
+    if (mode !== 'lb') return;
+    if (!rows.length){ st.textContent = 'No scores yet. Beat Fenrir, go into Endless mode and be the first.'; return; }
+    $('#lbBody').innerHTML = rows.map((r, i) => {
+      const me = lbMine && r.name === lbMine.name && r.wave === lbMine.wave && r.kills === lbMine.kills;
+      return `<tr class="${i < 3 ? 'top' : ''}${me ? ' me' : ''}"><td>${i + 1}</td><td>${esc(r.name)}</td><td>${r.wave}</td><td>${r.kills.toLocaleString('en')}</td><td>${new Date(r.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</td></tr>`;
+    }).join('');
+    st.textContent = 'Top 20 Endless runs, ranked by the wave reached, then by kills.'; tb.hidden = false;
+  } catch (err){
+    st.textContent = location.protocol === 'https:' && location.hostname.endsWith('github.io')
+      ? 'The leaderboard could not be loaded. Check your connection and press Refresh.'
+      : 'The leaderboard is unavailable here. It works in the version hosted on GitHub Pages.';
+  }
+}
+async function submitScore(e){
+  e.preventDefault();
+  const name = $('#lbName').value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 16), msg = $('#lbMsg');
+  if (!S || !S.endless || S.debugUsed || S.submitted) return;
+  if (!name){ msg.textContent = 'Type a name first (up to 16 characters).'; $('#lbName').focus(); return; }
+  try { localStorage.setItem('valhalla.name', name); } catch (err) {}
+  const row = { name, wave: S.wave, kills: S.kills, bosses: S.bosses, version: (VERSION + (BUILD ? '-' + BUILD : '')).slice(0, 16) };
+  $('#lbSend').disabled = true; msg.textContent = 'Sending…';
+  try {
+    const r = await fetch(LB_URL, { method: 'POST', headers: { apikey: LB_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify(row) });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    S.submitted = true; lbMine = row;
+    msg.innerHTML = 'Score submitted. <button class="btn sm" type="button" id="lbSee">See the leaderboard</button>';
+    $('#lbSee').onclick = openLeaderboard;
+  } catch (err){
+    $('#lbSend').disabled = false;
+    msg.textContent = location.hostname.endsWith('github.io') ? 'The score could not be sent. Check your connection and try again.' : 'Scores can only be sent from the version hosted on GitHub Pages.';
+  }
+}
+$('#lbForm').addEventListener('submit', submitScore);
+$('#btnLb').onclick = openLeaderboard;
+$('#btnLbRefresh').onclick = openLeaderboard;
+$('#btnLbBack').onclick = () => setMode('title');
+
 function renderTitle(){
   $('#tRunes').textContent = meta.runes;
   $('#bestTxt').textContent = meta.runs ? `Best result: wave ${meta.best} of 20${meta.wins ? ` · ${meta.wins} win${meta.wins > 1 ? 's' : ''}` : ''}${meta.bestEndless ? ` · endless wave ${meta.bestEndless}` : ''}. Requires a keyboard.` : 'Requires a keyboard. Made for desktop browsers.';
@@ -2186,6 +2274,10 @@ function gameOver(win, quit){
   $('#oTitle').textContent = S.endless ? (quit ? `You left on wave ${S.wave}` : `The endless night took you on wave ${S.wave}`) : win ? 'Fenrir has fallen' : `You fell on wave ${S.wave}`;
   $('#oText').textContent = S.endless ? `You survived ${ew} endless wave${ew === 1 ? '' : 's'} after Fenrir. Your best is wave ${meta.bestEndless}.` : win ? 'The valkyries carry your warband to Valhalla. Your runes await in the forge.' : 'The runes from this raid are yours. Spend them in the forge and try again.';
   $('#oStats').innerHTML = `<dt>Waves cleared</dt><dd>${S.endless ? `20 + ${ew} endless` : `${cleared} of 20`}</dd><dt>Enemies slain</dt><dd>${S.kills}</dd><dt>Bosses slain</dt><dd>${S.bosses}</dd><dt>Runes earned</dt><dd class="runes">+${runes}</dd>`;
+  $('#lbForm').hidden = !S.endless || S.debugUsed;
+  $('#lbBlocked').hidden = !S.endless || !S.debugUsed;
+  $('#lbMsg').textContent = ''; $('#lbSend').disabled = false;
+  try { $('#lbName').value = localStorage.getItem('valhalla.name') || ''; } catch (e) {}
   setMode('over');
 }
 function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; }
@@ -2283,7 +2375,7 @@ setMode('title');
 requestAnimationFrame(frame);
 
 // small hook for automated playtesting
-window.VALHALLA = { dbg, toggleDbg, dbgJump, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss };
+window.VALHALLA = { dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss };
 })();
 </script>
 
