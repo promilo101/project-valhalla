@@ -1093,14 +1093,16 @@ function buildUnitSprite(cls, mod){
     map.A = '#e8e3d6'; map.a = '#a49e90';
     rows[10] = '..AAAAAA..'.split(''); rows[11] = '..aaaaaa..'.split('');
     [[3, 6], [3, 7], [3, 8], [6, 6], [6, 7], [6, 8]].forEach(([x, y]) => px(x, y, P.T)); // stole
-    for (let y = 2; y <= 10; y++) px(9, y, '#a49e90');
-    px(9, 1, P.X); px(8, 1, P.X); px(9, 0, P.T);
+    for (let x = 2; x <= 7; x++) px(x, 1, '#dcaa45'); px(4, 1, P.X); px(5, 1, P.X);        // golden circlet with an element gem
+    px(4, 6, '#ecc860'); px(5, 6, '#ecc860'); px(4, 7, '#c89a3a');                          // Mjolnir pendant
+    [5, 6, 7, 8].forEach(y => px(9, y, '#c89a3a')); px(9, 4, '#ecc860'); px(8, 4, '#ecc860'); // short gold sceptre
+    px(9, 3, P.X); px(8, 3, P.X); px(9, 2, '#ffffff');                                      // gem on the sceptre
   }
   // element signatures
   if (mod === 'jern'){ px(1, 6, '#e8ecf2'); px(8, 6, '#e8ecf2'); }                                   // pauldrons
   if (mod === 'frost'){ px(2, 6, '#ffffff'); px(7, 6, '#ffffff'); px(2, 5, '#ffffff'); px(7, 5, '#ffffff'); } // fur collar
-  if (mod === 'ild'){ px(3, 9, '#ff8a1e'); px(6, 9, '#ffd27a'); if (cls !== 'archer'){ px(9, 0, '#ffd27a'); px(8, 0, '#ff5b2e'); } } // smouldering hem, burning tip
-  if (mod === 'blod'){ px(3, 3, '#c2185b'); px(5, 3, '#c2185b'); px(7, 3, '#c2185b'); px(cls === 'archer' ? 8 : 9, cls === 'archer' ? 9 : 4, '#c2185b'); } // war paint, drip
+  if (mod === 'ild'){ px(3, 9, '#ff8a1e'); px(6, 9, '#ffd27a'); if (cls === 'warrior' || cls === 'mage'){ px(9, 0, '#ffd27a'); px(8, 0, '#ff5b2e'); } } // smouldering hem, burning tip
+  if (mod === 'blod'){ px(3, 3, '#c2185b'); px(5, 3, '#c2185b'); px(7, 3, '#c2185b'); px(cls === 'archer' ? 8 : 9, cls === 'archer' ? 9 : cls === 'priest' ? 9 : 4, '#c2185b'); } // war paint, drip
   if (mod === 'lyn'){ set(3, 0, 'H'); set(6, 0, 'H'); px(2, 0, P.H); px(7, 0, P.H); px(4, 6, P.X); px(5, 7, P.X); px(4, 8, P.X); } // spiky hair, bolt
   if (mod === 'rune'){ px(4, 6, P.T); px(5, 8, P.T); px(cls === 'warrior' ? 2 : 1, 8, '#d6b8ff'); }        // runes, rune stone
   if (cls === 'mage' && mod !== 'lyn'){ set(3, 0, '.'); set(6, 0, '.'); }
