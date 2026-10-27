@@ -250,6 +250,20 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #dbg .stats{font-variant-numeric:tabular-nums;color:var(--muted);white-space:pre;font-size:16px}
 #dbg kbd{font-size:14px}
 #pause .box{display:grid;gap:12px;justify-items:center;text-align:center}
+#pause .best{width:min(760px,calc(100% - 24px));max-height:calc(100% - 24px);justify-items:stretch;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:14px 16px;grid-template-rows:auto minmax(0,1fr)}
+.best-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.best-head h2{margin:0}
+.best-scroll{overflow:auto;display:grid;gap:10px;padding-right:4px;align-content:start}
+.best-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px}
+.bst{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:2px;padding:8px 10px}
+.bst canvas{width:88px;height:80px;image-rendering:pixelated;image-rendering:crisp-edges;background:#171a14;border-radius:2px}
+.bst .t{min-width:0;display:grid;gap:2px}
+.bst h4{margin:0;font-size:22px;font-weight:400;color:var(--c,var(--fg));display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.bst h4 small{font-size:15px;color:var(--muted)}
+.bst p{margin:0;color:#c3c8d4;font-size:17px;line-height:1.25}
+.bst p b{color:var(--ember);font-weight:400}
+.best-sub{margin:6px 0 0;font-size:22px;font-weight:400;color:var(--gold)}
+.best-intro{margin:0;text-align:left}
 #feedback{z-index:5;background:rgba(7,8,12,.94)}
 .fb fieldset{border:0;padding:0;margin:0;display:grid;gap:6px}
 .fb legend{color:var(--fg);padding:0;margin-bottom:6px;font-size:20px}
@@ -507,7 +521,16 @@ a.btn{text-decoration:none;display:inline-block}
       <h2>Paused</h2>
       <p class="note">Press <kbd>P</kbd> to resume</p>
       <dl class="pu-list" id="puList"></dl>
-      <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
+      <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnBest" type="button">Bestiary</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
+    </div>
+    <div class="box best" id="bestiary" hidden aria-labelledby="bestTitle">
+      <div class="best-head"><h2 id="bestTitle">Bestiary</h2><button class="btn sm" id="btnBestBack" type="button">Back</button></div>
+      <div class="best-scroll">
+        <div class="best-grid" id="bestList"></div>
+        <h3 class="best-sub">Elite traits</h3>
+        <p class="note best-intro">Elites have a coloured aura and a health bar. They are tougher and drop more souls and 1 gold. Each one has one trait:</p>
+        <div class="best-grid" id="bestElite"></div>
+      </div>
     </div>
   </div>
 
@@ -2840,6 +2863,53 @@ $('#btnNew').onclick = requestNewRun; $('#btnMetaGo').onclick = requestNewRun; $
 $('#btnContinue').onclick = continueRaid; $('#btnSaveQuit').onclick = saveAndQuit;
 $('#btnMeta').onclick = () => setMode('meta'); $('#btnOverMeta').onclick = () => setMode('meta');
 $('#btnMetaBack').onclick = () => setMode('title'); $('#btnHome').onclick = () => setMode('title');
+/* ================= BESTIARY (pause screen) ================= */
+const BESTIARY = [
+  ['draugr', 'Draugr', 1, 'The common dead. Slow but many.', '<b>Grave rise:</b> some claw up out of the ground near you. They can\'t move while rising.'],
+  ['wolf', 'Wolf', 2, 'Fast and fragile. Hunts in packs.', '<b>Pounce:</b> circles you, then crouches behind a red line and leaps along it. Step sideways.'],
+  ['raven', 'Raven', 3, 'Very fast flyer with little health.', '<b>Dive:</b> marks a dashed red line, then dives along it and past you.'],
+  ['witch', 'Seiðkona', 4, 'Keeps her distance and throws bolts. Resists magic.', '<b>Curse:</b> marks the ground under you. The patch slows you for a few seconds.'],
+  ['armored', 'Iron Draugr', 7, 'Heavy armour. Magic damage works best.', '<b>Hammer slam:</b> raises the hammer and a circle marks where it lands. Leave the circle.'],
+];
+const BEST_AFF = [['frozen', 'Frozen', 'Leaves a trail of ice that slows you.'], ['burning', 'Burning', 'Explodes a moment after it dies. Leave the ring.'], ['warded', 'Warded', 'A rune shield soaks up damage first. Hits on it show in purple.'], ['swift', 'Swift', 'Moves about 45% faster and leaves an afterimage.']];
+const bestAnims = []; let bestRaf = 0;
+function buildBestiary(){
+  if (bestAnims.length) return;
+  const card = (k, html, aff) => {
+    const el = document.createElement('div'); el.className = 'bst'; if (aff) el.style.setProperty('--c', AFF_COL[aff]);
+    const c = document.createElement('canvas'); c.width = 22; c.height = 20; c.setAttribute('aria-hidden', 'true');
+    el.append(c); el.insertAdjacentHTML('beforeend', `<div class="t">${html}</div>`);
+    bestAnims.push({ g: c.getContext('2d'), k, aff, off: Math.random() * 3 });
+    return el;
+  };
+  $('#bestList').append(...BESTIARY.map(([k, n, w, d, m]) => card(k, `<h4>${n}<small>move from wave ${w}</small></h4><p>${d}</p><p>${m}</p>`)));
+  $('#bestElite').append(...BEST_AFF.map(([a, n, d], i) => card(['draugr', 'wolf', 'armored', 'witch'][i], `<h4>${n}</h4><p>${d}</p>`, a)));
+}
+function drawBestiary(ts){
+  const t = Math.max(0, ts || 0) / 1000;
+  for (const A of bestAnims){
+    const g = A.g, tt = t + A.off; g.clearRect(0, 0, 22, 20);
+    const s = SPR[Math.abs(Math.floor(tt * ENEMY_ANIM[A.k])) % 2 ? A.k + '1' : A.k], x = Math.round((22 - s.width) / 2), y = 19 - s.height;
+    g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.ellipse(11, 18.5, s.width * .35, 1.2, 0, 0, 7); g.fill();
+    if (A.aff){
+      const col = AFF_COL[A.aff];
+      g.globalAlpha = .22 + .08 * Math.sin(tt * 6); g.fillStyle = col; g.beginPath(); g.arc(11, y + s.height / 2, 9, 0, 7); g.fill(); g.globalAlpha = 1;
+      if (A.aff === 'frozen'){ g.globalAlpha = .5; g.fillStyle = '#c8ecff'; for (let k = 0; k < 3; k++){ g.beginPath(); g.ellipse(4 + k * 3 - (tt * 6 % 3), 18.5, 3, 1.2, 0, 0, 7); g.fill(); } g.globalAlpha = 1; }
+      if (A.aff === 'swift'){ g.globalAlpha = .28; g.drawImage(s, x - 3, y); g.globalAlpha = 1; }
+    }
+    g.drawImage(s, x, y);
+    if (A.aff === 'warded'){ g.strokeStyle = AFF_COL.warded; g.lineWidth = 1; g.setLineDash([1, 1]); g.beginPath(); g.arc(11, y + s.height / 2, 9.5, tt, tt + 6.283); g.stroke(); g.setLineDash([]); }
+    if (A.aff === 'burning'){ g.fillStyle = (tt * 8 | 0) % 2 ? '#ff5b2e' : '#ffb347'; g.fillRect(6 + (tt * 7 | 0) % 9, y + 2 + (tt * 5 | 0) % 6, 1, 1); }
+    if (A.aff){ g.fillStyle = '#000'; g.fillRect(4, Math.max(0, y - 3), 14, 2); g.fillStyle = AFF_COL[A.aff]; g.fillRect(4, Math.max(0, y - 3), 11, 2); }
+  }
+  bestRaf = $('#bestiary').hidden ? 0 : requestAnimationFrame(drawBestiary);
+}
+function showBestiary(on){
+  $('#bestiary').hidden = !on; $('#pause .box:not(.best)').hidden = on;
+  if (on){ buildBestiary(); if (!bestRaf) bestRaf = requestAnimationFrame(drawBestiary); $('#btnBestBack').focus(); } else $('#btnBest').focus();
+}
+$('#btnBest').onclick = () => showBestiary(true);
+$('#btnBestBack').onclick = () => showBestiary(false);
 $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () => { togglePause(false); gameOver(false, true); };
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
@@ -3277,7 +3347,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.9.0', 'The horde gets teeth', ['The game has its own tab icon', 'New looks for the draugr, wolves, ravens, Iron Draugr, Seiðkonur, Barrow Wights and Soul Wisps, with walk animations and their own deaths', 'Some draugr claw up out of the ground nearby', 'Wolves circle and pounce (from wave 2). Ravens mark a line and dive (wave 3)', 'Seiðkonur curse the ground under you (wave 4). Iron Draugr slam their hammers (wave 7)', 'Elites have a trait: Frozen leaves an icy trail, Burning explodes on death, Warded has a shield, Swift is fast']],
+  ['0.9.0', 'The horde gets teeth', ['The game has its own tab icon', 'A Bestiary in the pause screen shows every enemy and elite trait', 'New looks for the draugr, wolves, ravens, Iron Draugr, Seiðkonur, Barrow Wights and Soul Wisps, with walk animations and their own deaths', 'Some draugr claw up out of the ground nearby', 'Wolves circle and pounce (from wave 2). Ravens mark a line and dive (wave 3)', 'Seiðkonur curse the ground under you (wave 4). Iron Draugr slam their hammers (wave 7)', 'Elites have a trait: Frozen leaves an icy trail, Burning explodes on death, Warded has a shield, Swift is fast']],
   ['0.8.1', 'Small fixes', ['The Sort button explains how it sorts the bench']],
   ['0.8.0', 'Hero abilities and a new look', ['Hero abilities on 1, 2 and 3, aimed with the mouse. Pick 1 of 2 at the start of a raid and 1 of 3 after every boss', '8 Viking abilities with three levels each', 'Every card has its own look: 24 class and element sprites. Priests carry a gold sceptre', 'Rearrange your abilities in the shop', 'Health and dashes sit under the hero and the ability bar', 'The shop shows your warband resting around a campfire']],
   ['0.7.0', 'Leaderboard, saves and mini-bosses', ['Online leaderboard for Endless runs', 'Save and quit from the shop, and cloud save with a save code', 'The Draugr Jarl, Frost Giant and Herald of Hel have new looks and two new abilities each']],
@@ -3343,7 +3413,7 @@ function gameOver(win, quit){
   try { $('#lbName').value = localStorage.getItem('valhalla.name') || ''; } catch (e) {}
   setMode('over');
 }
-function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; }
+function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; if (!paused || !$('#bestiary').hidden) showBestiary(false); }
 
 addEventListener('keydown', e => {
   if (e.ctrlKey && e.shiftKey && e.code === 'KeyD'){ e.preventDefault(); toggleDbg(); return; }
