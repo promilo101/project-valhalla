@@ -306,6 +306,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .tut-spot.follow{transition:width .45s,height .45s,border-radius .45s}
 @keyframes tutPulse{50%{outline-color:rgba(226,178,76,.3);outline-offset:7px}}
 .tut-card{position:absolute;left:50%;top:50%;width:min(370px,calc(100% - 24px));pointer-events:auto;background:var(--panel);border:1px solid var(--gold);border-radius:3px;padding:12px 14px;display:grid;gap:8px;box-shadow:0 12px 32px rgba(0,0,0,.55);transition:left .45s cubic-bezier(.2,.8,.2,1),top .45s cubic-bezier(.2,.8,.2,1)}
+.tut-card.wide{width:min(640px,calc(100% - 24px))}
 .tut-k{color:var(--muted);font-size:15px;letter-spacing:.12em;text-transform:uppercase}
 .tut-card h3{margin:0;font-family:var(--font-display);font-weight:600;font-size:24px;color:var(--gold);text-wrap:balance}
 .tut-card p{margin:0;font-size:19px;line-height:1.25;color:var(--fg)}
@@ -3766,7 +3767,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.14.0', 'The Field Guide', ['The Bestiary is now the Field Guide, with tabs for Beasts and Relics. Open it from the main menu or the pause menu', 'Each relic unlocks in the guide the first time the Merchant offers it or the Altar grants it. Until then you only get a hint']],
+  ['0.14.0', 'The Field Guide', ['The Bestiary is now the Field Guide, with tabs for Beasts and Relics. Open it from the main menu or the pause menu', 'Each relic unlocks in the guide the first time the Merchant offers it or the Altar grants it. Until then you only get a hint', 'Relics cost more: 18 to 35 gold, so buying one is a real decision', 'The tutorial now shows the Wandering Merchant and the other campfire visitors']],
   ['0.13.0', 'Smoother and fairer', ['Interface size setting, picked automatically from your screen height', 'Graphics quality (High, Medium, Low), Reduce flashing and Show FPS in Settings. If the game runs slowly it offers to switch to Low', 'The shop fits short screens: the Start wave row stays visible, and the shop no longer stretches on ultrawide screens', 'Faster drawing of the ground and faster hit checks in crowded waves', 'Raven Banner now opens a 9th slot behind the hero at any level', 'Give up asks for confirmation', 'Fixed: the shop no longer jumps up and down when you hover cards and units. Long descriptions scroll inside the info box', 'The game fills the whole screen. Everyone sees exactly the same 16:9 battlefield, and on wider screens the sides fill with mist that hides anything in it', 'On wide screens the ability and health bar moves into the mist at the side, and the shop uses the extra width']],
   ['0.12.0', 'The Wandering Merchant', ['Shop events from wave 3: now and then a visitor waits at the campfire', 'The Wandering Merchant sells relics, items that twist a rule for the rest of the raid. Carry up to 3 and sell them back for half', '12 relics, such as Iron Oath, Ember Boots, Twin Souls and Raven Banner', 'A Blood Shrine trades health for gold. A Cursed Altar makes the next wave harder and pays with a free relic', "Sleipnir's Stride no longer appears once every dash slot is unlocked", 'A mute button in Settings, and M mutes or unmutes anywhere']],
   ['0.11.0', 'Sound and feel', ['Music and sound effects, all made in the game: war drums in battle, a campfire tune in the shop, a roar for every boss', 'Settings menu on the title screen and in the pause menu: volume, screen shake, damage numbers and tooltips', 'Big hits freeze the action for a moment, boss attacks flash the screen, and a boss dies in slow motion', 'Merging units bursts with light', 'The pause menu also opens in the shop: press Esc or P, or click Menu. It has Save and quit there too']],
@@ -3936,18 +3937,18 @@ const STEP = 1 / 60;
 /* ================= RELICS: items that twist a rule for the rest of the raid ================= */
 const MAX_RELICS = 3;
 const RELICS = {
-  iron_oath:      { name: 'Iron Oath', price: 10, desc: 'Iron units count double for the Iron synergy.' },
-  ember_boots:    { name: 'Ember Boots', price: 12, desc: 'Dashing leaves a trail of fire that burns enemies.' },
-  odins_eye:      { name: "Odin's Eye", price: 9, desc: 'Every 4th reroll in a shop is free.' },
-  draugr_pact:    { name: "Draugr's Pact", price: 13, desc: 'All units deal 40% more damage, but the hero has 30% less maximum health.' },
-  huginn_feather: { name: "Huginn's Feather", price: 10, desc: 'A random power-up appears near you at the start of every wave.' },
-  twin_souls:     { name: 'Twin Souls', price: 14, desc: 'Units with two or more stars count as two for synergies.' },
-  gleipnir_link:  { name: 'Gleipnir Link', price: 11, desc: 'Your first dash each wave stuns nearby enemies for 1.5 seconds.' },
-  usurer_coin:    { name: "Usurer's Coin", price: 8, desc: 'Interest goes up to 8 gold instead of 5, but healing costs double.' },
-  mead_hall:      { name: 'Horn of the Mead Hall', price: 9, desc: 'The hero heals 1.5 health every second.' },
-  berserk_mark:   { name: "Berserker's Mark", price: 11, desc: 'While the hero is below 40% health, all units attack 50% faster.' },
-  raven_banner:   { name: 'Raven Banner', price: 15, desc: 'One extra formation slot.' },
-  naglfar_chest:  { name: "Naglfar's Chest", price: 10, desc: 'Gain 3 gold every time the shop opens.' },
+  iron_oath:      { name: 'Iron Oath', price: 24, desc: 'Iron units count double for the Iron synergy.' },
+  ember_boots:    { name: 'Ember Boots', price: 26, desc: 'Dashing leaves a trail of fire that burns enemies.' },
+  odins_eye:      { name: "Odin's Eye", price: 18, desc: 'Every 4th reroll in a shop is free.' },
+  draugr_pact:    { name: "Draugr's Pact", price: 28, desc: 'All units deal 40% more damage, but the hero has 30% less maximum health.' },
+  huginn_feather: { name: "Huginn's Feather", price: 24, desc: 'A random power-up appears near you at the start of every wave.' },
+  twin_souls:     { name: 'Twin Souls', price: 32, desc: 'Units with two or more stars count as two for synergies.' },
+  gleipnir_link:  { name: 'Gleipnir Link', price: 24, desc: 'Your first dash each wave stuns nearby enemies for 1.5 seconds.' },
+  usurer_coin:    { name: "Usurer's Coin", price: 18, desc: 'Interest goes up to 8 gold instead of 5, but healing costs double.' },
+  mead_hall:      { name: 'Horn of the Mead Hall', price: 22, desc: 'The hero heals 1.5 health every second.' },
+  berserk_mark:   { name: "Berserker's Mark", price: 26, desc: 'While the hero is below 40% health, all units attack 50% faster.' },
+  raven_banner:   { name: 'Raven Banner', price: 35, desc: 'One extra formation slot.' },
+  naglfar_chest:  { name: "Naglfar's Chest", price: 20, desc: 'Gain 3 gold every time the shop opens.' },
 };
 const RELIC_ART = {
   iron_oath:      [['..XXXXX..', '.X.....X.', 'X...Y...X', 'X..YYY..X', 'X...Y...X', 'X...Y...X', 'X.......X', '.X.....X.', '..XXXXX..'], { X: '#a9aeb8', Y: '#e8ecf2' }],
@@ -4242,6 +4243,7 @@ const TUT_STEPS = [
   { mode: 'shop', target: '#cards', anim: 'merge', h: 'Three of a kind', p: 'Three copies of the same unit merge into a stronger unit with two stars. Three two-star units make a three-star. Cards you already own glow. We put two more copies in the shop.', enter: tutMerge, wait: () => owned().some(u => u.star >= 2), hint: 'Buy the two glowing copies' },
   { mode: 'shop', target: ['#formation', '#bench'], anim: 'drag', h: 'Formation and bench', p: 'Only units in the formation around your hero fight. The bench holds the rest. Drag a unit to move it, or right-click it to send it between bench and formation. Levelling up with XP opens more formation slots.' },
   { mode: 'shop', target: '#traits', h: 'Synergies', p: () => `Units in the formation build synergies. Two of the same class or element switch a bonus on. Four of a class, or three of an element, make it stronger. We added ${tut.gift || 'a unit'} so ${tut.giftEl || 'an element'} is active. Hover or click a synergy row to read exactly what it does.`, enter: tutSynergy },
+  { mode: 'shop', target: '#event', wide: true, h: 'Visitors at the campfire', p: 'The Wandering Merchant sells relics that twist a rule for the rest of the raid. They are expensive, you can carry 3, and you can sell one back for half. Other visitors: a Blood Shrine trades health for gold, and a Cursed Altar gives a free relic for a harder wave. Here is enough gold for one relic, if you want to try.', enter: tutMerchant },
   { mode: 'shop', target: '#btnStart', h: 'Start the wave', p: 'When your warband is ready, start the wave. In a real raid you can also press Space.', unlock: true, wait: () => mode === 'combat', hint: 'Click Start wave' },
   { mode: 'combat', target: 'hero', r: 46, anim: 'keys', h: 'Move your hero', p: 'Walk with W A S D or the arrow keys. Your hero doesn\'t attack. Your job is to keep the warband close and stay out of reach of the enemies.', enter: () => { tut.x0 = S.hero.x; tut.y0 = S.hero.y; }, wait: () => Math.hypot(S.hero.x - tut.x0, S.hero.y - tut.y0) > 70, hint: 'Walk around a little' },
   { mode: 'combat', target: 'hero', r: 150, h: 'Your warband fights', p: 'Units attack the nearest enemies on their own. Here come some draugr. Some of them climb out of the ground. Keep moving while your warband deals with them.', enter: tutSpawn, wait: () => S.kills - tut.k0 >= 4, hint: 'Defeat 4 draugr' },
@@ -4267,6 +4269,12 @@ function tutSynergy(){
   S.board[0] = best; S.board[1] = g; units.slice(1).forEach((u, i) => { S.bench[i] = u; });
   S.curTr = 'm:' + g.mod;
   renderShop(); $('#info').innerHTML = describeTrait('m:' + g.mod);
+}
+function tutMerchant(){
+  if (tut.merchant) return; tut.merchant = true;
+  S.event = makeEvent('merchant');
+  S.gold = Math.max(S.gold, Math.min(...S.event.offers.map(k => RELICS[k].price)));
+  renderShop();
 }
 function tutSpawn(){
   tut.k0 = S.kills; if (tut.spawned) return; tut.spawned = true;
@@ -4322,6 +4330,7 @@ function tutGo(i){
   const st = TUT_STEPS[i];
   if (st.unlock) tut.unlocked = true;
   if (st.enter) st.enter();
+  $('#tutCard').classList.toggle('wide', !!st.wide);
   $('#tutK').textContent = `Step ${i + 1} of ${TUT_STEPS.length}`;
   $('#tutH').textContent = st.h;
   $('#tutP').textContent = typeof st.p === 'function' ? st.p() : st.p;
