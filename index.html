@@ -399,6 +399,19 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #settings .screen-inner{gap:10px}
 #settings{place-items:start center}
 #settings .screen-inner{margin:auto 0}
+.mt-row{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:6px;align-items:center;font-size:15px;line-height:1.1}
+#meter{position:absolute;left:10px;top:40px;z-index:4;width:250px;background:rgba(10,12,18,.88);border:1px solid var(--line);border-radius:2px;padding:6px 8px;display:grid;gap:4px;pointer-events:auto;zoom:var(--ui,1)}
+#app.wide #meter{left:calc(var(--dockX,0px) - 125px)}
+.mt-head{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.mt-head .btn{font-size:13px;padding:1px 6px;letter-spacing:0;text-transform:none}
+.mt-row img{width:16px;height:19px;image-rendering:pixelated;image-rendering:crisp-edges}
+.mt-row .nm{min-width:0;display:grid;gap:2px}
+.mt-row .nm span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c9cfdb}
+.mt-row .bar{height:3px;background:#1b2030}
+.mt-row .bar i{display:block;height:100%}
+.mt-row b{font-weight:400;color:var(--fg);font-variant-numeric:tabular-nums}
+.mt-foot{font-size:13px;color:var(--muted);text-align:right}
+.mt-empty{font-size:15px;color:var(--muted)}
 #fps{position:absolute;left:8px;top:8px;z-index:4;font-size:16px;color:#7dc46a;background:rgba(7,8,12,.7);padding:1px 6px;border-radius:2px;pointer-events:none;font-variant-numeric:tabular-nums}
 #perfTip{position:absolute;left:50%;top:96px;transform:translateX(-50%);z-index:4;background:var(--panel);border:1px solid var(--gold);border-radius:2px;padding:8px 12px;display:flex;gap:10px;align-items:center;font-size:18px;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
 .tog[aria-pressed="false"]{color:var(--muted)}
@@ -418,6 +431,19 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .fb textarea:focus,.fb input[type=text]:focus{outline:2px solid var(--frost);outline-offset:1px}
 .fb-run summary{color:var(--muted);cursor:pointer;font-size:18px}
 .lb-wrap{overflow-x:auto}
+#over .screen-inner{width:min(860px,100%)}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.sum:empty{display:none}
+.sum section{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:8px 10px;display:grid;gap:4px;align-content:start;min-width:0}
+.sum h3{margin:0 0 2px;font-size:16px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sum .line{display:flex;justify-content:space-between;gap:8px;font-size:16px;color:#c9cfdb}
+.sum .line b{font-weight:400;color:var(--fg);font-variant-numeric:tabular-nums}
+.sum .line.kill{color:#ff8a8a}
+.sum .build{display:flex;flex-wrap:wrap;gap:3px}
+.sum .build img{width:24px;height:28px;image-rendering:pixelated;image-rendering:crisp-edges;background:#10131b;border:1px solid var(--line);border-radius:2px}
+.sum svg{width:100%;height:60px;display:block}
+.share-ask{background:var(--panel);border:1px solid var(--gold);border-radius:2px;padding:10px 12px;display:grid;gap:8px}
+.share-ask p{margin:0;font-size:17px;color:#c9cfdb}
 .notes-link{position:absolute;right:max(14px, env(safe-area-inset-right, 0px));bottom:12px;background:none;border:0;padding:4px 6px;color:var(--muted);font:inherit;font-size:18px;display:flex;align-items:center;gap:6px;cursor:pointer}
 .notes-link:hover{color:var(--fg)}
 .notes-link:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
@@ -552,7 +578,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.15.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
+      <div class="eyebrow">Prototype <span id="verTxt">0.16.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
@@ -571,6 +597,7 @@ a.btn{text-decoration:none;display:inline-block}
         <dt><kbd>P</kbd></dt><dd>Pause</dd>
         <dt><kbd>T</kbd></dt><dd>Show or hide power-up tooltips</dd>
         <dt><kbd>M</kbd></dt><dd>Mute or unmute all sound</dd>
+        <dt><kbd>Tab</kbd></dt><dd>Show or hide the damage meter</dd>
         <dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Hero abilities, aimed at the mouse cursor</dd>
         <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 2 minutes)</dd>
         <dt>Shop</dt><dd><kbd>R</kbd> reroll · <kbd>F</kbd> buy XP · <kbd>E</kbd> sell · <kbd>Q</kbd> sort bench · <kbd>G</kbd> heal</dd>
@@ -651,6 +678,12 @@ a.btn{text-decoration:none;display:inline-block}
       <h2 id="oTitle">You fell</h2>
       <p class="lead" id="oText"></p>
       <dl class="keys" id="oStats"></dl>
+      <div class="sum" id="runSum"></div>
+      <div class="share-ask" id="shareAsk" hidden>
+        <p><strong>Help balance the game?</strong> When a raid ends, share anonymous stats about it: waves, units, relics and what killed you. No name and no save code are sent. You can change this any time in Settings.</p>
+        <div class="row"><button class="btn primary sm" id="shareYes" type="button">Yes, share</button><button class="btn sm" id="shareNo" type="button">No thanks</button></div>
+      </div>
+      <p class="note" id="shareMsg" role="status"></p>
       <form class="lb-submit" id="lbForm" hidden novalidate>
         <label for="lbName">Put your run on the leaderboard</label>
         <div class="row"><input id="lbName" type="text" maxlength="16" autocomplete="nickname" placeholder="Your name"><button class="btn primary" id="lbSend" type="submit">Submit score</button></div>
@@ -667,6 +700,7 @@ a.btn{text-decoration:none;display:inline-block}
   </section>
 
   <div id="fps" hidden></div>
+  <aside id="meter" hidden aria-label="Damage meter"><div class="mt-head"><span id="meterTitle">Damage this wave</span><button type="button" id="meterMode" class="btn sm">Raid</button></div><div id="meterRows"></div><div class="mt-foot"><kbd>Tab</kbd> hide</div></aside>
   <div id="perfTip" hidden role="status"><span>The game is running slowly. Switch to Low graphics?</span><button class="btn sm primary" id="perfYes" type="button">Switch to Low</button><button class="btn sm" id="perfNo" type="button">No thanks</button></div>
   <div id="tut" hidden>
     <div class="tut-spot" id="tutSpot"></div>
@@ -725,6 +759,8 @@ a.btn{text-decoration:none;display:inline-block}
         <span>Screen shake</span><button class="btn sm tog" id="setShake" type="button" aria-pressed="true">On</button><span></span>
         <span>Damage numbers</span><button class="btn sm tog" id="setDmg" type="button" aria-pressed="true">On</button><span></span>
         <span>Power-up tooltips <kbd>T</kbd></span><button class="btn sm tog" id="setTips" type="button" aria-pressed="true">On</button><span></span>
+        <span>Damage meter <kbd>Tab</kbd></span><button class="btn sm tog" id="setMeter" type="button" aria-pressed="false">Off</button><span></span>
+        <span>Share anonymous run stats</span><button class="btn sm tog" id="setShare" type="button" aria-pressed="false">Off</button><span></span>
         <span>Tutorial</span><button class="btn sm" id="setTut" type="button">Mark as new again</button><span></span>
       </div>
       <p class="note">Press <kbd>M</kbd> anywhere to mute or unmute. Sound starts after your first click or key press, because browsers block it until then.</p>
@@ -802,6 +838,7 @@ a.btn{text-decoration:none;display:inline-block}
     <fieldset><legend>Game</legend>
       <div class="r" id="dbgSpeed"><span>Speed</span><button type="button" data-sp=".5">0.5×</button><button type="button" data-sp="1" class="on">1×</button><button type="button" data-sp="2">2×</button><button type="button" data-sp="4">4×</button><button type="button" data-sp="8">8×</button></div>
       <div class="r"><label for="dbgHit"><input type="checkbox" id="dbgHit"> Hitboxes and ranges</label></div>
+      <div class="r"><a href="stats.html" target="_blank" rel="noopener" style="color:var(--frost)">Open the balance stats page</a></div>
       <div class="r"><label for="dbgFenrir">Fenrir look</label><select id="dbgFenrir"><option value="auto">Auto (B, then A in endless)</option><option value="A">Always A</option><option value="B">Always B</option></select></div>
     </fieldset>
     <fieldset><legend>Saved progress</legend>
@@ -829,7 +866,7 @@ const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, physdmg: 0, mag
 try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.parse(s)); } catch (e) {}
 /* ================= SETTINGS ================= */
 const SET_KEY = 'valhalla.settings';
-const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true, ui: 'auto', quality: 'high', calm: false, fps: false }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
+const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true, ui: 'auto', quality: 'high', calm: false, fps: false, meter: false, share: null }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
 function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(settings)); } catch (e) {} }
 const RUN_KEY = 'valhalla.run', STAMP_KEY = 'valhalla.stamp';
 function bumpStamp(){ try { localStorage.setItem(STAMP_KEY, String(Date.now())); } catch (e) {} try { cloudQueue(); } catch (e) {} }
@@ -1557,7 +1594,7 @@ function newRun(R){
     enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], haz: [], corpses: [], halfDeath: null, breath: null, chill: 0,
     souls: 0, kills: 0, bosses: 0, waveT: 0, spawnAcc: 0, shake: 0, boss: null, endDelay: 0, sel: null,
     debugUsed: dbgUsed, submitted: false,
-    abil: [null, null, null], selAb: null, relics: [], event: null, sinceEvent: 0, cry: 0, cryM: 1, wall: 0, wallReflect: false, ravens: null, hornT: 0, hornRate: 0, rage: 0, rageDmg: 0, rageL3: false, quakes: [],
+    abil: [null, null, null], selAb: null, relics: [], event: null, sinceEvent: 0, stats: newStats(), cry: 0, cryM: 1, wall: 0, wallReflect: false, ravens: null, hornT: 0, hornRate: 0, rage: 0, rageDmg: 0, rageL3: false, quakes: [],
     tr: { cls: {}, mod: {} }, regen: 0, dmgTaken: 1, hurt: 0, time: 0, puT: 8, fury: 0, magnet: 0, bind: null, eclipse: 0, eclipseMax: 1,
     endless: false, won: false, midBattle: false, endlessStart: false, shopCd: 0,
   };
@@ -1591,7 +1628,7 @@ function applyRun(R){
   S.hero.dashSlots = num(R.dashSlots, 1, dashCap(), 1); S.hero.dashCh = S.hero.dashSlots;
   S.relics = (Array.isArray(R.relics) ? R.relics : []).filter((k, i, a) => RELICS[k] && a.indexOf(k) === i).slice(0, MAX_RELICS);
   const E = R.event; S.event = E && ['merchant', 'shrine', 'altar'].includes(E.type) ? (E.type === 'merchant' ? { type: 'merchant', offers: (E.offers || []).filter(k => RELICS[k]).slice(0, 3), bought: (E.bought || []).filter(k => RELICS[k]) } : { type: E.type, cost: num(E.cost, 1, 999, 20), gold: num(E.gold, 1, 99, 10), done: !!E.done }) : null;
-  S.sinceEvent = num(R.sinceEvent, 0, 9, 0); S.altarPending = !!R.altarPending; S.resumed = true;
+  S.sinceEvent = num(R.sinceEvent, 0, 9, 0); S.altarPending = !!R.altarPending; S.resumed = true; S.stats.partial = true;
   if (S.event && S.event.type === 'merchant') S.event.offers.forEach(k => { if (!relicSeen(k)){ if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = []; meta.relicsSeen.push(k); } }); (S.relics || []).forEach(k => { if (!relicSeen(k)){ if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = []; meta.relicsSeen.push(k); } });
   S.board = Array.from({ length: 9 }, (_, i) => mkU((R.board || [])[i]));
   S.bench = Array.from({ length: 8 }, (_, i) => mkU((R.bench || [])[i]));
@@ -1671,7 +1708,7 @@ function buyHeal(){
   const h = S.hero;
   if (h.hp >= h.maxHp) return toast('Already at full health');
   const c = healCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold');
-  sfx('heal');
+  sfx('heal'); if (!dbg.infGold) statGold('Healing', c, true);
   if (!dbg.infGold) S.gold -= c; S.healN++;
   const before = h.hp; healHero(h.maxHp * HEAL_PCT);
   toast(`Healed ${Math.round(h.hp - before)} health`);
@@ -1692,7 +1729,7 @@ function buy(i){
   const free = S.bench.indexOf(null);
   const same = sameCount(c.cls, c.mod, 1);
   if (free < 0 && same < 2) return toast('The bench is full. Sell a unit first.');
-  if (!dbg.infGold) S.gold -= cost; S.shop[i] = null;
+  if (!dbg.infGold){ S.gold -= cost; statGold('Cards', cost, true); } S.shop[i] = null;
   const u = { id: ++uid, cls: c.cls, mod: c.mod, star: 1, mana: 0, cd: 0, x: S.hero.x, y: S.hero.y + 4, face: 1, anim: 0 };
   let temp = null;
   if (free >= 0) S.bench[free] = u; else temp = u;
@@ -1717,13 +1754,13 @@ function tryMerge(cls, mod, star, temp){
 function sellValue(u){ return MODS[u.mod].tier * [1, 3, 9][u.star - 1]; }
 function sellAt(where, i){
   const u = S[where][i]; if (!u) return;
-  S.gold += sellValue(u); S[where][i] = null; S.sel = null; sfx('sell');
+  S.gold += sellValue(u); statGold('Selling', sellValue(u)); S[where][i] = null; S.sel = null; sfx('sell');
   toast(`Sold ${cardName(u)} for ${sellValue(u)} gold`);
   computeTraits(); renderShop();
 }
 function sellSel(){ if (S.sel) sellAt(S.sel.where, S.sel.i); }
-function reroll(){ const c = rollCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.rollN++; sfx('reroll'); rollShop(); renderShop(); }
-function buyXp(){ if (S.level >= MAX_LVL) return; const c = xpCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.xpN++; sfx('xp'); addXp(XP_GAIN); renderShop(); }
+function reroll(){ const c = rollCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold){ S.gold -= c; statGold('Rerolls', c, true); } S.rollN++; sfx('reroll'); rollShop(); renderShop(); }
+function buyXp(){ if (S.level >= MAX_LVL) return; const c = xpCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold){ S.gold -= c; statGold('XP', c, true); } S.xpN++; sfx('xp'); addXp(XP_GAIN); renderShop(); }
 function addXp(n){
   if (S.level >= MAX_LVL) return;
   S.xp += n;
@@ -1819,7 +1856,8 @@ function endlessNext(){
   const W = waveDef(S.wave);
   const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
   const reward = 5 + interest + (W.boss ? 5 : 0);
-  S.gold += reward; addXp(WAVE_XP);
+  S.gold += reward; statGold('Wave rewards', reward - interest); statGold('Interest', interest); addXp(WAVE_XP);
+  if (S.stats){ S.stats.hp.push(Math.max(0, Math.round(100 * S.hero.hp / S.hero.maxHp))); S.stats.lastW = S.stats.wdmg; S.stats.wdmg = {}; }
   if (W.boss) S.hero.hp = S.hero.maxHp;
   S.wave++; S.waveT = 0; S.endDelay = 0; S.boss = null;
   const N = waveDef(S.wave);
@@ -1848,8 +1886,8 @@ function endWave(){
   const W = waveDef(S.wave); sfx('clear');
   if (S.cursed){
     S.cursed = false; const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
-    if (S.relics.length < MAX_RELICS && pool.length){ const k = pick(pool); gainRelic(k); setTimeout(() => toast(`The altar grants you ${RELICS[k].name}`), 1200); }
-    else { S.gold += 12; setTimeout(() => toast('The altar grants you 12 gold'), 1200); }
+    if (S.relics.length < MAX_RELICS && pool.length){ const k = pick(pool); gainRelic(k); if (S.stats) S.stats.relicBuys.push({ k, w: S.wave, altar: true }); setTimeout(() => toast(`The altar grants you ${RELICS[k].name}`), 1200); }
+    else { S.gold += 12; statGold('Events', 12); setTimeout(() => toast('The altar grants you 12 gold'), 1200); }
   }
   S.enemies.forEach(e => burst(e.x, e.y, 6, ['#6f9479', '#bfe9ff'], 40));
   S.enemies = []; S.eprojs = []; S.tele = []; S.pups = []; S.corpses = []; clearBossFx();
@@ -1857,7 +1895,8 @@ function endWave(){
   if (S.wave >= WAVES.length) return showVictory();
   const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
   const reward = 5 + interest + (W.boss ? 5 : 0);
-  S.gold += reward;
+  S.gold += reward; statGold('Wave rewards', reward - interest); statGold('Interest', interest);
+  if (S.stats){ S.stats.hp.push(Math.max(0, Math.round(100 * S.hero.hp / S.hero.maxHp))); S.stats.lastW = S.stats.wdmg; S.stats.wdmg = {}; }
   addXp(WAVE_XP);
   if (W.boss) S.hero.hp = S.hero.maxHp; // only bosses restore health; otherwise healing is bought in the shop
   S.wave++;
@@ -1919,7 +1958,7 @@ function takePowerup(p){
     if (h.dashSlots < dashCap()){ h.dashSlots++; h.dashCh++; addText(h.x, h.y - 26, `${h.dashSlots} dash slots`, '#e6ebf5', true); }
     else { h.dashCh = h.dashSlots; h.dashRt = 0; addText(h.x, h.y - 26, 'Dashes refilled', '#e6ebf5', true); }
   }
-  else if (p.type === 'hoard'){ const g = 3 + Math.floor(S.wave / 5); S.gold += g; addText(h.x, h.y - 26, `+${g} gold`, '#e2b24c', true); }
+  else if (p.type === 'hoard'){ const g = 3 + Math.floor(S.wave / 5); S.gold += g; statGold('Power-ups', g); addText(h.x, h.y - 26, `+${g} gold`, '#e2b24c', true); }
   else if (p.type === 'frost'){ for (const e of S.enemies) if (!e.dead){ e.frz = e.d.boss ? 1.5 : 3; } S.rings.push({ x: h.x, y: h.y, r: 220, life: .6, max: .6, col: '#a0f0ff' }); }
   else if (p.type === 'thor'){
     const dmg = 20 + 9 * S.wave;
@@ -1947,13 +1986,15 @@ function hit(e, raw, dtype, u, opt){
   d *= 100 / (100 + res);
   const warded = e.shield > 0, shown = d;
   if (warded){ const ab = Math.min(e.shield, d); e.shield -= ab; d -= ab; if (e.shield <= 0){ burst(e.x, e.y, 16, ['#b98cff', '#d6b8ff', '#ffffff'], 70); addText(e.x, e.y - e.h / 2 - 6, 'Ward broken', '#d6b8ff', true); } }
+  const src = u ? ukey(u) : (opt.src || 'hero');
+  statDmg(src, Math.min(d, Math.max(0, e.hp))); e.lastSrc = src;
   e.hp -= d; e.flash = .07;
   sfx(crit ? 'crit' : 'hit');
   if (crit && shown >= 40 && shown >= e.max * .3 && !e.d.boss) stopFor(.035);
   if (settings.dmgNum) addText(e.x, e.y - e.h / 2, Math.round(shown), warded ? '#b98cff' : crit ? '#ffd27a' : dtype === 'magic' ? '#d6b8ff' : '#e9e4d8', crit);
   if (u && !opt.noMod){
     const m = u.mod, p = modPow(m);
-    if (m === 'ild' || opt.burn){ e.burn = 3; e.burnD = Math.max(e.burnD, raw * .35 * (m === 'ild' ? p : 1) / 3); }
+    if (m === 'ild' || opt.burn){ e.burn = 3; e.burnD = Math.max(e.burnD, raw * .35 * (m === 'ild' ? p : 1) / 3); e.burnSrc = ukey(u); }
     if (m === 'frost'){ e.slowT = 1.6; e.slow = Math.min(.6, .3 * p); }
     if (m === 'lyn' && Math.random() < .2 * p) chain(e, raw * .6, u);
     if (m === 'blod') healHero(d * .03 * p);
@@ -1974,21 +2015,23 @@ function chain(from, dmg, u){
 function kill(e){
   if (e.dead) return;
   e.dead = true; S.kills++;
+  if (S.stats){ const k = e.lastSrc || 'hero'; S.stats.kills[k] = (S.stats.kills[k] || 0) + 1; }
   if (e.d.boss) burst(e.x, e.y, 60, ['#ff5b2e', '#ffd27a', '#bfe9ff', '#fff'], 120); else deathFx(e);
   if (e.tl && e.mst === 'wind') e.tl.cancel = true;
   if (e.aff === 'burning'){ S.tele.push({ x: e.x, y: e.y, r: 26, t: 0, dur: .7, dmg: e.dmg * 1.2, kind: 'fire' }); addText(e.x, e.y - e.h / 2 - 6, 'Burning!', '#ffb347', false); }
   const v = e.d.boss ? 40 : e.elite ? 6 : 1;
   const n = e.d.boss ? 12 : 1;
   for (let i = 0; i < n; i++) S.orbs.push({ x: e.x + rand(-6, 6) * (n > 1), y: e.y + rand(-6, 6) * (n > 1), v: Math.ceil(v / n), big: e.elite || e.d.boss, t: 0 });
-  if (e.elite) S.gold += 1;
+  if (e.elite){ S.gold += 1; statGold('Elites', 1); }
   if (e.d.boss){ sfx('bossdie'); slowMo = 1.2; flash('255,214,122', .5); S.bosses++; S.shake = 10; S.endDelay = 1.6; S.boss = null; clearBossFx(); S.enemies.forEach(o => { if (!o.d.boss && !o.dead){ o.dead = true; burst(o.x, o.y, 5, ['#6f9479', '#bfe9ff'], 40); } }); }
 }
-function gainSouls(v){ S.souls += v; sfx('soul'); while (S.souls >= 10){ S.souls -= 10; S.gold++; sfx('coin'); } }
+function gainSouls(v){ S.souls += v; sfx('soul'); while (S.souls >= 10){ S.souls -= 10; S.gold++; statGold('Souls', 1); sfx('coin'); } }
 function healHero(n){ const h = S.hero; h.hp = Math.min(h.maxHp, h.hp + n); }
-function heroDamage(d){
+function heroDamage(d, src){
   const h = S.hero;
   if (dbg.god || S.tutorial || h.inv > 0 || h.dashT > 0 || S.wall > 0 || mode !== 'combat') return;
-  d *= S.dmgTaken; h.hp -= d; h.inv = .5; S.hurt = .25; sfx('hurt'); stopFor(.05); S.shake = Math.min(7, S.shake + 3);
+  d *= S.dmgTaken; h.hp -= d; h.inv = .5; S.hurt = .25; sfx('hurt'); stopFor(.05);
+  if (S.stats){ const k = src || 'Unknown'; S.stats.taken[k] = (S.stats.taken[k] || 0) + Math.min(d, d + Math.min(0, h.hp)); if (h.hp <= 0) S.stats.killer = k; } S.shake = Math.min(7, S.shake + 3);
   addText(h.x, h.y - 10, Math.round(d), '#ff6b6b', true);
   if (h.hp <= 0){ h.hp = 0; gameOver(false); }
 }
@@ -2090,7 +2133,7 @@ function updateBossFx(dt){
     const ex = Math.cos(A.ang), ey = Math.sin(A.ang);
     const dist = k < A.out ? A.len * (1 - (1 - k / A.out) ** 2) : A.len * (1 - Math.min(1, (k - A.out) / A.back) ** 2);
     A.x = A.x0 + ex * dist; A.y = A.y0 + ey * dist;
-    if (dist2(A.x, A.y, h.x, h.y) < 10 * 10){ if (k < A.out && !A.hitOut){ A.hitOut = true; heroDamage(A.dmg); } else if (k >= A.out && !A.hitBack){ A.hitBack = true; heroDamage(A.dmg); } }
+    if (dist2(A.x, A.y, h.x, h.y) < 10 * 10){ if (k < A.out && !A.hitOut){ A.hitOut = true; heroDamage(A.dmg, 'Draugr King: Axe Hurl'); } else if (k >= A.out && !A.hitBack){ A.hitBack = true; heroDamage(A.dmg, 'Draugr King: Axe Hurl'); } }
     if (k >= A.out + A.back) A.done = true;
   }
   S.bossAxes = S.bossAxes.filter(A => !A.done);
@@ -2098,7 +2141,7 @@ function updateBossFx(dt){
     B.t += dt;
     if (B.t >= B.dur && !B.done){
       B.done = true;
-      if (dist2(h.x, h.y, B.tx, B.ty) < B.r * B.r) heroDamage(B.dmg);
+      if (dist2(h.x, h.y, B.tx, B.ty) < B.r * B.r) heroDamage(B.dmg, 'Frost Giant: Glacier Hurl');
       for (let k = 0; k < 8; k++){ const a = k * Math.PI / 4 + .3; S.eprojs.push({ x: B.tx + Math.cos(a) * B.r * .8, y: B.ty + Math.sin(a) * B.r * .8, vx: Math.cos(a) * 115, vy: Math.sin(a) * 115, dmg: B.dmg * .45, r: 2.5, life: 1.3, col: '#bfe9ff' }); }
       burst(B.tx, B.ty, 34, ['#e6fbff', '#9fe6ff', '#5fb8de'], 120); S.rings.push({ x: B.tx, y: B.ty, r: B.r, life: .3, max: .3, col: '#bfe9ff' }); S.shake = Math.min(8, S.shake + 4);
     }
@@ -2109,7 +2152,7 @@ function updateBossFx(dt){
     Bz.x = e.x + 10 * Math.cos(Bz.ang); Bz.y = e.y - e.h * .25;
     if (Bz.t >= Bz.wind){
       const rx = h.x - Bz.x, ry = h.y - Bz.y, dd = Math.hypot(rx, ry), da = Math.abs(((Math.atan2(ry, rx) - Bz.ang + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
-      if (dd < Bz.len && da < Bz.half){ S.chill = Math.max(S.chill, 2.5); if (!Bz.hit){ Bz.hit = true; heroDamage(Bz.dmg); } }
+      if (dd < Bz.len && da < Bz.half){ S.chill = Math.max(S.chill, 2.5); if (!Bz.hit){ Bz.hit = true; heroDamage(Bz.dmg, 'Frost Giant: Frost Breath'); } }
       for (let k = 0; k < 3; k++){ const a = Bz.ang + rand(-Bz.half, Bz.half), v = rand(120, 220); S.parts.push({ x: Bz.x, y: Bz.y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: Bz.len / v * .9, max: Bz.len / v, col: pick(['#dff4ff', '#86d4ff', '#ffffff']), s: 2, add: true }); }
       if (!Bz.iced){ Bz.iced = true; for (let k = 0; k < 4; k++){ const a = Bz.ang + rand(-Bz.half * .8, Bz.half * .8), r = rand(40, Bz.len - 10); S.ice.push({ x: Bz.x + Math.cos(a) * r, y: Bz.y + Math.sin(a) * r, rx: 16, ry: 7, life: 5, max: 5 }); } }
     }
@@ -2119,7 +2162,7 @@ function updateBossFx(dt){
   S.ice = S.ice.filter(I => I.life > 0);
   if (S.halfDeath){
     const H = S.halfDeath; H.t += dt;
-    if (H.t >= H.warn && !H.hit && (h.x - H.x0) * H.side > 0){ H.hit = true; heroDamage(H.dmg); }
+    if (H.t >= H.warn && !H.hit && (h.x - H.x0) * H.side > 0){ H.hit = true; heroDamage(H.dmg, 'Herald of Hel: Half-Death'); }
     if (H.t >= H.warn + H.fog) S.halfDeath = null;
   }
   for (const c of S.chains){
@@ -2129,7 +2172,7 @@ function updateBossFx(dt){
       const ex = Math.cos(c.a), ey = Math.sin(c.a), rx = h.x - c.x, ry = h.y - c.y;
       const along = rx * ex + ry * ey, perp = Math.abs(rx * ey - ry * ex);
       if (along > 0 && along < c.len && perp < 8 && h.dashT <= 0 && h.inv <= 0 && S.wall <= 0){
-        heroDamage(c.dmg);
+        heroDamage(c.dmg, 'Fenrir: Chain Snap');
         if (mode === 'combat' && !dbg.god){ S.bind = { t: 1.8, e: c.e }; addText(h.x, h.y - 14, 'Bound! Dash to break free', '#b4bccb', true); }
       }
     }
@@ -2145,7 +2188,7 @@ function updateBossFx(dt){
     } else if (L.state === 'wind' && L.t >= L.wind){ L.state = 'run'; L.t = 0; L.x = L.sx; L.y = L.sy; }
     else if (L.state === 'run'){
       L.x += L.ux * 420 * dt; L.y += L.uy * 420 * dt;
-      if (!L.hitDone && dist2(L.x, L.y, h.x, h.y) < 12 * 12){ L.hitDone = true; heroDamage(L.dmg); }
+      if (!L.hitDone && dist2(L.x, L.y, h.x, h.y) < 12 * 12){ L.hitDone = true; heroDamage(L.dmg, 'Fenrir: Devour the Sun'); }
       if (Math.random() < .9) S.parts.push({ x: L.x + rand(-4, 4), y: L.y + rand(-3, 3), vx: 0, vy: 0, life: .35, max: .35, col: pick(['#3a1a5c', '#2a1240', '#7a45c8']), s: 2, add: false });
       if (L.t * 420 >= L.len) L.state = 'done';
     }
@@ -2289,7 +2332,7 @@ function update(dt){
     if (e.dead) continue;
     e.t += dt; e.flash = Math.max(0, e.flash - dt);
     if (e.burn > 0 && e.immune) e.burn = 0;
-    if (e.burn > 0){ e.burn -= dt; e.hp -= e.burnD * dt; if (Math.random() < .25) S.parts.push({ x: e.x + rand(-3, 3), y: e.y - rand(0, e.h / 2), vx: 0, vy: -20, life: .35, max: .35, col: pick(['#ff5b2e', '#ffb05a']), s: 1, add: true }); if (e.hp <= 0){ kill(e); continue; } }
+    if (e.burn > 0){ e.burn -= dt; statDmg(e.burnSrc || 'hero', Math.min(e.burnD * dt, Math.max(0, e.hp))); if (e.burnSrc) e.lastSrc = e.burnSrc; e.hp -= e.burnD * dt; if (Math.random() < .25) S.parts.push({ x: e.x + rand(-3, 3), y: e.y - rand(0, e.h / 2), vx: 0, vy: -20, life: .35, max: .35, col: pick(['#ff5b2e', '#ffb05a']), s: 1, add: true }); if (e.hp <= 0){ kill(e); continue; } }
     if (e.slowT > 0) e.slowT -= dt;
     if (e.frz > 0){ e.frz -= dt; continue; }
     if (e.stun > 0){ e.stun -= dt; continue; }
@@ -2309,9 +2352,9 @@ function update(dt){
     if (e.mst === 'crouch' || e.mst === 'leap' || e.mst === 'mark' || e.mst === 'dive') e.face = e.lx < 0 ? -1 : 1;
     else if (Math.abs(dx) > 1) e.face = dx < 0 ? -1 : 1;
     if (d < e.r + 6){
-      if (e.d.wisp){ const hp0 = h.hp; heroDamage(e.dmg); if (h.hp < hp0 && S.boss && !S.boss.dead){ const heal = S.boss.max * .03; S.boss.hp = Math.min(S.boss.max, S.boss.hp + heal); addText(S.boss.x, S.boss.y - S.boss.h / 2 - 6, '+' + Math.round(heal), '#7dc46a', true); S.bolts.push({ pts: [[h.x, h.y], [S.boss.x, S.boss.y]], life: .25 }); } e.dead = true; burst(e.x, e.y, 10, ['#a8f0d4', '#4fa88a'], 50); continue; }
+      if (e.d.wisp){ const hp0 = h.hp; heroDamage(e.dmg, 'Soul Wisp'); if (h.hp < hp0 && S.boss && !S.boss.dead){ const heal = S.boss.max * .03; S.boss.hp = Math.min(S.boss.max, S.boss.hp + heal); addText(S.boss.x, S.boss.y - S.boss.h / 2 - 6, '+' + Math.round(heal), '#7dc46a', true); S.bolts.push({ pts: [[h.x, h.y], [S.boss.x, S.boss.y]], life: .25 }); } e.dead = true; burst(e.x, e.y, 10, ['#a8f0d4', '#4fa88a'], 50); continue; }
       if (S.rage > 0 && (e.rageCd || 0) <= S.time){ e.rageCd = S.time + .4; hit(e, S.rageDmg, 'phys', null); if (e.dead && S.rageL3 && h.dashCh < h.dashSlots){ h.dashCh++; addText(h.x, h.y - 14, 'Dash refilled', '#e6ebf5', false); } if (e.dead) continue; }
-      heroDamage(e.dmg);
+      heroDamage(e.dmg, e.d.boss ? e.d.name : (e.elite ? 'Elite ' : '') + e.d.name);
     }
     if (!e.d.boss){ const key = ((e.x / 14) | 0) + ',' + ((e.y / 14) | 0); let c = grid.get(key); if (!c) grid.set(key, c = []); c.push(e); }
   }
@@ -2326,7 +2369,7 @@ function update(dt){
   S.enemies = S.enemies.filter(e => !e.dead);
 
   // enemy projectiles
-  for (const p of S.eprojs){ p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; if (dist2(p.x, p.y, h.x, h.y) < (p.r + 4) ** 2){ if (S.wall > 0 && S.wallReflect){ S.projs.push({ kind: 'holy', x: p.x, y: p.y, vx: -p.vx * 1.6, vy: -p.vy * 1.6, dmg: p.dmg * 3, dtype: 'magic', u: null, r: 3, life: 1.5, aoe: 0, pierce: 0, hits: null }); } else heroDamage(p.dmg); p.life = 0; } }
+  for (const p of S.eprojs){ p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; if (dist2(p.x, p.y, h.x, h.y) < (p.r + 4) ** 2){ if (S.wall > 0 && S.wallReflect){ S.projs.push({ kind: 'holy', x: p.x, y: p.y, vx: -p.vx * 1.6, vy: -p.vy * 1.6, dmg: p.dmg * 3, dtype: 'magic', u: null, r: 3, life: 1.5, aoe: 0, pierce: 0, hits: null }); } else heroDamage(p.dmg, p.src || (S.boss ? S.boss.d.name + ' projectile' : 'Projectile')); p.life = 0; } }
   S.eprojs = S.eprojs.filter(p => p.life > 0);
   // telegraphs
   for (const t of S.tele){
@@ -2337,7 +2380,7 @@ function update(dt){
       const L = TELE_LOOK[t.kind] || TELE_LOOK.frost;
       sfx(t.kind === 'fire' ? 'bigfire' : 'slam');
       if (dist2(h.x, h.y, t.x, t.y) < (t.r + 40) ** 2) kick(h.x - t.x, h.y - t.y, t.kind ? 2 : 4);
-      if (dist2(h.x, h.y, t.x, t.y) < t.r * t.r){ heroDamage(t.dmg); if (!t.kind) flash('255,255,255', .3); }
+      if (dist2(h.x, h.y, t.x, t.y) < t.r * t.r){ heroDamage(t.dmg, t.kind === 'slam' ? 'Iron Draugr: Hammer Slam' : t.kind === 'fire' ? 'Burning elite explosion' : S.boss ? S.boss.d.name + ': Stomp' : 'Ground attack'); if (!t.kind) flash('255,255,255', .3); }
       burst(t.x, t.y, t.kind ? 18 : 30, L.burst, t.kind ? 80 : 110);
       S.rings.push({ x: t.x, y: t.y, r: t.r, life: .3, max: .3, col: L.ring });
       S.shake = Math.min(8, S.shake + L.shake);
@@ -2350,7 +2393,7 @@ function update(dt){
     z.t += dt; z.life -= dt;
     if (z.kind === 'ember'){
       z.tick -= dt; if (z.tick > 0) continue; z.tick = .35;
-      for (const e of S.enemies) if (!e.dead && ((e.x - z.x) / (z.r + e.r)) ** 2 + ((e.y - z.y) / (z.ry + e.r)) ** 2 < 1) hit(e, 4 + S.wave * 1.2, 'magic', null);
+      for (const e of S.enemies) if (!e.dead && ((e.x - z.x) / (z.r + e.r)) ** 2 + ((e.y - z.y) / (z.ry + e.r)) ** 2 < 1) hit(e, 4 + S.wave * 1.2, 'magic', null, { src: 'ember' });
       continue;
     }
     if (z.t >= z.arm && ((h.x - z.x) / z.r) ** 2 + ((h.y + 4 - z.y) / z.ry) ** 2 < 1) S.chill = Math.max(S.chill, .3);
@@ -2418,7 +2461,7 @@ function enemyAI(e, dt, dx, dy, d, sp){
       return;
     }
     e.atkT -= dt;
-    if (e.atkT <= 0 && d < 170){ e.atkT = rand(2.2, 3); S.eprojs.push({ x: e.x, y: e.y - 4, vx: dx / d * 85, vy: dy / d * 85, dmg: e.dmg, r: 3, life: 3, col: '#d6a2ff' }); }
+    if (e.atkT <= 0 && d < 170){ e.atkT = rand(2.2, 3); S.eprojs.push({ x: e.x, y: e.y - 4, vx: dx / d * 85, vy: dy / d * 85, dmg: e.dmg, r: 3, life: 3, col: '#d6a2ff', src: 'Witch' }); }
     return;
   }
   // draugr shamble straight at you, wights and wisps drift
@@ -3036,7 +3079,7 @@ function openShop(){
   shopReadyAt = performance.now() + 800; S.rollN = 0; S.xpN = 0; S.healN = 0; S.selRelic = null;
   if (!S.relics) S.relics = [];
   if (S.resumed) S.resumed = false; // a continued raid keeps its saved event
-  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 3; setTimeout(() => toast("Ghost Ship Chest: +3 gold"), 400); } }
+  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 3; statGold('Relics', 3); setTimeout(() => toast("Ghost Ship Chest: +3 gold"), 400); } }
   setMode('shop'); $('#info').innerHTML = DEFAULT_INFO; renderShop(); }
 const DEFAULT_INFO = 'Click a card to buy it. Lock a card with its padlock to keep it through rerolls and into the next shop. Reroll, XP and healing get 50% more expensive each time you use them in the same shop. Health only refills by itself after a boss. Drag a unit onto a slot to move or swap it, or right-click to send it between bench and formation. Three of a kind combine into one more star.';
 let toastT = 0;
@@ -3344,7 +3387,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.15.0'; // major.minor.patch
+const VERSION = '0.16.0'; // major.minor.patch
 const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3781,6 +3824,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.16.0', 'Damage meter and run summary', ['A damage meter: press Tab to see how much each unit deals this wave, or for the whole raid. In the shop it shows the last wave', 'A run summary on the result screen: damage by unit, class and element, what hit you hardest, where your gold went, and your health after each wave', 'Optional anonymous run stats help us balance the game. You are asked once, and you can change it in Settings']],
   ['0.15.0', 'Physical and magic damage', ['The Rune Forge upgrade Raw Damage is split into Physical Damage (warriors and archers) and Magic Damage (mages and priests), +8% per level each', 'Runes spent on Raw Damage are refunded, so you can choose again', 'Fixed: cloud saves now keep the relics you have found']],
   ['0.14.0', 'The Field Guide', ['The Bestiary is now the Field Guide, with tabs for Beasts and Relics. Open it from the main menu or the pause menu', 'Each relic unlocks in the guide the first time the Merchant offers it or the Altar grants it. Until then you only get a hint', 'Relics cost more: 18 to 35 gold, so buying one is a real decision', 'The tutorial now shows the Wandering Merchant and the other campfire visitors', 'Simpler names: the Seiðkona is now the Witch, the Draugr Jarl is the Draugr King, and other Old Norse names became plain English, such as Odin\'s Spear, Great Fireball, Swift Stride and Ghost Ship Chest']],
   ['0.13.0', 'Smoother and fairer', ['Interface size setting, picked automatically from your screen height', 'Graphics quality (High, Medium, Low), Reduce flashing and Show FPS in Settings. If the game runs slowly it offers to switch to Low', 'The shop fits short screens: the Start wave row stays visible, and the shop no longer stretches on ultrawide screens', 'Faster drawing of the ground and faster hit checks in crowded waves', 'Raven Banner now opens a 9th slot behind the hero at any level', 'Give up asks for confirmation', 'Fixed: the shop no longer jumps up and down when you hover cards and units. Long descriptions scroll inside the info box', 'The game fills the whole screen. Everyone sees exactly the same 16:9 battlefield, and on wider screens the sides fill with mist that hides anything in it', 'On wide screens the ability and health bar moves into the mist at the side, and the shop uses the extra width']],
@@ -3837,6 +3881,65 @@ $('#ups').addEventListener('click', e => {
   meta.runes -= c; meta[u.k]++; saveMeta(); renderMeta();
 });
 
+/* ---------- run summary on the result screen ---------- */
+function sumBars(obj, n, label, icon){
+  const list = Object.entries(obj).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, n);
+  if (!list.length) return '<div class="mt-empty">Nothing yet</div>';
+  const top = list[0][1], tot = Object.values(obj).reduce((a, b) => a + b, 0) || 1;
+  return list.map(([k, v]) => `<div class="mt-row">${icon ? `<img src="${icon(k)}" alt="">` : '<span></span>'}<div class="nm"><span>${label(k)}</span><div class="bar"><i style="width:${Math.max(2, 100 * v / top)}%;background:${meterColor(k)}"></i></div></div><b>${fmtN(v)} <small style="color:var(--muted)">${Math.round(100 * v / tot)}%</small></b></div>`).join('');
+}
+function groupBy(obj, f){ const o = {}; for (const [k, v] of Object.entries(obj)){ const g = f(k); if (g) o[g] = (o[g] || 0) + v; } return o; }
+function renderRunSummary(){
+  const st = S.stats; if (!st){ $('#runSum').innerHTML = ''; return; }
+  const byCls = groupBy(st.dmg, k => CLASSES[k.split('_')[0]] ? k.split('_')[0] : null), byEl = groupBy(st.dmg, k => MODS[k.split('_')[1]] ? k.split('_')[1] : null);
+  const taken = Object.entries(st.taken).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  const sumO = o => Object.values(o).reduce((a, b) => a + b, 0);
+  const hp = st.hp, w = Math.max(1, hp.length - 1);
+  const spark = hp.length > 1 ? `<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-label="Health after each wave"><polyline fill="none" stroke="var(--hp,#c4213f)" stroke-width="1.5" vector-effect="non-scaling-stroke" points="${hp.map((v, i) => `${(i / w * 100).toFixed(1)},${(38 - v * .36).toFixed(1)}`).join(' ')}"/></svg>` : '<div class="mt-empty">Fewer than two waves</div>';
+  const board = S.board.filter(Boolean);
+  $('#runSum').innerHTML = `
+    <section><h3>Damage dealt</h3>${sumBars(st.dmg, 8, srcLabel, srcIcon)}</section>
+    <section><h3>By class</h3>${sumBars(byCls, 4, k => CLASSES[k].name + 's', k => ICON[k])}<h3 style="margin-top:6px">By element</h3>${sumBars(byEl, 6, k => MODS[k].name, null)}</section>
+    <section><h3>Damage taken</h3>${taken.length ? taken.map(([k, v]) => `<div class="line${k === st.killer ? ' kill' : ''}"><span>${k}${k === st.killer ? ' · final blow' : ''}</span><b>${Math.round(v)}</b></div>`).join('') : '<div class="mt-empty">No damage taken</div>'}</section>
+    <section><h3>Gold</h3><div class="line"><span>Earned</span><b>${sumO(st.earned)}</b></div>${Object.entries(st.earned).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="line"><span>· ${k}</span><b>${v}</b></div>`).join('')}<div class="line" style="margin-top:4px"><span>Spent</span><b>${sumO(st.spent)}</b></div>${Object.entries(st.spent).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="line"><span>· ${k}</span><b>${v}</b></div>`).join('')}</section>
+    <section><h3>Health after each wave</h3>${spark}</section>
+    <section><h3>Your build</h3><div class="build">${board.map(u => `<img src="${ICON[ukey(u)]}" alt="${cardName(u)} ${u.star} star" title="${cardName(u)} ${'★'.repeat(u.star)}">`).join('')}</div>
+      <div class="line"><span>Abilities</span><b>${S.abil.filter(Boolean).map(a => ABILITIES[a.key].name + ' ' + LV[a.lvl - 1]).join(', ') || 'None'}</b></div>
+      <div class="line"><span>Relics</span><b>${(S.relics || []).map(k => RELICS[k].name).join(', ') || 'None'}</b></div></section>`;
+}
+/* ---------- anonymous run stats for balancing ---------- */
+const RUNS_URL = 'https://zgzvhcwzrtjoapnozroo.supabase.co/rest/v1/runs';
+function runRecord(result){
+  const st = S.stats, r = n => Math.round(n);
+  const forge = {}; for (const u of UPGRADES) forge[u.k] = meta[u.k] || 0;
+  const dmg = {}; for (const [k, v] of Object.entries(st.dmg)) dmg[k] = r(v);
+  const taken = {}; for (const [k, v] of Object.entries(st.taken)) taken[k] = r(v);
+  return {
+    version: VERSION, build: BUILD, hero: HERO_ID, map: MAP_ID, result, wave: S.wave,
+    endless_wave: S.endless ? Math.max(0, S.wave - WAVES.length - 1) : 0, minutes: Math.round((Date.now() - st.t0) / 6000) / 10, debug: !!S.debugUsed,
+    data: { level: S.level, kills: S.kills, bosses: S.bosses, partial: st.partial, board: S.board.filter(Boolean).map(u => ({ c: u.cls, m: u.mod, s: u.star })),
+      bench: S.bench.filter(Boolean).map(u => ({ c: u.cls, m: u.mod, s: u.star })), abilities: S.abil.filter(Boolean).map(a => ({ k: a.key, l: a.lvl })),
+      relics: (S.relics || []).slice(), relicBuys: st.relicBuys, events: st.events, forge, dash: S.hero.dashSlots,
+      dmg, kills: st.kills, taken, killer: st.killer, earned: st.earned, spent: st.spent, hp: st.hp },
+  };
+}
+async function sendRun(rec){
+  try {
+    const res = await fetch(RUNS_URL, { method: 'POST', headers: { apikey: LB_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' }, body: JSON.stringify(rec) });
+    $('#shareMsg').textContent = res.ok ? 'Run stats shared. Thank you for helping balance the game!' : '';
+  } catch (e) { $('#shareMsg').textContent = ''; }
+}
+let pendingRun = null;
+function afterRunStats(result){
+  renderRunSummary();
+  $('#shareMsg').textContent = '';
+  const ok = S.stats && !S.stats.botUsed && !S.tutorial;
+  pendingRun = ok ? runRecord(result) : null;
+  $('#shareAsk').hidden = !(ok && settings.share == null);
+  if (ok && settings.share === true) sendRun(pendingRun);
+}
+$('#shareYes').onclick = () => { settings.share = true; saveSettings(); $('#shareAsk').hidden = true; if (pendingRun) sendRun(pendingRun); };
+$('#shareNo').onclick = () => { settings.share = false; saveSettings(); $('#shareAsk').hidden = true; $('#shareMsg').textContent = 'No problem. You can turn it on in Settings.'; };
 function gameOver(win, quit){
   if (S && S.tutorial){ endTutorial(); return; }
   sfx(win ? 'victory' : 'death');
@@ -3855,6 +3958,7 @@ function gameOver(win, quit){
   $('#lbBlocked').hidden = !S.endless || !S.debugUsed;
   $('#lbMsg').textContent = ''; $('#lbSend').disabled = false;
   try { $('#lbName').value = localStorage.getItem('valhalla.name') || ''; } catch (e) {}
+  afterRunStats(win ? 'won' : quit ? 'quit' : 'died');
   setMode('over');
 }
 function togglePause(v){ if (mode !== 'combat' && mode !== 'shop') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; $('#pause').classList.toggle('over-shop', mode === 'shop'); $('#btnSavePause').hidden = !(mode === 'shop' && S && !S.tutorial); if (!paused || !$('#bestiary').hidden) showBestiary(false); }
@@ -3871,6 +3975,7 @@ addEventListener('keydown', e => {
   if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return; // typing in a form
   if (!$('#feedback').hidden){ if (e.code === 'Escape') closeFeedback(); return; }
   if (e.code === 'KeyM' && !e.repeat && !e.ctrlKey && !e.metaKey){ toggleMute(); return; }
+  if (e.code === 'Tab' && (mode === 'combat' || mode === 'shop') && !e.altKey){ e.preventDefault(); if (!e.repeat) toggleMeter(); return; }
   keys[e.code] = true;
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (mode === 'combat' || mode === 'shop')) e.preventDefault();
   if (mode === 'combat'){
@@ -3950,6 +4055,20 @@ function updateHud(dt){
 /* ================= LOOP ================= */
 let last = performance.now(), acc = 0;
 const STEP = 1 / 60;
+/* ================= RUN STATS: what happened in a raid, for the damage meter, the summary and balancing ================= */
+const HERO_ID = 'viking', MAP_ID = 'barrows'; // fields for future heroes and maps
+const newStats = () => ({ t0: Date.now(), dmg: {}, wdmg: {}, lastW: {}, kills: {}, taken: {}, killer: null, earned: {}, spent: {}, hp: [], relicBuys: [], events: [], botUsed: !!dbg.bot, partial: false });
+const ukey = u => u.cls + '_' + u.mod;
+function statDmg(src, n){ const st = S && S.stats; if (!st || !(n > 0)) return; st.dmg[src] = (st.dmg[src] || 0) + n; st.wdmg[src] = (st.wdmg[src] || 0) + n; }
+function statGold(kind, n, spend){ const st = S && S.stats; if (!st || !(n > 0) || S.tutorial) return; const o = spend ? st.spent : st.earned; o[kind] = (o[kind] || 0) + n; }
+function srcLabel(k){
+  if (k === 'hero') return 'Hero and power-ups';
+  if (k === 'ember') return 'Ember Boots';
+  const [c, m] = k.split('_'); return CLASSES[c] && MODS[m] ? `${MODS[m].name} ${CLASSES[c].name}` : k;
+}
+const srcIcon = k => k === 'hero' || k === 'ember' ? ICON.hero : ICON[k] || ICON.hero;
+const fmtN = n => n >= 10000 ? Math.round(n / 1000) + 'k' : n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(Math.round(n));
+
 /* ================= RELICS: items that twist a rule for the rest of the raid ================= */
 const MAX_RELICS = 3;
 const RELICS = {
@@ -3993,13 +4112,13 @@ function buyRelic(k){
   const R = RELICS[k]; if (!R || !S.event || S.event.type !== 'merchant' || S.event.bought.includes(k)) return;
   if (S.relics.length >= MAX_RELICS) return toast('Your relic slots are full. Sell a relic first.');
   if (!dbg.infGold && S.gold < R.price) return toast('Not enough gold');
-  if (!dbg.infGold) S.gold -= R.price;
-  gainRelic(k); S.event.bought.push(k); sfx('merge'); toast(`${R.name} is yours`);
+  if (!dbg.infGold){ S.gold -= R.price; statGold('Relics', R.price, true); }
+  gainRelic(k); S.event.bought.push(k); if (S.stats){ S.stats.relicBuys.push({ k, w: S.wave }); const ev = S.stats.events[S.stats.events.length - 1]; if (ev && ev.t === 'merchant') ev.a = true; } sfx('merge'); toast(`${R.name} is yours`);
   renderShop(); $('#info').innerHTML = describeRelic(k, true);
 }
 function sellRelic(k){
   const i = S.relics.indexOf(k); if (i < 0) return;
-  S.relics.splice(i, 1); S.gold += relicSell(k); S.selRelic = null; relicsChanged(); sfx('sell');
+  S.relics.splice(i, 1); S.gold += relicSell(k); statGold('Selling', relicSell(k)); S.selRelic = null; relicsChanged(); sfx('sell');
   toast(`Sold ${RELICS[k].name} for ${relicSell(k)} gold`); renderShop(); $('#info').innerHTML = DEFAULT_INFO;
 }
 function describeRelic(k, owned){
@@ -4032,6 +4151,7 @@ function rollEvent(){
   S.sinceEvent = 0;
   const altarOk = !S.endless && !waveDef(S.wave).boss;
   S.event = makeEvent(weighted({ merchant: 6, shrine: 2, altar: altarOk ? 2 : 0 }));
+  if (S.stats) S.stats.events.push({ t: S.event.type, w: S.wave, a: false });
 }
 function renderEvent(){
   const el = $('#event'), E = S.event;
@@ -4053,8 +4173,8 @@ function renderEvent(){
 function eventAction(a){
   const E = S.event; if (!E || E.done) return;
   if (a === 'leave'){ E.done = true; if (E.type === 'shrine') S.event = null; renderShop(); return; }
-  if (E.type === 'shrine'){ if (S.hero.hp <= E.cost + 1) return; S.hero.hp -= E.cost; S.gold += E.gold; E.done = true; sfx('hurt'); sfx('coin'); toast(`The shrine takes ${E.cost} health and gives ${E.gold} gold`); }
-  if (E.type === 'altar'){ S.altarPending = true; E.done = true; sfx('bosscast', 'herald'); toast('The curse is on you'); }
+  if (E.type === 'shrine'){ if (S.hero.hp <= E.cost + 1) return; S.hero.hp -= E.cost; S.gold += E.gold; statGold('Events', E.gold); E.done = true; if (S.stats){ const ev = S.stats.events[S.stats.events.length - 1]; if (ev) ev.a = true; } sfx('hurt'); sfx('coin'); toast(`The shrine takes ${E.cost} health and gives ${E.gold} gold`); }
+  if (E.type === 'altar'){ S.altarPending = true; E.done = true; if (S.stats){ const ev = S.stats.events[S.stats.events.length - 1]; if (ev) ev.a = true; } sfx('bosscast', 'herald'); toast('The curse is on you'); }
   renderShop();
 }
 // small sprites for the event visitors at the campfire
@@ -4408,7 +4528,7 @@ function syncSettings(){
   const mb = $('#setMute'); mb.textContent = settings.muted ? 'Muted' : 'Sound on'; mb.setAttribute('aria-pressed', String(settings.muted)); mb.classList.toggle('muted', settings.muted);
   for (const id of ['setMaster', 'setMusic', 'setSfx']) $('#' + id).disabled = settings.muted;
   $('#setUi').value = String(settings.ui); $('#setQ').value = settings.quality; tog('setCalm', settings.calm); tog('setFps', settings.fps);
-  tog('setShake', settings.shake); tog('setDmg', settings.dmgNum); tog('setTips', showTips);
+  tog('setShake', settings.shake); tog('setMeter', settings.meter); tog('setShare', settings.share === true); tog('setDmg', settings.dmgNum); tog('setTips', showTips);
 }
 function openSettings(){ syncSettings(); $('#settings').hidden = false; $('#setBack').focus(); }
 function closeSettings(){ $('#settings').hidden = true; const b = mode === 'title' ? $('#btnSettings') : $('#btnSetPause'); b && b.focus(); }
@@ -4425,6 +4545,8 @@ $('#setFps').onclick = () => { settings.fps = !settings.fps; saveSettings(); syn
 $('#perfYes').onclick = () => { settings.quality = 'low'; saveSettings(); groundKey = ''; $('#perfTip').hidden = true; toast('Graphics set to Low. Change it any time in Settings'); };
 $('#perfNo').onclick = () => { $('#perfTip').hidden = true; };
 $('#fps').hidden = !settings.fps;
+$('#setMeter').onclick = () => toggleMeter();
+$('#setShare').onclick = () => { settings.share = settings.share !== true; saveSettings(); syncSettings(); };
 $('#setShake').onclick = () => { settings.shake = !settings.shake; saveSettings(); syncSettings(); };
 $('#setDmg').onclick = () => { settings.dmgNum = !settings.dmgNum; saveSettings(); syncSettings(); };
 $('#setTips').onclick = () => { toggleTips(); syncSettings(); };
@@ -4440,7 +4562,7 @@ $('#tutSkip').onclick = () => endTutorial();
 let botAim = null, botT = 0, botCast = 0;
 const MOVE_KEYS = ['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 function setBot(on){
-  dbg.bot = !!on; $('#dbgBot').checked = dbg.bot; botT = 0; botAim = null;
+  dbg.bot = !!on; if (on && S && S.stats) S.stats.botUsed = true; $('#dbgBot').checked = dbg.bot; botT = 0; botAim = null;
   for (const k in keys) keys[k] = false;
 }
 function botShop(){
@@ -4504,6 +4626,25 @@ function botMeta(dt){
 $('#dbg').addEventListener('click', e => { const b = e.target.closest('button[data-ev]'); if (!b || !S) return; if (mode !== 'shop') return toast('Open the shop first'); S.event = makeEvent(b.dataset.ev); renderShop(); });
 $('#dbgBot').addEventListener('change', e => { setBot(e.target.checked); toast(dbg.bot ? 'Autoplay on' : 'Autoplay off'); });
 
+/* ---------- damage meter ---------- */
+let meterRaid = false, meterAcc = 0;
+function meterColor(k){ if (MODS[k]) return MODS[k].col; const m = k.split('_')[1]; return MODS[m] ? MODS[m].col : '#e2b24c'; }
+function meterRows(obj, max){
+  const list = Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, max);
+  if (!list.length) return '<div class="mt-empty">No damage yet</div>';
+  const top = list[0][1], tot = Object.values(obj).reduce((a, b) => a + b, 0) || 1;
+  return list.map(([k, v]) => `<div class="mt-row"><img src="${srcIcon(k)}" alt=""><div class="nm"><span>${srcLabel(k)}</span><div class="bar"><i style="width:${Math.max(2, 100 * v / top)}%;background:${meterColor(k)}"></i></div></div><b>${fmtN(v)} <small style="color:var(--muted)">${Math.round(100 * v / tot)}%</small></b></div>`).join('');
+}
+function renderMeter(){
+  const el = $('#meter'), show = settings.meter && S && S.stats && (mode === 'combat' || mode === 'shop') && !S.tutorial;
+  el.hidden = !show; if (!show) return;
+  const st = S.stats, raid = meterRaid, obj = raid ? st.dmg : mode === 'shop' ? st.lastW : st.wdmg;
+  $('#meterTitle').textContent = raid ? 'Damage this raid' : mode === 'shop' ? 'Damage last wave' : 'Damage this wave';
+  $('#meterMode').textContent = raid ? 'Wave' : 'Raid';
+  $('#meterRows').innerHTML = meterRows(obj, 8);
+}
+function toggleMeter(){ settings.meter = !settings.meter; saveSettings(); renderMeter(); if (!$('#settings').hidden) syncSettings(); }
+$('#meterMode').onclick = e => { meterRaid = !meterRaid; e.currentTarget.blur(); renderMeter(); };
 // frame-rate counter, and a one-time suggestion to lower the graphics when combat stays slow
 const perf = { acc: 0, n: 0, fps: 60, slow: 0, asked: false };
 function perfWatch(dt){
@@ -4525,6 +4666,7 @@ function frame(now){
   if (dbg.bot && mode !== 'combat') botMeta(dt);
   if (tut) tutTick(false);
   perfWatch(dt);
+  meterAcc += dt; if (meterAcc > .25){ meterAcc = 0; renderMeter(); }
   dbgTick(dt);
   render(mode === 'combat' && paused ? 0 : dt);
   updateTips();

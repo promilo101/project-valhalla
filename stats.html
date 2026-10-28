@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valhalla Balance Stats</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@600&family=VT323&display=swap">
+<style>
+/* Layout: one reading column of balance tables; each table is a list of rows with a sample size and a bar */
+:root{
+  --bg:#0b0d13; --panel:#141822; --line:#262d3f; --fg:#e4e7ee; --muted:#8e95a6; --gold:#e2b24c; --ember:#ff5b2e; --frost:#86d4ff; --good:#7dc46a; --bad:#ff6b6b;
+  --display:'Pixelify Sans','Courier New',monospace; --body:'VT323','Courier New',monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:20px/1.25 var(--body)}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 16px 60px;display:grid;gap:22px}
+h1{font:600 clamp(28px,5vw,40px)/1.1 var(--display);margin:0}
+h1 span{color:var(--ember)}
+h2{font:600 22px var(--display);margin:0 0 8px;color:var(--gold)}
+.lede{margin:0;color:#c3c8d4;max-width:70ch}
+.note{color:var(--muted);font-size:18px;margin:0}
+.filters{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:10px 12px}
+label{display:flex;gap:6px;align-items:center}
+select,button{font:inherit;font-size:19px;color:var(--fg);background:#1b2030;border:1px solid var(--line);border-radius:2px;padding:2px 10px}
+button{cursor:pointer}
+button:hover{border-color:var(--gold)}
+button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.tile{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:10px 12px}
+.tile .k{color:var(--muted);font-size:17px;letter-spacing:.08em;text-transform:uppercase}
+.tile .v{font-size:36px;line-height:1;font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:16px}
+section.card{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:12px 14px;min-width:0}
+.tbl{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tbl th{font-weight:400;color:var(--muted);text-align:right;font-size:17px;padding:2px 6px;border-bottom:1px solid var(--line)}
+.tbl th:first-child,.tbl td:first-child{text-align:left}
+.tbl td{padding:3px 6px;text-align:right;white-space:nowrap}
+.tbl td.bar{width:38%}
+.tbl tr.few td{color:var(--muted)}
+.b{height:8px;background:#1b2030;border-radius:1px;overflow:hidden}
+.b i{display:block;height:100%;background:var(--gold)}
+.hist{display:flex;align-items:flex-end;gap:3px;height:140px;border-bottom:1px solid var(--line);padding-top:6px}
+.hist div{flex:1;background:var(--frost);min-height:1px;position:relative}
+.hist div.boss{background:var(--ember)}
+.hist div span{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);font-size:14px;color:var(--muted)}
+.hx{display:flex;gap:3px;font-size:14px;color:var(--muted)}
+.hx span{flex:1;text-align:center}
+.status{color:var(--muted)}
+.status.err{color:var(--bad)}
+.scroll{overflow-x:auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <h1>Project Valhalla <span>balance stats</span></h1>
+    <p class="lede">Anonymous run records from players who chose to share them. Rows with fewer than 5 runs are greyed out, because small samples are mostly noise.</p>
+  </header>
+  <div class="filters" role="group" aria-label="Filters">
+    <label for="fVer">Version <select id="fVer"><option value="">All</option></select></label>
+    <label for="fBuild">Build <select id="fBuild"><option value="public">Public</option><option value="dev">Dev</option><option value="">Both</option></select></label>
+    <label for="fHero">Hero <select id="fHero"><option value="">All</option></select></label>
+    <label for="fMap">Map <select id="fMap"><option value="">All</option></select></label>
+    <label for="fDebug"><input type="checkbox" id="fDebug"> Include debug runs</label>
+    <button type="button" id="btnReload">Reload</button>
+    <button type="button" id="btnJson">Download JSON</button>
+    <span class="status" id="status" role="status">Loading…</span>
+  </div>
+  <div class="tiles" id="tiles"></div>
+  <section class="card"><h2>Where raids end</h2><div class="hist" id="hist"></div><div class="hx" id="hx"></div><p class="note" style="margin-top:6px">Red bars are boss waves. "E" is Endless (after wave 20).</p></section>
+  <div class="grid">
+    <section class="card"><h2>What kills players</h2><div class="scroll"><table class="tbl" id="tKill"></table></div></section>
+    <section class="card"><h2>Gold spent per run</h2><div class="scroll"><table class="tbl" id="tGold"></table></div></section>
+    <section class="card"><h2>Elements in the final formation</h2><div class="scroll"><table class="tbl" id="tEl"></table></div></section>
+    <section class="card"><h2>Classes in the final formation</h2><div class="scroll"><table class="tbl" id="tCls"></table></div></section>
+    <section class="card"><h2>Relics</h2><div class="scroll"><table class="tbl" id="tRel"></table></div></section>
+    <section class="card"><h2>Hero abilities</h2><div class="scroll"><table class="tbl" id="tAb"></table></div></section>
+    <section class="card"><h2>Damage share by unit</h2><div class="scroll"><table class="tbl" id="tUnit"></table></div></section>
+    <section class="card"><h2>Rune Forge levels</h2><div class="scroll"><table class="tbl" id="tForge"></table></div></section>
+  </div>
+</div>
+<script>
+const URL = 'https://zgzvhcwzrtjoapnozroo.supabase.co/rest/v1/runs', KEY = 'sb_publishable_9x8BszWUoD7QCVVFyIDGrw_Vkok4swF';
+const EL = { jern: 'Iron', frost: 'Frost', ild: 'Fire', blod: 'Blood', lyn: 'Lightning', rune: 'Rune' };
+const CL = { warrior: 'Warrior', archer: 'Archer', mage: 'Mage', priest: 'Priest' };
+const RL = { iron_oath: 'Iron Oath', ember_boots: 'Ember Boots', odins_eye: "Odin's Eye", draugr_pact: 'Pact of the Dead', huginn_feather: 'Raven Feather', twin_souls: 'Twin Souls', gleipnir_link: 'Binding Chain', usurer_coin: "Moneylender's Coin", mead_hall: 'Horn of the Mead Hall', berserk_mark: "Berserker's Mark", raven_banner: 'Raven Banner', naglfar_chest: 'Ghost Ship Chest' };
+const AB = { bash: 'Shield Bash', spear: "Odin's Spear", quake: 'Earthshaker', cry: 'Battle Cry', wall: 'Shield Wall', ravens: "Odin's Ravens", horn: 'Horn of Valhalla', rage: 'Berserker Rage' };
+const FG = { atkspd: 'Attack Speed', crit: 'Critical Chance', critdmg: 'Critical Damage', physdmg: 'Physical Damage', magdmg: 'Magic Damage', mana: 'Mana', hp: 'Vitality', gold: 'War Chest', dash: 'Extra Dash Slots' };
+const BOSS = [5, 10, 15, 20];
+const $ = s => document.querySelector(s);
+let all = [];
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pct = x => Math.round(x * 100) + '%';
+const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
+const median = a => { if (!a.length) return 0; const b = [...a].sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+const beat = r => r.result === 'won' || r.wave > 20;
+const unitName = k => { const [c, m] = k.split('_'); return CL[c] && EL[m] ? `${EL[m]} ${CL[c]}` : k === 'hero' ? 'Hero and power-ups' : k === 'ember' ? 'Ember Boots' : k; };
+const bar = (v, max, col) => `<div class="b"><i style="width:${max ? Math.max(1, 100 * v / max) : 0}%;${col ? 'background:' + col : ''}"></i></div>`;
+function table(el, head, rows){ el.innerHTML = `<thead><tr>${head.map(h => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.join('') : `<tr><td colspan="${head.length}" class="note">No data yet</td></tr>`}</tbody>`; }
+// for a set of things, compare runs that had the thing with all runs
+function presence(runs, getKeys, label){
+  const m = new Map();
+  for (const r of runs){ for (const k of new Set(getKeys(r))){ if (!m.has(k)) m.set(k, []); m.get(k).push(r); } }
+  const base = avg(runs.map(r => r.wave));
+  const rows = [...m.entries()].map(([k, rs]) => ({ k, n: rs.length, share: rs.length / runs.length, wave: avg(rs.map(r => r.wave)), beat: rs.filter(beat).length / rs.length })).sort((a, b) => b.n - a.n);
+  const maxW = Math.max(1, ...rows.map(x => x.wave));
+  return rows.map(x => `<tr class="${x.n < 5 ? 'few' : ''}"><td>${esc(label(x.k))}</td><td>${x.n}</td><td>${pct(x.share)}</td><td>${x.wave.toFixed(1)} <small style="color:${x.wave >= base ? 'var(--good)' : 'var(--bad)'}">${x.wave >= base ? '+' : ''}${(x.wave - base).toFixed(1)}</small></td><td>${pct(x.beat)}</td><td class="bar">${bar(x.wave, maxW)}</td></tr>`);
+}
+function render(){
+  const v = $('#fVer').value, b = $('#fBuild').value, he = $('#fHero').value, mp = $('#fMap').value, dbg = $('#fDebug').checked;
+  const runs = all.filter(r => (!v || r.version === v) && (b === '' || (b === 'dev' ? r.build === 'dev' : r.build !== 'dev')) && (!he || r.hero === he) && (!mp || r.map === mp) && (dbg || !r.debug));
+  const waves = runs.map(r => r.wave), endless = runs.filter(r => r.wave > 20);
+  $('#tiles').innerHTML = [
+    ['Runs', runs.length], ['Beat Fenrir', runs.length ? pct(runs.filter(beat).length / runs.length) : '–'], ['Average wave', runs.length ? avg(waves).toFixed(1) : '–'],
+    ['Median minutes', runs.length ? median(runs.map(r => r.minutes || 0)).toFixed(1) : '–'], ['Best endless wave', endless.length ? Math.max(...endless.map(r => r.wave)) : '–'],
+  ].map(([k, x]) => `<div class="tile"><div class="k">${k}</div><div class="v">${x}</div></div>`).join('');
+  // where raids end
+  const buckets = Array.from({ length: 21 }, () => 0); for (const r of runs) buckets[Math.min(20, r.wave - 1)]++;
+  const bm = Math.max(1, ...buckets);
+  $('#hist').innerHTML = buckets.map((n, i) => `<div class="${BOSS.includes(i + 1) ? 'boss' : ''}" style="height:${100 * n / bm}%" title="${i < 20 ? 'Wave ' + (i + 1) : 'Endless'}: ${n} runs">${n ? `<span>${n}</span>` : ''}</div>`).join('');
+  $('#hx').innerHTML = buckets.map((_, i) => `<span>${i < 20 ? i + 1 : 'E'}</span>`).join('');
+  // killers
+  const kills = {}; for (const r of runs) if (r.result === 'died'){ const k = (r.data && r.data.killer) || 'Unknown'; kills[k] = (kills[k] || 0) + 1; }
+  const kl = Object.entries(kills).sort((a, b) => b[1] - a[1]), km = Math.max(1, ...kl.map(x => x[1])), deaths = kl.reduce((a, x) => a + x[1], 0) || 1;
+  table($('#tKill'), ['Final blow', 'Deaths', 'Share', ''], kl.slice(0, 15).map(([k, n]) => `<tr><td>${esc(k)}</td><td>${n}</td><td>${pct(n / deaths)}</td><td class="bar">${bar(n, km, 'var(--bad)')}</td></tr>`));
+  // gold
+  const spent = {}; for (const r of runs) for (const [k, n] of Object.entries((r.data && r.data.spent) || {})) spent[k] = (spent[k] || 0) + n;
+  const gl = Object.entries(spent).map(([k, n]) => [k, n / Math.max(1, runs.length)]).sort((a, b) => b[1] - a[1]), gm = Math.max(1, ...gl.map(x => x[1]));
+  table($('#tGold'), ['Spent on', 'Average per run', ''], gl.map(([k, n]) => `<tr><td>${esc(k)}</td><td>${n.toFixed(1)}</td><td class="bar">${bar(n, gm)}</td></tr>`));
+  const H = ['', 'Runs', 'Of all', 'Average wave', 'Beat Fenrir', ''];
+  table($('#tEl'), H, presence(runs, r => ((r.data && r.data.board) || []).map(u => u.m), k => EL[k] || k));
+  table($('#tCls'), H, presence(runs, r => ((r.data && r.data.board) || []).map(u => u.c), k => CL[k] || k));
+  table($('#tRel'), H, presence(runs, r => ((r.data && r.data.relicBuys) || []).map(x => x.k).concat((r.data && r.data.relics) || []), k => RL[k] || k));
+  table($('#tAb'), H, presence(runs, r => ((r.data && r.data.abilities) || []).map(a => a.k), k => AB[k] || k));
+  // damage share by unit type
+  const dm = {}; let dt = 0; for (const r of runs) for (const [k, n] of Object.entries((r.data && r.data.dmg) || {})){ dm[k] = (dm[k] || 0) + n; dt += n; }
+  const dl = Object.entries(dm).sort((a, b) => b[1] - a[1]).slice(0, 20), dmax = Math.max(1, ...dl.map(x => x[1]));
+  table($('#tUnit'), ['Unit', 'Share of all damage', ''], dl.map(([k, n]) => `<tr><td>${esc(unitName(k))}</td><td>${pct(n / (dt || 1))}</td><td class="bar">${bar(n, dmax)}</td></tr>`));
+  // forge
+  const fl = Object.keys(FG).map(k => { const lv = runs.map(r => (r.data && r.data.forge && r.data.forge[k]) || 0); return [k, avg(lv), lv.filter(x => x > 0).length / Math.max(1, runs.length)]; }), fm = Math.max(1, ...fl.map(x => x[1]));
+  table($('#tForge'), ['Upgrade', 'Average level', 'Runs with it', ''], fl.map(([k, a, p]) => `<tr><td>${FG[k]}</td><td>${a.toFixed(2)}</td><td>${pct(p)}</td><td class="bar">${bar(a, fm)}</td></tr>`));
+}
+function fillSelect(sel, values){ const cur = sel.value; sel.innerHTML = '<option value="">All</option>' + values.map(x => `<option>${esc(x)}</option>`).join(''); if (values.includes(cur)) sel.value = cur; }
+async function load(){
+  const st = $('#status'); st.textContent = 'Loading…'; st.classList.remove('err');
+  try {
+    const res = await fetch(`${URL}?select=created_at,version,build,hero,map,result,wave,endless_wave,minutes,debug,data&order=created_at.desc&limit=10000`, { headers: { apikey: KEY } });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    all = await res.json();
+    const uniq = f => [...new Set(all.map(f).filter(Boolean))];
+    fillSelect($('#fVer'), uniq(r => r.version).sort((a, b) => b.localeCompare(a, undefined, { numeric: true })));
+    fillSelect($('#fHero'), uniq(r => r.hero)); fillSelect($('#fMap'), uniq(r => r.map));
+    st.textContent = `${all.length} runs loaded`;
+  } catch (e) { all = []; st.textContent = 'Could not load runs. Check the connection, or that the runs table exists.'; st.classList.add('err'); }
+  render();
+}
+for (const id of ['#fVer', '#fBuild', '#fHero', '#fMap', '#fDebug']) $(id).addEventListener('change', render);
+$('#btnReload').onclick = load;
+$('#btnJson').onclick = () => { const a = document.createElement('a'); a.href = URL_.createObjectURL(new Blob([JSON.stringify(all, null, 1)], { type: 'application/json' })); a.download = 'valhalla-runs.json'; a.click(); };
+const URL_ = window.URL;
+load();
+</script>
+</body>
+</html>
