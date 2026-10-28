@@ -680,8 +680,8 @@ a.btn{text-decoration:none;display:inline-block}
       <dl class="keys" id="oStats"></dl>
       <div class="sum" id="runSum"></div>
       <div class="share-ask" id="shareAsk" hidden>
-        <p><strong>Help balance the game?</strong> When a raid ends, share anonymous stats about it: waves, units, relics and what killed you. No name and no save code are sent. You can change this any time in Settings.</p>
-        <div class="row"><button class="btn primary sm" id="shareYes" type="button">Yes, share</button><button class="btn sm" id="shareNo" type="button">No thanks</button></div>
+        <p><strong>Anonymous run stats help balance the game.</strong> When a raid ends, the game shares stats about it: waves, units, relics and what killed you. No name and no save code are sent. Do you want to keep sharing? You can change this any time in Settings.</p>
+        <div class="row"><button class="btn primary sm" id="shareYes" type="button">Keep sharing</button><button class="btn sm" id="shareNo" type="button">Turn off</button></div>
       </div>
       <p class="note" id="shareMsg" role="status"></p>
       <form class="lb-submit" id="lbForm" hidden novalidate>
@@ -3824,7 +3824,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.16.0', 'Damage meter and run summary', ['A damage meter: press Tab to see how much each unit deals this wave, or for the whole raid. In the shop it shows the last wave', 'A run summary on the result screen: damage by unit, class and element, what hit you hardest, where your gold went, and your health after each wave', 'Optional anonymous run stats help us balance the game. You are asked once, and you can change it in Settings', 'The campfire music in the shop is softer and no longer buzzes']],
+  ['0.16.0', 'Damage meter and run summary', ['A damage meter: press Tab to see how much each unit deals this wave, or for the whole raid. In the shop it shows the last wave', 'A run summary on the result screen: damage by unit, class and element, what hit you hardest, where your gold went, and your health after each wave', 'Anonymous run stats help us balance the game. They are on by default, you are told once, and you can turn them off in Settings', 'The campfire music in the shop is softer and no longer buzzes']],
   ['0.15.0', 'Physical and magic damage', ['The Rune Forge upgrade Raw Damage is split into Physical Damage (warriors and archers) and Magic Damage (mages and priests), +8% per level each', 'Runes spent on Raw Damage are refunded, so you can choose again', 'Fixed: cloud saves now keep the relics you have found']],
   ['0.14.0', 'The Field Guide', ['The Bestiary is now the Field Guide, with tabs for Beasts and Relics. Open it from the main menu or the pause menu', 'Each relic unlocks in the guide the first time the Merchant offers it or the Altar grants it. Until then you only get a hint', 'Relics cost more: 18 to 35 gold, so buying one is a real decision', 'The tutorial now shows the Wandering Merchant and the other campfire visitors', 'Simpler names: the Seiðkona is now the Witch, the Draugr Jarl is the Draugr King, and other Old Norse names became plain English, such as Odin\'s Spear, Great Fireball, Swift Stride and Ghost Ship Chest']],
   ['0.13.0', 'Smoother and fairer', ['Interface size setting, picked automatically from your screen height', 'Graphics quality (High, Medium, Low), Reduce flashing and Show FPS in Settings. If the game runs slowly it offers to switch to Low', 'The shop fits short screens: the Start wave row stays visible, and the shop no longer stretches on ultrawide screens', 'Faster drawing of the ground and faster hit checks in crowded waves', 'Raven Banner now opens a 9th slot behind the hero at any level', 'Give up asks for confirmation', 'Fixed: the shop no longer jumps up and down when you hover cards and units. Long descriptions scroll inside the info box', 'The game fills the whole screen. Everyone sees exactly the same 16:9 battlefield, and on wider screens the sides fill with mist that hides anything in it', 'On wide screens the ability and health bar moves into the mist at the side, and the shop uses the extra width']],
@@ -3936,11 +3936,11 @@ function afterRunStats(result){
   const ok = S.stats && !S.stats.botUsed && !S.tutorial && !S.debugUsed && BUILD !== 'dev';
   pendingRun = ok ? runRecord(result) : null;
   $('#shareAsk').hidden = !(ok && settings.share == null);
-  if (ok && settings.share === true) sendRun(pendingRun);
+  if (ok && settings.share !== false) sendRun(pendingRun); // on by default, players can turn it off
   if (BUILD === 'dev' && S.stats && !S.tutorial) $('#shareMsg').textContent = 'This is the test build, so run stats are not shared.';
 }
-$('#shareYes').onclick = () => { settings.share = true; saveSettings(); $('#shareAsk').hidden = true; if (pendingRun) sendRun(pendingRun); };
-$('#shareNo').onclick = () => { settings.share = false; saveSettings(); $('#shareAsk').hidden = true; $('#shareMsg').textContent = 'No problem. You can turn it on in Settings.'; };
+$('#shareYes').onclick = () => { settings.share = true; saveSettings(); $('#shareAsk').hidden = true; };
+$('#shareNo').onclick = () => { settings.share = false; saveSettings(); $('#shareAsk').hidden = true; $('#shareMsg').textContent = 'Run stats are off. Future raids are not shared. You can turn it back on in Settings.'; };
 function gameOver(win, quit){
   if (S && S.tutorial){ endTutorial(); return; }
   sfx(win ? 'victory' : 'death');
@@ -4531,7 +4531,7 @@ function syncSettings(){
   const mb = $('#setMute'); mb.textContent = settings.muted ? 'Muted' : 'Sound on'; mb.setAttribute('aria-pressed', String(settings.muted)); mb.classList.toggle('muted', settings.muted);
   for (const id of ['setMaster', 'setMusic', 'setSfx']) $('#' + id).disabled = settings.muted;
   $('#setUi').value = String(settings.ui); $('#setQ').value = settings.quality; tog('setCalm', settings.calm); tog('setFps', settings.fps);
-  tog('setShake', settings.shake); tog('setMeter', settings.meter); tog('setShare', settings.share === true); tog('setDmg', settings.dmgNum); tog('setTips', showTips);
+  tog('setShake', settings.shake); tog('setMeter', settings.meter); tog('setShare', settings.share !== false); tog('setDmg', settings.dmgNum); tog('setTips', showTips);
 }
 function openSettings(){ syncSettings(); $('#settings').hidden = false; $('#setBack').focus(); }
 function closeSettings(){ $('#settings').hidden = true; const b = mode === 'title' ? $('#btnSettings') : $('#btnSetPause'); b && b.focus(); }
@@ -4549,7 +4549,7 @@ $('#perfYes').onclick = () => { settings.quality = 'low'; saveSettings(); ground
 $('#perfNo').onclick = () => { $('#perfTip').hidden = true; };
 $('#fps').hidden = !settings.fps;
 $('#setMeter').onclick = () => toggleMeter();
-$('#setShare').onclick = () => { settings.share = settings.share !== true; saveSettings(); syncSettings(); };
+$('#setShare').onclick = () => { settings.share = settings.share === false; saveSettings(); syncSettings(); };
 $('#setShake').onclick = () => { settings.shake = !settings.shake; saveSettings(); syncSettings(); };
 $('#setDmg').onclick = () => { settings.dmgNum = !settings.dmgNum; saveSettings(); syncSettings(); };
 $('#setTips').onclick = () => { toggleTips(); syncSettings(); };
@@ -4681,7 +4681,7 @@ requestAnimationFrame(frame);
 cloudStartup();
 
 // small hook for automated playtesting
-window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup };
+window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup, runRecord, buyRelic, RELICS, gainRelic, sellAt, MODS, renderShop };
 })();
 </script>
 
