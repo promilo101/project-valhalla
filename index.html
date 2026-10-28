@@ -38,6 +38,32 @@ body{
 }
 #app{position:relative;height:100%;width:100%;overflow:hidden;border:1px solid var(--line);background:#07080c;border-radius:3px}
 #cv{position:absolute;left:0;top:0;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+#hud,#shop,#dock,#pause,.screen,#btnShopOpen,#toast,#count,#perfTip{zoom:var(--ui,1)}
+#app.wide #dock{left:var(--dockX,50%);bottom:24px}
+#shop{left:max(8px,calc(50% - max(820px,34vw)))!important;right:max(8px,calc(50% - max(820px,34vw)))!important}
+.bench{grid-template-columns:repeat(8,minmax(0,clamp(58px,5.4vw,112px)))!important;justify-content:start}
+#shop{grid-template-columns:200px minmax(0,1fr) clamp(230px,16vw,330px)}
+.card{min-height:clamp(96px,12vh,142px)}
+.card img{width:clamp(32px,2.6vw,52px);height:auto}
+.cards{max-width:min(100%,1040px)}
+.act{position:sticky;bottom:-12px;background:rgba(13,15,22,.97);padding:6px 0 8px;z-index:2;margin-bottom:-6px}
+@media (max-height:820px){
+  #shop{padding:8px 10px;gap:12px}
+  .card{min-height:94px;padding:4px 3px}
+  .card img{width:32px;height:38px}
+  .bench{grid-template-columns:repeat(8,minmax(0,66px))!important}
+  .event{padding:6px 8px;gap:6px;margin-bottom:6px}
+  .ev-head p{font-size:15px}
+  .ev-ic{height:34px}
+  .relic-card .rd{font-size:14px}
+  .info{min-height:3em}
+}
+@media (max-height:700px){
+  .keys{max-height:26vh;overflow:auto;padding-right:6px}
+  #title .screen-inner{gap:12px}
+  #title h1{font-size:clamp(40px,9vh,72px)}
+  .notes-link{position:static;justify-self:end;padding:0}
+}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
 .px{image-rendering:pixelated;image-rendering:crisp-edges}
@@ -120,6 +146,28 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .abt:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
 #dock{position:absolute;left:50%;bottom:10px;transform:translateX(-50%);display:grid;justify-items:center;gap:6px;pointer-events:none;width:min(260px,calc(100% - 20px))}
 #abil{display:flex;gap:8px;pointer-events:auto}
+#relicBar{display:flex;gap:4px;pointer-events:auto}
+#relicBar img{width:22px;height:22px;image-rendering:pixelated;image-rendering:crisp-edges;background:rgba(13,15,22,.85);border:1px solid var(--line);padding:2px;border-radius:2px}
+.relics{display:flex;justify-content:center;gap:6px}
+.rl{width:46px;height:46px;background:#10131b;border:1px solid var(--line);border-radius:2px;display:grid;place-items:center;padding:0}
+.rl.empty{border-style:dashed;cursor:default}
+.rl img{width:28px;height:28px;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
+.rl.sel{outline:2px solid var(--frost);outline-offset:1px}
+.event{border:1px solid #5a4a2a;background:linear-gradient(180deg,rgba(226,178,76,.08),rgba(226,178,76,.02));border-radius:2px;padding:8px 10px;margin-bottom:10px;display:grid;gap:8px}
+.ev-head{display:flex;gap:10px;align-items:center}
+.ev-head > div{min-width:0}
+.ev-ic{height:44px;image-rendering:pixelated;image-rendering:crisp-edges;flex:none}
+.ev-head h4{margin:0;font-size:22px;font-weight:400;color:var(--gold)}
+.ev-head p{margin:0;font-size:17px;line-height:1.2;color:#c9cfdb}
+.ev-head b{font-weight:400;color:var(--ember)}
+.ev-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.relic-card{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto auto;gap:0 8px;text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:2px;padding:6px 8px;color:var(--fg);font:inherit}
+.relic-card:hover:not(:disabled){border-color:var(--gold)}
+.relic-card:disabled{opacity:.5;cursor:default}
+.relic-card img{grid-row:1 / 4;width:30px;height:30px;image-rendering:pixelated;image-rendering:crisp-edges;align-self:center}
+.relic-card .rn{font-size:18px;color:var(--gold)}
+.relic-card .rd{font-size:15px;line-height:1.15;color:#c9cfdb}
+.relic-card .rp{font-size:16px;color:var(--muted)}
 #dock .hud-hp{width:100%}
 .dock-row{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
 #dock .hud-hp.low .bar i{animation:lowHp .8s ease-in-out infinite}
@@ -200,6 +248,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 @keyframes readyPulse{50%{box-shadow:0 0 0 1px var(--gold),0 0 2px rgba(226,178,76,.2)}}
 .formation{position:relative;width:180px;height:180px;margin:0 auto}
 .formation .slot{position:absolute;width:40px;height:40px}
+.formation.nine{height:228px}
 .formation .hero{position:absolute;left:50%;top:50%;width:34px;transform:translate(-50%,-50%)}
 .traits{display:grid;gap:4px;font-size:19px}
 .trait{display:flex;align-items:center;gap:8px;color:var(--muted);cursor:help;padding:1px 4px;margin:0 -4px;border-radius:2px}
@@ -214,6 +263,8 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .trait.on{color:var(--fg)}
 .trait b{font-weight:400;font-variant-numeric:tabular-nums}
 .trait.on b{color:var(--gold)}
+.side{display:flex;flex-direction:column;height:0;min-height:100%;overflow:hidden}
+.side .info{flex:1 1 0;min-height:4em;overflow:auto;padding-right:4px}
 .info{font-size:18px;color:#c9cfdb;min-height:5.2em;border-top:1px solid var(--line);padding-top:8px;margin-top:10px}
 .info strong{font-weight:400;color:var(--fg);font-size:20px}
 .next{font-size:19px;color:#c9cfdb;margin:10px 0 0}
@@ -244,7 +295,10 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .pu-list dd{margin:0}
 
 #pause{position:absolute;inset:0;display:grid;place-items:center;background:rgba(7,8,12,.7)}
+#pause{z-index:6}
+#pause.over-shop{background:rgba(7,8,12,.96)}
 .tut-btn{position:relative}
+#btnQuit.warn{border-color:var(--hp,#c4213f);color:#ff8a8a}
 .tut-btn .dot{position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--ember);box-shadow:0 0 8px var(--ember)}
 #tut{position:absolute;inset:0;z-index:30;pointer-events:none}
 .tut-spot{position:absolute;left:50%;top:50%;width:0;height:0;border-radius:4px;box-shadow:0 0 0 200vmax rgba(5,6,10,.66);outline:2px solid var(--gold);outline-offset:3px;transition:left .45s cubic-bezier(.2,.8,.2,1),top .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1),height .45s cubic-bezier(.2,.8,.2,1),border-radius .45s;animation:tutPulse 1.6s ease-in-out infinite}
@@ -318,6 +372,22 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .best-sub{margin:6px 0 0;font-size:22px;font-weight:400;color:var(--gold)}
 .best-intro{margin:0;text-align:left}
 #feedback{z-index:5;background:rgba(7,8,12,.94)}
+#settings{z-index:8;background:rgba(7,8,12,.985)}
+.set-grid{display:grid;grid-template-columns:auto minmax(0,1fr) 3.2ch;gap:8px 16px;align-items:center;font-size:20px;margin:8px 0 4px}
+.set-grid input[type=range]{width:100%;accent-color:var(--ember)}
+.set-grid output{font-variant-numeric:tabular-nums;color:var(--gold);text-align:right}
+.set-grid .btn{justify-self:start}
+.set-grid select{font:inherit;font-size:18px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:2px;padding:3px 8px;justify-self:start;max-width:100%}
+.set-h{grid-column:1 / -1;margin:8px 0 0;font-size:16px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+#settings .screen-inner{gap:10px}
+#settings{place-items:start center}
+#settings .screen-inner{margin:auto 0}
+#fps{position:absolute;left:8px;top:8px;z-index:4;font-size:16px;color:#7dc46a;background:rgba(7,8,12,.7);padding:1px 6px;border-radius:2px;pointer-events:none;font-variant-numeric:tabular-nums}
+#perfTip{position:absolute;left:50%;top:96px;transform:translateX(-50%);z-index:4;background:var(--panel);border:1px solid var(--gold);border-radius:2px;padding:8px 12px;display:flex;gap:10px;align-items:center;font-size:18px;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
+.tog[aria-pressed="false"]{color:var(--muted)}
+#setMute{color:var(--fg)}
+#setMute.muted{color:var(--ember);border-color:var(--ember)}
+.set-grid input[type=range]:disabled{opacity:.4}
 .fb fieldset{border:0;padding:0;margin:0;display:grid;gap:6px}
 .fb legend{color:var(--fg);padding:0;margin-bottom:6px;font-size:20px}
 .choices{display:flex;flex-wrap:wrap;gap:6px}
@@ -356,6 +426,7 @@ a.btn{text-decoration:none;display:inline-block}
 
 @media (max-width:980px){
   #shop{grid-template-columns:minmax(0,1fr)}
+  .side{height:auto;overflow:visible}
   .cards{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
   .bench{grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
 }
@@ -403,6 +474,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <div id="dock" hidden>
     <div id="abil" hidden aria-label="Hero abilities"></div>
+    <div id="relicBar" hidden aria-label="Relics"></div>
     <div class="hud-box hud-hp" id="hpDock">
       <div class="lbl"><span>Health</span><span id="hpTxt">100/100</span></div>
       <div class="bar"><i id="hpBar"></i></div>
@@ -430,6 +502,8 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="head" style="margin-top:12px"><h3>Hero abilities</h3></div>
       <div class="abslots" id="shopAbil" aria-label="Hero abilities. Drag or click two slots to swap them"></div>
       <p class="note" style="text-align:center;margin-top:4px;font-size:16px">Drag or click to reorder</p>
+      <div class="head" style="margin-top:12px"><h3>Relics</h3></div>
+      <div class="relics" id="relicRow" aria-label="Relics"></div>
     </div>
     <div>
       <div class="shop-top">
@@ -440,17 +514,19 @@ a.btn{text-decoration:none;display:inline-block}
         <span class="stat shop-hp">Health <span id="sHp">100/100</span> <span class="xpbar hpbar"><i id="sHpBar"></i></span></span>
         <button class="btn" id="btnHeal" type="button">Heal 30% · <span id="healCost">10</span>g <kbd>G</kbd></button>
       </div>
+      <div class="event" id="event" hidden></div>
       <div class="cards" id="cards"></div>
       <div class="head"><h3>Bench</h3><button class="btn sm" id="btnSort" type="button" title="Sort the bench: highest stars first, then by class (Warrior, Archer, Mage, Priest), then rarer elements first (Lightning and Rune, then Fire and Blood, then Iron and Frost). Matching units end up side by side.">Sort <kbd>Q</kbd></button></div>
       <div class="bench" id="bench"></div>
-      <div class="row" style="margin-top:12px;align-items:center">
+      <div class="row act" style="margin-top:12px;align-items:center">
         <button class="btn primary" id="btnStart" type="button">Start wave 1 <kbd>Space</kbd></button>
         <button class="btn" id="btnSell" type="button" disabled>Sell <kbd>E</kbd></button>
         <button class="btn" id="btnSaveQuit" type="button">Save and quit</button>
+        <button class="btn" id="btnShopMenu" type="button">Menu <kbd>Esc</kbd></button>
       </div>
       <p class="next" id="nextTxt"></p>
     </div>
-    <div>
+    <div class="side">
       <div class="head"><h3>Synergies</h3></div>
       <div class="traits" id="traits"></div>
       <div class="info" id="info"></div>
@@ -459,7 +535,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.10.0</span><span id="devTag" hidden> · DEV build</span> · Norse dark fantasy</div>
+      <div class="eyebrow">Prototype <span id="verTxt">0.13.0</span><span id="devTag" hidden> · DEV build</span> · Norse dark fantasy</div>
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
@@ -468,6 +544,7 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="btn tut-btn" id="btnTut" type="button">How to play<span class="dot" id="tutDot" hidden></span></button>
         <button class="btn" id="btnMeta" type="button">Rune Forge · <span class="runes" id="tRunes">0</span> runes</button>
         <button class="btn" id="btnLb" type="button">Leaderboard</button>
+        <button class="btn" id="btnSettings" type="button">Settings</button>
         <button class="btn" id="btnFbTitle" type="button">Send feedback</button>
       </div>
       <dl class="keys">
@@ -475,6 +552,7 @@ a.btn{text-decoration:none;display:inline-block}
         <dt><kbd>Space</kbd></dt><dd>Dash in battle · start the next wave in the shop</dd>
         <dt><kbd>P</kbd></dt><dd>Pause</dd>
         <dt><kbd>T</kbd></dt><dd>Show or hide power-up tooltips</dd>
+        <dt><kbd>M</kbd></dt><dd>Mute or unmute all sound</dd>
         <dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Hero abilities, aimed at the mouse cursor</dd>
         <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 2 minutes)</dd>
         <dt>Shop</dt><dd><kbd>R</kbd> reroll · <kbd>F</kbd> buy XP · <kbd>E</kbd> sell · <kbd>Q</kbd> sort bench · <kbd>G</kbd> heal</dd>
@@ -570,6 +648,8 @@ a.btn{text-decoration:none;display:inline-block}
     </div>
   </section>
 
+  <div id="fps" hidden></div>
+  <div id="perfTip" hidden role="status"><span>The game is running slowly. Switch to Low graphics?</span><button class="btn sm primary" id="perfYes" type="button">Switch to Low</button><button class="btn sm" id="perfNo" type="button">No thanks</button></div>
   <div id="tut" hidden>
     <div class="tut-spot" id="tutSpot"></div>
     <div class="tut-hand" id="tutHand" hidden aria-hidden="true"><svg viewBox="0 0 11 16" width="22" height="32" shape-rendering="crispEdges"><path d="M0 0h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v2H7v1h1v2H6v-2H5v-1H4v1H3v1H1v1H0z" fill="#0b0d13"/><path d="M1 2h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v1H6v1h1v2H6v-2H5v-1H4v1H3v1H1z" fill="#f4efe2"/></svg></div>
@@ -586,9 +666,9 @@ a.btn{text-decoration:none;display:inline-block}
   <div id="pause" hidden>
     <div class="box">
       <h2>Paused</h2>
-      <p class="note">Press <kbd>P</kbd> to resume</p>
+      <p class="note">Press <kbd>P</kbd> or <kbd>Esc</kbd> to resume</p>
       <dl class="pu-list" id="puList"></dl>
-      <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnBest" type="button">Bestiary</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
+      <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnBest" type="button">Bestiary</button><button class="btn" id="btnSetPause" type="button">Settings</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnSavePause" type="button" hidden>Save and quit</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
     </div>
     <div class="box best" id="bestiary" hidden aria-labelledby="bestTitle">
       <div class="best-head"><h2 id="bestTitle">Bestiary</h2><button class="btn sm" id="btnBestBack" type="button">Back</button></div>
@@ -600,6 +680,31 @@ a.btn{text-decoration:none;display:inline-block}
       </div>
     </div>
   </div>
+
+  <section id="settings" class="screen" hidden aria-labelledby="setTitle">
+    <div class="screen-inner" style="width:min(560px,100%)">
+      <div class="eyebrow">Options</div>
+      <h2 id="setTitle">Settings</h2>
+      <div class="set-grid">
+        <span>Sound</span><button class="btn sm tog" id="setMute" type="button" aria-pressed="false">Sound on</button><span></span>
+        <label for="setMaster">Master volume</label><input type="range" id="setMaster" min="0" max="100" step="5"><output id="setMasterV" for="setMaster"></output>
+        <label for="setMusic">Music</label><input type="range" id="setMusic" min="0" max="100" step="5"><output id="setMusicV" for="setMusic"></output>
+        <label for="setSfx">Sound effects</label><input type="range" id="setSfx" min="0" max="100" step="5"><output id="setSfxV" for="setSfx"></output>
+        <h3 class="set-h">Display</h3>
+        <label for="setUi">Interface size</label><select id="setUi"><option value="auto">Auto</option><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option><option value="115">115%</option><option value="130">130%</option><option value="145">145%</option></select><span></span>
+        <label for="setQ">Graphics quality</label><select id="setQ"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low (fastest)</option></select><span></span>
+        <span>Reduce flashing</span><button class="btn sm tog" id="setCalm" type="button" aria-pressed="false">Off</button><span></span>
+        <span>Show FPS</span><button class="btn sm tog" id="setFps" type="button" aria-pressed="false">Off</button><span></span>
+        <h3 class="set-h">Gameplay</h3>
+        <span>Screen shake</span><button class="btn sm tog" id="setShake" type="button" aria-pressed="true">On</button><span></span>
+        <span>Damage numbers</span><button class="btn sm tog" id="setDmg" type="button" aria-pressed="true">On</button><span></span>
+        <span>Power-up tooltips <kbd>T</kbd></span><button class="btn sm tog" id="setTips" type="button" aria-pressed="true">On</button><span></span>
+        <span>Tutorial</span><button class="btn sm" id="setTut" type="button">Mark as new again</button><span></span>
+      </div>
+      <p class="note">Press <kbd>M</kbd> anywhere to mute or unmute. Sound starts after your first click or key press, because browsers block it until then.</p>
+      <div class="row"><button class="btn primary" id="setBack" type="button">Back</button></div>
+    </div>
+  </section>
 
   <section id="feedback" class="screen" hidden aria-labelledby="fbTitle">
     <form class="screen-inner fb" id="fbForm" novalidate>
@@ -650,11 +755,12 @@ a.btn{text-decoration:none;display:inline-block}
     <fieldset><legend>Waves</legend>
       <div class="r"><label for="dbgWave">Wave</label><input type="number" id="dbgWave" min="1" max="99" value="20"><button type="button" id="dbgGo">Jump to wave</button></div>
       <div class="r"><label for="dbgNoSpawn"><input type="checkbox" id="dbgNoSpawn"> Stop enemy spawns</label></div>
+      <div class="r"><span>Shop event</span><button type="button" data-ev="merchant">Merchant</button><button type="button" data-ev="shrine">Shrine</button><button type="button" data-ev="altar">Altar</button></div>
       <div class="r"><button type="button" id="dbgKill">Kill all enemies</button><button type="button" id="dbgKillBoss">Kill boss</button><button type="button" id="dbgShopCd">Reset shop cooldown</button></div>
     </fieldset>
     <fieldset><legend>Spawn</legend>
       <div class="r"><select id="dbgBoss" aria-label="Boss"><option value="jarl:A">Jarl, Barrow King (A)</option><option value="jarl:B">Jarl, Mound-Dweller (B)</option><option value="giant:A">Giant, Rime-Jötunn (A)</option><option value="giant:B">Giant, Hrímþurs (B)</option><option value="herald:A">Herald, Half-Faced (A)</option><option value="herald:B">Herald, Hel's Valkyrie (B)</option><option value="fenrir:B">Fenrir, World-Eater</option><option value="fenrir:A">Fenrir, Gleipnir-Bound</option></select><button type="button" id="dbgSpawnBoss">Spawn boss</button></div>
-      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Seiðkona</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
+      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Seiðkona</option><option value="wight">Barrow Wight</option><option value="wisp">Soul Wisp</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
       <div class="r"><select id="dbgPu" aria-label="Power-up"></select><button type="button" id="dbgSpawnPu">Spawn power-up</button></div>
     </fieldset>
     <fieldset><legend>Economy and units</legend>
@@ -695,6 +801,10 @@ function weighted(o){ let t = 0; for (const k in o) t += o[k]; let r = Math.rand
 const META_KEY = 'valhalla.meta.v1';
 const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, dash: 0, best: 0, runs: 0, wins: 0, bestEndless: 0 };
 try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.parse(s)); } catch (e) {}
+/* ================= SETTINGS ================= */
+const SET_KEY = 'valhalla.settings';
+const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true, ui: 'auto', quality: 'high', calm: false, fps: false }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
+function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(settings)); } catch (e) {} }
 const RUN_KEY = 'valhalla.run', STAMP_KEY = 'valhalla.stamp';
 function bumpStamp(){ try { localStorage.setItem(STAMP_KEY, String(Date.now())); } catch (e) {} try { cloudQueue(); } catch (e) {} }
 function localStamp(){ try { return +localStorage.getItem(STAMP_KEY) || 0; } catch (e) { return 0; } }
@@ -1018,7 +1128,7 @@ const BOSS_DESIGNS = {
 // layers are drawn back to front; each layer is one material with base / highlight / shadow colours
 function pxBuild(W, H, layers, details, ol){
   const c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   const mat = new Int16Array(W * H).fill(-1);
   const api = {
     poly: pts => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fill(); },
@@ -1399,17 +1509,18 @@ for (let v = 0; v < 4; v++){
 let S = null, uid = 0, mode = 'title', paused = false;
 const keys = {};
 const SLOT_OFF = Array.from({ length: 8 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 4; return { x: Math.cos(a) * 24, y: Math.sin(a) * 20 }; });
+SLOT_OFF.push({ x: 0, y: 34 }); // the 9th slot, opened by the Raven Banner: a rear guard behind the hero
 
 function newRun(R){
   if (R && R.v !== 1) R = null; // called from a click handler: no save to restore
   S = {
     wave: 1, gold: 5 + meta.gold, level: 1, xp: 0,
     hero: { x: 0, y: 0, hp: 100, maxHp: 100, inv: 0, dashSlots: 1, dashCh: 1, dashRt: 0, dashT: 0, dx: 0, dy: 1, face: 1, walk: 0 },
-    bench: Array(8).fill(null), board: Array(8).fill(null), shop: [],
+    bench: Array(8).fill(null), board: Array(9).fill(null), shop: [],
     enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], haz: [], corpses: [], halfDeath: null, breath: null, chill: 0,
     souls: 0, kills: 0, bosses: 0, waveT: 0, spawnAcc: 0, shake: 0, boss: null, endDelay: 0, sel: null,
     debugUsed: dbgUsed, submitted: false,
-    abil: [null, null, null], selAb: null, cry: 0, cryM: 1, wall: 0, wallReflect: false, ravens: null, hornT: 0, hornRate: 0, rage: 0, rageDmg: 0, rageL3: false, quakes: [],
+    abil: [null, null, null], selAb: null, relics: [], event: null, sinceEvent: 0, cry: 0, cryM: 1, wall: 0, wallReflect: false, ravens: null, hornT: 0, hornRate: 0, rage: 0, rageDmg: 0, rageL3: false, quakes: [],
     tr: { cls: {}, mod: {} }, regen: 0, dmgTaken: 1, hurt: 0, time: 0, puT: 8, fury: 0, magnet: 0, bind: null, eclipse: 0, eclipseMax: 1,
     endless: false, won: false, midBattle: false, endlessStart: false, shopCd: 0,
   };
@@ -1428,6 +1539,7 @@ function runSnapshot(){
     endless: S.endless, won: S.won, debugUsed: S.debugUsed, hp: Math.ceil(S.hero.hp), dashSlots: S.hero.dashSlots,
     board: S.board.map(U), bench: S.bench.map(U), shop: S.shop.map(c => c && { cls: c.cls, mod: c.mod, locked: !!c.locked }),
     abil: S.abil.map(a => a && { key: a.key, lvl: a.lvl }),
+    relics: (S.relics || []).slice(), event: S.event || null, sinceEvent: S.sinceEvent || 0, altarPending: !!S.altarPending,
     rollN: S.rollN || 0, xpN: S.xpN || 0, healN: S.healN || 0, savedAt: Date.now() };
 }
 function applyRun(R){
@@ -1440,7 +1552,10 @@ function applyRun(R){
   S.endlessStart = S.endless; S.midBattle = false;
   S.abil = [0, 1, 2].map(i => { const a = (R.abil || [])[i]; return a && ABILITIES[a.key] ? { key: a.key, lvl: clamp(a.lvl | 0, 1, 3), cd: 0 } : null; });
   S.hero.dashSlots = num(R.dashSlots, 1, dashCap(), 1); S.hero.dashCh = S.hero.dashSlots;
-  S.board = Array.from({ length: 8 }, (_, i) => mkU((R.board || [])[i]));
+  S.relics = (Array.isArray(R.relics) ? R.relics : []).filter((k, i, a) => RELICS[k] && a.indexOf(k) === i).slice(0, MAX_RELICS);
+  const E = R.event; S.event = E && ['merchant', 'shrine', 'altar'].includes(E.type) ? (E.type === 'merchant' ? { type: 'merchant', offers: (E.offers || []).filter(k => RELICS[k]).slice(0, 3), bought: (E.bought || []).filter(k => RELICS[k]) } : { type: E.type, cost: num(E.cost, 1, 999, 20), gold: num(E.gold, 1, 99, 10), done: !!E.done }) : null;
+  S.sinceEvent = num(R.sinceEvent, 0, 9, 0); S.altarPending = !!R.altarPending; S.resumed = true;
+  S.board = Array.from({ length: 9 }, (_, i) => mkU((R.board || [])[i]));
   S.bench = Array.from({ length: 8 }, (_, i) => mkU((R.bench || [])[i]));
   S.shop = Array.from({ length: 5 }, (_, i) => { const c = (R.shop || [])[i]; return c && CLASSES[c.cls] && MODS[c.mod] ? { cls: c.cls, mod: c.mod, locked: !!c.locked } : null; });
 }
@@ -1470,22 +1585,23 @@ function requestNewRun(e){
 
 /* ================= TRAITS & STATS ================= */
 function allUnits(){ return [...S.board, ...S.bench].filter(Boolean); }
-const slotCount = () => Math.min(8, S.level);
+const slotCount = () => hasR('raven_banner') ? Math.min(9, S.level + 1) : Math.min(8, S.level);
 function computeTraits(){
   const cls = { warrior: 0, archer: 0, mage: 0, priest: 0 }, mod = {};
   for (const k in MODS) mod[k] = 0;
-  S.board.forEach((u, i) => { if (u && i < slotCount()){ cls[u.cls]++; mod[u.mod]++; } });
+  const twin = hasR('twin_souls'), oath = hasR('iron_oath');
+  S.board.forEach((u, i) => { if (u && i < slotCount()){ const w = twin && u.star >= 2 ? 2 : 1; cls[u.cls] += w; mod[u.mod] += w * (oath && u.mod === 'jern' ? 2 : 1); } });
   S.tr = { cls, mod };
   const cw = cls.warrior, cp = cls.priest;
   S.dmgTaken = cw >= 4 ? .7 : cw >= 2 ? .85 : 1;
-  S.regen = cp >= 4 ? 3 : cp >= 2 ? 1 : 0;
+  S.regen = (cp >= 4 ? 3 : cp >= 2 ? 1 : 0) + (hasR('mead_hall') ? 1.5 : 0);
 }
 function modPow(m){ const n = S.tr.mod[m] || 0; return n >= 3 ? 2 : n >= 2 ? 1.5 : 1; }
-function heroMaxHp(){ const cp = S.tr.cls.priest; return 100 + meta.hp * 15 + (cp >= 4 ? 50 : cp >= 2 ? 20 : 0); }
+function heroMaxHp(){ const cp = S.tr.cls.priest; return Math.round((100 + meta.hp * 15 + (cp >= 4 ? 50 : cp >= 2 ? 20 : 0)) * (hasR('draugr_pact') ? .7 : 1)); }
 function calcStats(u){
   const c = CLASSES[u.cls], m = MODS[u.mod], t = S.tr.cls;
   const starM = [1, 1.8, 3.2][u.star - 1], tierM = 1 + .3 * (m.tier - 1);
-  let dmg = c.atk * starM * tierM * (1 + meta.dmg * .06);
+  let dmg = c.atk * starM * tierM * (1 + meta.dmg * .06) * (hasR('draugr_pact') ? 1.4 : 1);
   let as = c.as * (1 + meta.atkspd * .05);
   let mana = 1 + meta.mana * .1;
   if (u.mod === 'jern') dmg *= 1 + .3 * modPow('jern');
@@ -1510,19 +1626,26 @@ function rollShop(){
 }
 function toggleLock(i){ const c = S.shop[i]; if (!c) return; c.locked = !c.locked; renderShop(); }
 // prices grow by 1.5x for every use within the same shop phase
-const rollCost = () => Math.round(REROLL_COST * 1.5 ** S.rollN);
+const rollCost = () => hasR('odins_eye') && (S.rollN + 1) % 4 === 0 ? 0 : Math.round(REROLL_COST * 1.5 ** S.rollN);
 const xpCost = () => Math.round(XP_COST * 1.5 ** S.xpN);
-const healCost = () => Math.round(HEAL_COST * 1.5 ** S.healN);
+const healCost = () => Math.round(HEAL_COST * 1.5 ** S.healN) * (hasR('usurer_coin') ? 2 : 1);
 function buyHeal(){
   const h = S.hero;
   if (h.hp >= h.maxHp) return toast('Already at full health');
   const c = healCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold');
+  sfx('heal');
   if (!dbg.infGold) S.gold -= c; S.healN++;
   const before = h.hp; healHero(h.maxHp * HEAL_PCT);
   toast(`Healed ${Math.round(h.hp - before)} health`);
   renderShop();
 }
 const cardName = c => `${MODS[c.mod].name} ${CLASSES[c.cls].name}`;
+function mergeFx(u){
+  const col = MODS[u.mod].col, x = u.x || S.hero.x, y = u.y || S.hero.y;
+  burst(x, y - 3, 26, [col, '#ffd27a', '#ffffff'], 70); S.rings.push({ x, y, r: 16, life: .4, max: .4, col: '#ffd27a' });
+  const el = [...document.querySelectorAll('#formation .slot, #bench .slot')].find(s => s.dataset.key === gkey(u));
+  if (el && el.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) el.animate([{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255,210,122,0)' }, { transform: 'scale(1.18)', boxShadow: '0 0 18px 4px rgba(255,210,122,.8)', offset: .3 }, { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255,210,122,0)' }], { duration: 650, easing: 'ease-out' });
+}
 function sameCount(cls, mod, star){ return allUnits().filter(u => u.cls === cls && u.mod === mod && u.star === star).length; }
 function buy(i){
   const c = S.shop[i]; if (!c) return;
@@ -1536,8 +1659,10 @@ function buy(i){
   let temp = null;
   if (free >= 0) S.bench[free] = u; else temp = u;
   const merged = tryMerge(c.cls, c.mod, 1, temp);
+  sfx(merged ? 'merge' : 'buy');
   if (merged) toast(`${cardName(c)} upgraded to ${'★'.repeat(merged.star)}`);
   S.sel = null; renderShop();
+  if (merged) mergeFx(merged);
 }
 function tryMerge(cls, mod, star, temp){
   if (star >= 3) return null;
@@ -1554,17 +1679,17 @@ function tryMerge(cls, mod, star, temp){
 function sellValue(u){ return MODS[u.mod].tier * [1, 3, 9][u.star - 1]; }
 function sellAt(where, i){
   const u = S[where][i]; if (!u) return;
-  S.gold += sellValue(u); S[where][i] = null; S.sel = null;
+  S.gold += sellValue(u); S[where][i] = null; S.sel = null; sfx('sell');
   toast(`Sold ${cardName(u)} for ${sellValue(u)} gold`);
   computeTraits(); renderShop();
 }
 function sellSel(){ if (S.sel) sellAt(S.sel.where, S.sel.i); }
-function reroll(){ const c = rollCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.rollN++; rollShop(); renderShop(); }
-function buyXp(){ if (S.level >= MAX_LVL) return; const c = xpCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.xpN++; addXp(XP_GAIN); renderShop(); }
+function reroll(){ const c = rollCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.rollN++; sfx('reroll'); rollShop(); renderShop(); }
+function buyXp(){ if (S.level >= MAX_LVL) return; const c = xpCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.xpN++; sfx('xp'); addXp(XP_GAIN); renderShop(); }
 function addXp(n){
   if (S.level >= MAX_LVL) return;
   S.xp += n;
-  while (S.level < MAX_LVL && S.xp >= XPN[S.level]){ S.xp -= XPN[S.level]; S.level++; toast(`Level ${S.level}: ${slotCount()} formation slots`); }
+  while (S.level < MAX_LVL && S.xp >= XPN[S.level]){ S.xp -= XPN[S.level]; S.level++; sfx('level'); toast(`Level ${S.level}: ${slotCount()} formation slots`); }
   if (S.level >= MAX_LVL) S.xp = 0;
 }
 function sortBench(){
@@ -1605,7 +1730,7 @@ function slotClick(where, i){
 
 /* ================= WAVES ================= */
 function startWave(){
-  if (picking) return;
+  if (picking || paused) return;
   if (tut && !tut.unlocked) return toast('Follow the tutorial steps first, or press Skip tutorial');
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   // fill empty open slots from the bench so a new player is never stuck
@@ -1616,6 +1741,9 @@ function startWave(){
     S.board[i] = S.bench[b]; S.bench[b] = null; moved++;
   }
   if (!S.board.some(Boolean)) return toast('Buy at least one card first');
+  sfx('horn');
+  S.gleipUsed = false; S.cursed = !!S.altarPending; S.altarPending = false; S.event = null;
+  if (S.cursed) setTimeout(() => toast('The curse is on this wave'), 900);
   computeTraits();
   const ratio = S.hero.hp / S.hero.maxHp; S.hero.maxHp = heroMaxHp(); S.hero.hp = Math.max(1, Math.round(S.hero.maxHp * ratio));
   S.board.forEach(u => { if (u){ u.st = calcStats(u); u.cd = rand(0, .4); u.mana = 0; } });
@@ -1627,6 +1755,7 @@ function startWave(){
   }
   if (S.endlessStart){ S.endlessStart = false; S.shopCd = SHOP_CD; }
   S.waveT = 0; S.spawnAcc = 0; S.endDelay = 0; S.boss = null; S.fury = 0; S.magnet = 0; S.puT = rand(6, 10);
+  if (hasR('huginn_feather')){ spawnPowerup(); const p = S.pups[S.pups.length - 1]; if (p){ const a = rand(0, 6.283); p.x = S.hero.x + Math.cos(a) * 70; p.y = S.hero.y + Math.sin(a) * 50; } }
   const W = waveDef(S.wave);
   if (W.boss) spawnBoss(W.boss);
   setMode('combat');
@@ -1635,7 +1764,7 @@ function startWave(){
 }
 function spawnBoss(type, design){
   const a = rand(0, Math.PI * 2);
-  S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110);
+  S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110); sfx('roar', type); flash('255,255,255', .25);
   if (type === 'fenrir'){
     const d = design || (dbg.fenrir !== 'auto' ? dbg.fenrir : S.wave > WAVES.length ? 'A' : 'B');
     S.boss.design = d; S.boss.title = d === 'A' ? 'Fenrir, Gleipnir-Bound' : 'Fenrir, the World-Eater';
@@ -1650,7 +1779,7 @@ function clearBossFx(){ S.chains = []; S.lunges = []; S.eclipse = 0; S.bind = nu
 // Endless mode: waves roll straight into the next one, with no shop in between
 function endlessNext(){
   const W = waveDef(S.wave);
-  const interest = Math.min(5, Math.floor(S.gold / 10));
+  const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
   const reward = 5 + interest + (W.boss ? 5 : 0);
   S.gold += reward; addXp(WAVE_XP);
   if (W.boss) S.hero.hp = S.hero.maxHp;
@@ -1661,6 +1790,7 @@ function endlessNext(){
   if (W.boss) showPick('boss');
 }
 function showVictory(){
+  sfx('victory');
   S.won = true; meta.wins++; saveMeta();
   $('#vStats').innerHTML = `<dt>Enemies slain</dt><dd>${S.kills}</dd><dt>Bosses slain</dt><dd>${S.bosses}</dd><dt>Best endless wave</dt><dd>${meta.bestEndless ? meta.bestEndless : 'not tried yet'}</dd>`;
   setMode('victory');
@@ -1677,12 +1807,17 @@ function openEndlessShop(){
   rollShop(); openShop();
 }
 function endWave(){
-  const W = waveDef(S.wave);
+  const W = waveDef(S.wave); sfx('clear');
+  if (S.cursed){
+    S.cursed = false; const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
+    if (S.relics.length < MAX_RELICS && pool.length){ const k = pick(pool); gainRelic(k); setTimeout(() => toast(`The altar grants you ${RELICS[k].name}`), 1200); }
+    else { S.gold += 12; setTimeout(() => toast('The altar grants you 12 gold'), 1200); }
+  }
   S.enemies.forEach(e => burst(e.x, e.y, 6, ['#6f9479', '#bfe9ff'], 40));
   S.enemies = []; S.eprojs = []; S.tele = []; S.pups = []; S.corpses = []; clearBossFx();
   S.orbs.forEach(o => gainSouls(o.v)); S.orbs = [];
   if (S.wave >= WAVES.length) return showVictory();
-  const interest = Math.min(5, Math.floor(S.gold / 10));
+  const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
   const reward = 5 + interest + (W.boss ? 5 : 0);
   S.gold += reward;
   addXp(WAVE_XP);
@@ -1693,11 +1828,11 @@ function endWave(){
   if (W.boss) showPick('boss');
   banner(`Wave ${S.wave - 1} cleared`, `+${reward} gold${interest ? ` (${interest} interest)` : ''}${W.boss ? ' · fully healed' : ''}`);
 }
-function waveRate(){ const W = waveDef(S.wave); return (0.6 + S.wave * 0.2) * (W.rate || 1) * (W.boss ? (W.endless ? .5 : .3) : 1); }
+function waveRate(){ const W = waveDef(S.wave); return (S.cursed ? 1.25 : 1) * (0.6 + S.wave * 0.2) * (W.rate || 1) * (W.boss ? (W.endless ? .5 : .3) : 1); }
 function spawnFromWave(){
   const W = waveDef(S.wave);
   const type = weighted(W.mix);
-  const a = rand(0, Math.PI * 2), d = Math.hypot(VW, VH) / 2 + 24;
+  const a = rand(0, Math.PI * 2), d = Math.hypot(FW, VH) / 2 + 24;
   const elite = Math.random() < (W.elite || 0) + 0.015 + S.wave * 0.005;
   if (type === 'draugr' && !W.boss && Math.random() < .35){ // some draugr claw their way up out of the ground nearby
     const rd = rand(95, 150), z = spawnEnemy(type, S.hero.x + Math.cos(a) * rd, S.hero.y + Math.sin(a) * rd, elite); z.rise = z.riseM = .9; return;
@@ -1707,7 +1842,7 @@ function spawnFromWave(){
 function spawnEnemy(type, x, y, elite){
   const d = ENEMIES[type], W = waveDef(S.wave);
   const ek = Math.max(0, S.wave - WAVES.length); // endless waves past Fenrir
-  const hs = d.boss ? (ek ? hpScale(S.wave) / hpScale(BOSS_HOME[type]) * .8 : 1) : hpScale(S.wave) * (W.hp || 1) * 1.06 ** ek;
+  const hs = d.boss ? (ek ? hpScale(S.wave) / hpScale(BOSS_HOME[type]) * .8 : 1) : hpScale(S.wave) * (W.hp || 1) * 1.06 ** ek * (S.cursed ? 1.4 : 1);
   const sc = d.scale || 1, spr = SPR[d.spr];
   const e = {
     type, d, x, y, hp: d.hp * hs * (elite ? 4 : 1), spd: d.spd * (W.spd || 1) * rand(.9, 1.1),
@@ -1730,10 +1865,11 @@ function spawnEnemy(type, x, y, elite){
 /* ================= POWER-UPS ================= */
 function spawnPowerup(){
   const h = S.hero, a = rand(0, Math.PI * 2), d = rand(140, 320);
-  const type = weighted({ mead: 3, fury: 3, thor: 2, raven: 2, hoard: 2, frost: 2, stride: 2 });
+  const type = weighted({ mead: 3, fury: 3, thor: 2, raven: 2, hoard: 2, frost: 2, stride: S.hero.dashSlots >= dashCap() ? 0 : 2 });
   S.pups.push({ type, x: h.x + Math.cos(a) * d, y: h.y + Math.sin(a) * d, life: 35, max: 35, t: 0 });
 }
 function takePowerup(p){
+  sfx('power');
   const h = S.hero, P = POWERUPS[p.type];
   addText(h.x, h.y - 16, P.name, P.col, true);
   burst(p.x, p.y, 26, [P.col, '#ffffff'], 90);
@@ -1774,7 +1910,9 @@ function hit(e, raw, dtype, u, opt){
   const warded = e.shield > 0, shown = d;
   if (warded){ const ab = Math.min(e.shield, d); e.shield -= ab; d -= ab; if (e.shield <= 0){ burst(e.x, e.y, 16, ['#b98cff', '#d6b8ff', '#ffffff'], 70); addText(e.x, e.y - e.h / 2 - 6, 'Ward broken', '#d6b8ff', true); } }
   e.hp -= d; e.flash = .07;
-  addText(e.x, e.y - e.h / 2, Math.round(shown), warded ? '#b98cff' : crit ? '#ffd27a' : dtype === 'magic' ? '#d6b8ff' : '#e9e4d8', crit);
+  sfx(crit ? 'crit' : 'hit');
+  if (crit && shown >= 40 && shown >= e.max * .3 && !e.d.boss) stopFor(.035);
+  if (settings.dmgNum) addText(e.x, e.y - e.h / 2, Math.round(shown), warded ? '#b98cff' : crit ? '#ffd27a' : dtype === 'magic' ? '#d6b8ff' : '#e9e4d8', crit);
   if (u && !opt.noMod){
     const m = u.mod, p = modPow(m);
     if (m === 'ild' || opt.burn){ e.burn = 3; e.burnD = Math.max(e.burnD, raw * .35 * (m === 'ild' ? p : 1) / 3); }
@@ -1793,7 +1931,7 @@ function chain(from, dmg, u){
     if (!best) break;
     done.add(best); pts.push([best.x, best.y]); hit(best, dmg, 'magic', u, { noMod: true }); cur = best;
   }
-  if (pts.length > 1) S.bolts.push({ pts, life: .16 });
+  if (pts.length > 1){ S.bolts.push({ pts, life: .16 }); sfx('zap'); }
 }
 function kill(e){
   if (e.dead) return;
@@ -1805,14 +1943,14 @@ function kill(e){
   const n = e.d.boss ? 12 : 1;
   for (let i = 0; i < n; i++) S.orbs.push({ x: e.x + rand(-6, 6) * (n > 1), y: e.y + rand(-6, 6) * (n > 1), v: Math.ceil(v / n), big: e.elite || e.d.boss, t: 0 });
   if (e.elite) S.gold += 1;
-  if (e.d.boss){ S.bosses++; S.shake = 10; S.endDelay = 1.6; S.boss = null; clearBossFx(); S.enemies.forEach(o => { if (!o.d.boss && !o.dead){ o.dead = true; burst(o.x, o.y, 5, ['#6f9479', '#bfe9ff'], 40); } }); }
+  if (e.d.boss){ sfx('bossdie'); slowMo = 1.2; flash('255,214,122', .5); S.bosses++; S.shake = 10; S.endDelay = 1.6; S.boss = null; clearBossFx(); S.enemies.forEach(o => { if (!o.d.boss && !o.dead){ o.dead = true; burst(o.x, o.y, 5, ['#6f9479', '#bfe9ff'], 40); } }); }
 }
-function gainSouls(v){ S.souls += v; while (S.souls >= 10){ S.souls -= 10; S.gold++; } }
+function gainSouls(v){ S.souls += v; sfx('soul'); while (S.souls >= 10){ S.souls -= 10; S.gold++; sfx('coin'); } }
 function healHero(n){ const h = S.hero; h.hp = Math.min(h.maxHp, h.hp + n); }
 function heroDamage(d){
   const h = S.hero;
   if (dbg.god || S.tutorial || h.inv > 0 || h.dashT > 0 || S.wall > 0 || mode !== 'combat') return;
-  d *= S.dmgTaken; h.hp -= d; h.inv = .5; S.hurt = .25; S.shake = Math.min(7, S.shake + 3);
+  d *= S.dmgTaken; h.hp -= d; h.inv = .5; S.hurt = .25; sfx('hurt'); stopFor(.05); S.shake = Math.min(7, S.shake + 3);
   addText(h.x, h.y - 10, Math.round(d), '#ff6b6b', true);
   if (h.hp <= 0){ h.hp = 0; gameOver(false); }
 }
@@ -1822,11 +1960,11 @@ function attack(u, t){
   u.anim = .12; u.face = t.x < u.x ? -1 : 1;
   if (c === 'warrior'){ // a spinning axe that cuts through enemies, then flies back
     const a = Math.atan2(t.y - u.y, t.x - u.x), sp = 210;
-    S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: st.dmg, dtype: 'phys', u, kind: 'axe', r: 4, life: 2.4, aoe: 0, pierce: 2, hits: new Set(), dist: 0, maxd: st.range + 20, ret: false, spin: 0 });
+    sfx('axe'); S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: st.dmg, dtype: 'phys', u, kind: 'axe', r: 4, life: 2.4, aoe: 0, pierce: 2, hits: new Set(), dist: 0, maxd: st.range + 20, ret: false, spin: 0 });
   } else {
     const a = Math.atan2(t.y - u.y, t.x - u.x);
     const kind = c === 'archer' ? 'arrow' : c === 'mage' ? 'fire' : 'holy';
-    const sp = kind === 'arrow' ? 290 : kind === 'fire' ? 175 : 215;
+    const sp = kind === 'arrow' ? 290 : kind === 'fire' ? 175 : 215; sfx(kind);
     S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: st.dmg, dtype: st.dtype, u, kind, r: kind === 'fire' ? 3 : 2.5, life: 1.1, aoe: kind === 'fire' ? 16 : 0, pierce: 0, hits: null });
     if (kind === 'holy') healHero(.35 * u.star);
   }
@@ -1842,23 +1980,24 @@ function ability(u, t){
     }
     best = best || t;
     u.leap = { t: 0, dur: .42, sx: u.x, sy: u.y, tx: best.x, ty: best.y, dmg: st.dmg * 3 };
-    addText(u.x, u.y - 14, 'Berserker Leap', '#ffb7a3', true);
+    addText(u.x, u.y - 14, 'Berserker Leap', '#ffb7a3', true); sfx('leap');
   } else if (u.cls === 'archer'){
-    const a0 = Math.atan2(t.y - u.y, t.x - u.x);
+    const a0 = Math.atan2(t.y - u.y, t.x - u.x); sfx('volley');
     for (let k = -3; k <= 3; k++){ const a = a0 + k * .14; S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * 300, vy: Math.sin(a) * 300, dmg: st.dmg * 1.2, dtype: 'phys', u, kind: 'arrow', r: 2.5, life: 1, aoe: 0, pierce: 2, hits: new Set() }); }
   } else if (u.cls === 'mage'){
     const a = Math.atan2(t.y - u.y, t.x - u.x);
     S.projs.push({ x: u.x, y: u.y - 4, vx: Math.cos(a) * 150, vy: Math.sin(a) * 150, dmg: st.dmg * 4, dtype: 'magic', u, kind: 'bigfire', r: 6, life: 1.6, aoe: 50, pierce: 0, hits: null, burn: true });
-    addText(u.x, u.y - 14, "Muspel's Fire", '#ff8a5c', true);
+    addText(u.x, u.y - 14, "Muspel's Fire", '#ff8a5c', true); sfx('fire');
   } else {
     const h = S.hero;
-    healHero(6 + 5 * u.star + h.maxHp * .06);
+    healHero(6 + 5 * u.star + h.maxHp * .06); sfx('heal');
     for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, h.x, h.y) < 56 * 56) hit(e, st.dmg * 2.2, 'magic', u);
     S.rings.push({ x: h.x, y: h.y, r: 56, life: .45, max: .45, col: '#ffe9a0' });
     burst(h.x, h.y, 22, ['#fff2b0', '#ffd27a'], 70);
   }
 }
 function leapLand(u, L){
+  sfx('boom'); kick(0, 1, 2);
   for (const e of S.enemies){
     if (e.dead || dist2(e.x, e.y, u.x, u.y) > (46 + e.r) ** 2) continue;
     const a = Math.atan2(e.y - u.y, e.x - u.x);
@@ -1978,7 +2117,7 @@ function updateBossFx(dt){
 }
 
 function explode(p){
-  const big = p.kind === 'bigfire';
+  const big = p.kind === 'bigfire'; if (big) sfx('bigfire');
   for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, p.x, p.y) < (p.aoe + e.r) ** 2) hit(e, p.dmg, p.dtype, p.u, { burn: p.burn });
   S.rings.push({ x: p.x, y: p.y, r: p.aoe, life: big ? .4 : .18, max: big ? .4 : .18, col: big ? '#ff5b2e' : '#ff8a5c', fill: big });
   burst(p.x, p.y, big ? 70 : 9, big ? ['#ff2a1a', '#ff5b2e', '#ff8a3c', '#ffd27a', '#fff3c4'] : ['#ff5b2e', '#ffb05a'], big ? 150 : 60, true);
@@ -1987,13 +2126,14 @@ function explode(p){
 
 /* ================= EFFECTS ================= */
 function burst(x, y, n, cols, sp, add){
+  if (settings.quality === 'low') n = Math.ceil(n * .35); else if (settings.quality === 'medium') n = Math.ceil(n * .65);
   for (let i = 0; i < n; i++){
     const a = rand(0, Math.PI * 2), v = rand(.2, 1) * sp;
     S.parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(.25, .7), max: .7, col: pick(cols), s: Math.random() < .3 ? 2 : 1, add: add !== false });
   }
 }
 function addText(x, y, txt, col, big){
-  if (!big && S.texts.length > 70) return;
+  if (!big && S.texts.length > (settings.quality === 'low' ? 25 : settings.quality === 'medium' ? 45 : 70)) return;
   S.texts.push({ x: x + rand(-3, 3), y, txt: String(txt), col, life: big ? .9 : .55, max: big ? .9 : .55, big });
 }
 
@@ -2055,7 +2195,7 @@ function update(dt){
   S.pups = S.pups.filter(p => p.life > 0);
 
   // units
-  const furyM = (S.fury > 0 ? 1.6 : 1) * (S.cry > 0 ? S.cryM : 1);
+  const furyM = (S.fury > 0 ? 1.6 : 1) * (S.cry > 0 ? S.cryM : 1) * (hasR('berserk_mark') && h.hp < h.maxHp * .4 ? 1.5 : 1);
   S.board.forEach((u, i) => {
     if (!u || i >= slotCount()) return;
     const o = SLOT_OFF[i], tx = h.x + o.x, ty = h.y + o.y, k = Math.min(1, dt * 9);
@@ -2079,7 +2219,11 @@ function update(dt){
     if (u.mana >= 100){ u.mana = 0; ability(u, t); }
   });
 
-  // projectiles
+  // projectiles: enemies are bucketed into a coarse grid so each shot only tests its neighbours
+  const PG = 32, pgrid = new Map();
+  for (const e of S.enemies){ if (e.dead) continue; const k = ((e.x / PG) | 0) * 65536 + ((e.y / PG) | 0); let c = pgrid.get(k); if (!c) pgrid.set(k, c = []); c.push(e); }
+  const near = (x, y, out) => { out.length = 0; const cx = (x / PG) | 0, cy = (y / PG) | 0; for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++){ const c = pgrid.get((cx + i) * 65536 + cy + j); if (c) for (const e of c) out.push(e); } return out; };
+  const nb = [];
   for (const p of S.projs){
     if (p.kind === 'axe'){ updateAxe(p, dt); continue; }
     if (p.kind === 'spear'){ updateSpear(p, dt); continue; }
@@ -2089,7 +2233,7 @@ function update(dt){
       for (let i = 0; i < n; i++) S.parts.push({ x: p.x + rand(-2, 2), y: p.y + rand(-2, 2), vx: -p.vx * .1 + rand(-12, 12), vy: -p.vy * .1 + rand(-12, 12), life: rand(.15, .4), max: .4, col: pick(['#ff2a1a', '#ff5b2e', '#ffb05a', '#ffd27a']), s: p.kind === 'bigfire' ? 2 : 1, add: true });
     }
     if (p.kind === 'holy' && Math.random() < .5) S.parts.push({ x: p.x, y: p.y, vx: 0, vy: 0, life: .2, max: .2, col: '#ffe9a0', s: 1, add: true });
-    for (const e of S.enemies){
+    for (const e of (S.enemies.length > 40 ? near(p.x, p.y, nb) : S.enemies)){
       if (e.dead) continue;
       if (dist2(p.x, p.y, e.x, e.y) > (p.r + e.r) ** 2) continue;
       if (p.hits && p.hits.has(e)) continue;
@@ -2153,7 +2297,9 @@ function update(dt){
       t.done = true;
       if (t.cancel) continue;
       const L = TELE_LOOK[t.kind] || TELE_LOOK.frost;
-      if (dist2(h.x, h.y, t.x, t.y) < t.r * t.r) heroDamage(t.dmg);
+      sfx(t.kind === 'fire' ? 'bigfire' : 'slam');
+      if (dist2(h.x, h.y, t.x, t.y) < (t.r + 40) ** 2) kick(h.x - t.x, h.y - t.y, t.kind ? 2 : 4);
+      if (dist2(h.x, h.y, t.x, t.y) < t.r * t.r){ heroDamage(t.dmg); if (!t.kind) flash('255,255,255', .3); }
       burst(t.x, t.y, t.kind ? 18 : 30, L.burst, t.kind ? 80 : 110);
       S.rings.push({ x: t.x, y: t.y, r: t.r, life: .3, max: .3, col: L.ring });
       S.shake = Math.min(8, S.shake + L.shake);
@@ -2161,7 +2307,16 @@ function update(dt){
   }
   S.tele = S.tele.filter(t => !t.done);
   // ground hazards: seiðr curses and frozen trails slow the hero
-  for (const z of S.haz){ z.t += dt; z.life -= dt; if (z.t >= z.arm && ((h.x - z.x) / z.r) ** 2 + ((h.y + 4 - z.y) / z.ry) ** 2 < 1) S.chill = Math.max(S.chill, .3); }
+  if (hasR('ember_boots') && h.dashT > 0){ S.embT = (S.embT || 0) - dt; if (S.embT <= 0){ S.embT = .025; S.haz.push({ kind: 'ember', x: h.x, y: h.y + 5, r: 10, ry: 5, t: 0, arm: 0, life: 2.2, max: 2.2, tick: 0 }); } }
+  for (const z of S.haz){
+    z.t += dt; z.life -= dt;
+    if (z.kind === 'ember'){
+      z.tick -= dt; if (z.tick > 0) continue; z.tick = .35;
+      for (const e of S.enemies) if (!e.dead && ((e.x - z.x) / (z.r + e.r)) ** 2 + ((e.y - z.y) / (z.ry + e.r)) ** 2 < 1) hit(e, 4 + S.wave * 1.2, 'magic', null);
+      continue;
+    }
+    if (z.t >= z.arm && ((h.x - z.x) / z.r) ** 2 + ((h.y + 4 - z.y) / z.ry) ** 2 < 1) S.chill = Math.max(S.chill, .3);
+  }
   S.haz = S.haz.filter(z => z.life > 0);
   updateBossFx(dt);
   // orbs
@@ -2175,6 +2330,13 @@ function update(dt){
 }
 
 /* ---------- basic enemy moves. Each one is telegraphed and only appears from a given wave ---------- */
+function onDash(){
+  if (hasR('gleipnir_link') && !S.gleipUsed){
+    S.gleipUsed = true; const h = S.hero;
+    for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, h.x, h.y) < 60 * 60) e.stun = Math.max(e.stun, e.d.boss ? .5 : 1.5);
+    S.rings.push({ x: h.x, y: h.y, r: 60, life: .4, max: .4, col: '#d6d8de' }); sfx('zap'); addText(h.x, h.y - 14, 'Gleipnir!', '#d6d8de', true);
+  }
+}
 function chase(e, dt, dx, dy, d, sp, wob){ e.x += (dx / d - dy / d * wob) * sp * dt; e.y += (dy / d + dx / d * wob) * sp * dt; }
 const MOVE_WAVE = { wolf: 2, raven: 3, witch: 4, armored: 7 };
 function enemyAI(e, dt, dx, dy, d, sp){
@@ -2231,6 +2393,8 @@ function enemyFrame(e){
   return Math.floor(e.t * ENEMY_ANIM[t]) % 2 ? t + '1' : t;
 }
 function deathFx(e){
+  sfx({ draugr: 'bones', armored: 'clang', wolf: 'yelp', raven: 'caw', witch: 'shriek' }[e.type] || 'spirit');
+  if (e.elite) stopFor(.04);
   const t = e.type, P = (n, o) => { for (let i = 0; i < n; i++) S.parts.push(Object.assign({ x: e.x + rand(-3, 3), y: e.y + rand(-4, 3), vx: rand(-30, 30), vy: rand(-30, 10), life: rand(.4, .8), max: .8, s: 1, add: false }, o())); };
   if (t === 'draugr'){ P(7, () => ({ col: pick(['#e8e3d6', '#c8c2b0', '#9a9488']), s: Math.random() < .4 ? 2 : 1 })); P(4, () => ({ col: '#456552', smoke: true, s: 2, vy: rand(-14, -4) })); addCorpse('bones', e); }
   else if (t === 'armored'){ P(10, () => ({ col: pick(['#ffd27a', '#ffffff', '#c8ced8']), add: true, vx: rand(-60, 60), vy: rand(-60, 0), life: rand(.2, .45) })); P(4, () => ({ col: '#7d8494', s: 2 })); addCorpse('ironhelm', e); }
@@ -2239,7 +2403,7 @@ function deathFx(e){
   else if (t === 'witch'){ P(10, () => ({ col: pick(['#9a78d6', '#d6a2ff', '#3c4f7c']), add: true, vx: rand(-40, 40), vy: rand(-40, 10) })); P(6, () => ({ col: '#22304f', smoke: true, s: 2, vy: rand(-16, -4), life: 1, max: 1 })); addCorpse('rune', e); }
   else P(10, () => ({ col: pick(['#6fc7a0', '#a8f0d4', '#e6fff2']), add: true, vy: rand(-40, -10) }));
 }
-function addCorpse(k, e){ if (S.corpses.length > 40) S.corpses.shift(); S.corpses.push({ k, x: e.x, y: e.y + e.h / 2 - 3, face: e.face, life: 7, max: 7 }); }
+function addCorpse(k, e){ if (settings.quality === 'low') return; if (S.corpses.length > (settings.quality === 'medium' ? 20 : 40)) S.corpses.shift(); S.corpses.push({ k, x: e.x, y: e.y + e.h / 2 - 3, face: e.face, life: 7, max: 7 }); }
 const AFF_COL = { frozen: '#86d4ff', burning: '#ff5b2e', warded: '#b98cff', swift: '#f4e04d' };
 const TELE_LOOK = {
   frost: { line: 'rgba(191,233,255,.7)', fill: '134,212,255', burst: ['#bfe9ff', '#e3edf5', '#86d4ff'], ring: '#bfe9ff', shake: 4 },
@@ -2322,7 +2486,8 @@ function bossAI(e, dt, dx, dy, d, sp){
 }
 
 /* ================= RENDER ================= */
-let VW = 480, VH = 270, SCALE = 2, lastCamX = 0, lastCamY = 0, camScreenY = null, campEmber = 0;
+let VW = 480, VH = 270, FW = 480, SCALE = 2, lastCamX = 0, lastCamY = 0, camScreenY = null, campEmber = 0, shopTop = 0, shopTopAt = 0, groundKey = '';
+const groundCv = document.createElement('canvas'), groundCtx = groundCv.getContext('2d');
 // power-up tooltips are HTML so the text stays sharp at any scale
 const tipsEl = document.getElementById('tips'), tipEls = [];
 let showTips = true;
@@ -2334,7 +2499,7 @@ function toggleTips(){
 }
 function syncTipsBtn(){ const b = document.getElementById('btnTips'); if (b){ b.innerHTML = `Tooltips: ${showTips ? 'on' : 'off'} <kbd>T</kbd>`; b.setAttribute('aria-pressed', String(showTips)); } }
 function updateTips(){
-  const list = mode === 'combat' && S && showTips ? S.pups : [];
+  const list = mode === 'combat' && S && showTips ? S.pups.filter(p => Math.abs(p.x - S.hero.x) <= FW / 2) : [];
   while (tipEls.length < list.length){ const d = document.createElement('div'); d.className = 'pu-tip'; tipsEl.appendChild(d); tipEls.push(d); }
   tipEls.forEach((d, i) => {
     const p = list[i];
@@ -2343,17 +2508,28 @@ function updateTips(){
     if (d.dataset.type !== p.type){ d.dataset.type = p.type; d.style.setProperty('--c', P.col); d.innerHTML = `<b>${P.name}</b>${P.short}<i></i>`; }
     d.style.setProperty('--w', Math.max(0, p.life / (p.max || 35) * 100) + '%');
     d.hidden = false;
-    d.style.left = Math.round((p.x - lastCamX) * SCALE) + 'px';
+    d.style.left = Math.round((p.x - lastCamX) * SCALE + cvOffX) + 'px';
     d.style.top = Math.round((p.y - lastCamY - 12) * SCALE) + 'px';
   });
 }
+let cvOffX = 0;
 function resize(){
   const r = app.getBoundingClientRect();
-  SCALE = Math.max(1, Math.floor(Math.min(r.width / 420, r.height / 250)));
-  VW = Math.ceil(r.width / SCALE); VH = Math.ceil(r.height / SCALE);
-  cv.width = VW; cv.height = VH; cv.style.width = VW * SCALE + 'px'; cv.style.height = VH * SCALE + 'px';
+  // every screen sees about 270 world pixels of height, and at most a 21:9 slice of width, so nobody sees further than anyone else
+  // everyone sees exactly 270 world pixels of height and at most a 16:9 battlefield; wider screens fill the sides with mist
+  VH = 270; SCALE = r.height / VH;
+  VW = Math.ceil(r.width / SCALE); FW = Math.min(VW, 480);
+  cv.width = VW; cv.height = VH; cv.style.width = r.width + 'px'; cv.style.height = r.height + 'px';
+  cvOffX = 0; cv.style.left = '0px';
+  const marginCss = (r.width - FW * SCALE) / 2, ui = uiScale();
+  app.classList.toggle('wide', marginCss / ui >= 270);
+  app.style.setProperty('--dockX', Math.round(marginCss / 2 / ui) + 'px');
   ctx.imageSmoothingEnabled = false;
+  groundKey = ''; shopTopAt = 0;
+  applyUi();
 }
+function uiScale(){ const h = window.innerHeight; if (settings.ui !== 'auto') return +settings.ui / 100; return Math.round((h >= 1080 ? Math.min(1.5, h / 1080) : Math.max(.8, h / 1000)) * 20) / 20; }
+function applyUi(){ document.documentElement.style.setProperty('--ui', uiScale()); }
 new ResizeObserver(resize).observe(app);
 resize();
 
@@ -2365,35 +2541,61 @@ function drawSprite(name, x, y, sc, face, white){
   const img = SPR[key] || SPR[name];
   ctx.drawImage(img, Math.round(x - img.width * sc / 2), Math.round(y - img.height * sc / 2), img.width * sc, img.height * sc);
 }
+const mistCv = document.createElement('canvas'); mistCv.width = mistCv.height = 160;
+(() => { const g = mistCv.getContext('2d'); for (let i = 0; i < 46; i++){ const x = Math.random() * 160, y = Math.random() * 160, r = 14 + Math.random() * 34; for (const dx of [-160, 0, 160]) for (const dy of [-160, 0, 160]){ const gr = g.createRadialGradient(x + dx, y + dy, 0, x + dx, y + dy, r); gr.addColorStop(0, 'rgba(120,134,160,.16)'); gr.addColorStop(1, 'rgba(120,134,160,0)'); g.fillStyle = gr; g.fillRect(x + dx - r, y + dy - r, r * 2, r * 2); } } })();
+function drawMist(cx, t){
+  const half = FW / 2, L = Math.round(cx - half), R = Math.round(cx + half);
+  if (L <= 0 && R >= VW) return;
+  const band = 26;
+  for (const side of [-1, 1]){
+    const x0 = side < 0 ? 0 : R, x1 = side < 0 ? L : VW; if (x1 - x0 <= 0) continue;
+    const edge = side < 0 ? L : R;
+    ctx.fillStyle = 'rgba(8,10,15,.93)'; ctx.fillRect(x0, 0, x1 - x0, VH);
+    const gr = ctx.createLinearGradient(edge, 0, edge - side * band, 0); gr.addColorStop(0, 'rgba(8,10,15,.93)'); gr.addColorStop(1, 'rgba(8,10,15,0)');
+    ctx.fillStyle = gr; ctx.fillRect(side < 0 ? edge : edge - band, 0, band, VH);
+    if (settings.quality !== 'low'){
+      ctx.save(); ctx.beginPath(); ctx.rect(x0, 0, x1 - x0, VH); ctx.clip();
+      const ox = ((t * 7 * side) % 160 + 160) % 160, oy = ((t * 3) % 160 + 160) % 160;
+      for (let x = x0 - 160 + ox - (x0 % 160); x < x1; x += 160) for (let y = -160 + oy; y < VH; y += 160) ctx.drawImage(mistCv, Math.round(x), Math.round(y));
+      const g2 = ctx.createLinearGradient(edge, 0, edge + side * 40, 0); g2.addColorStop(0, 'rgba(8,10,15,.95)'); g2.addColorStop(1, 'rgba(8,10,15,0)');
+      ctx.fillStyle = g2; ctx.fillRect(side < 0 ? edge - 40 : edge, 0, 40, VH);
+      ctx.restore();
+    }
+  }
+}
 function shadow(x, y, w){ ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.beginPath(); ctx.ellipse(Math.round(x), Math.round(y), w, w * .35, 0, 0, 6.283); ctx.fill(); }
 
 function render(dt){
   const st = S || { hero: { x: 0, y: 0, face: 1, walk: 0 }, board: [], enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], halfDeath: null, breath: null, chill: 0, eclipse: 0, eclipseMax: 1, shake: 0, hurt: 0, time: performance.now() / 1000 };
   const h = st.hero;
   let sx = 0, sy = 0;
-  if (st.shake > 0){ sx = rand(-st.shake, st.shake); sy = rand(-st.shake, st.shake); st.shake = Math.max(0, st.shake - dt * 30); }
+  if (st.shake > 0){ const k = settings.shake ? 1 : 0; sx = rand(-st.shake, st.shake) * k; sy = rand(-st.shake, st.shake) * k; st.shake = Math.max(0, st.shake - dt * 30); }
+  sx += kickX; sy += kickY; kickX *= Math.max(0, 1 - dt * 12); kickY *= Math.max(0, 1 - dt * 12);
   // while the shop is open the camera lifts so the resting warband sits in the space above the shop panel
   const camp = !!(S && mode === 'shop');
   let want = VH / 2;
-  if (camp){ const top = document.getElementById('shop').getBoundingClientRect().top - app.getBoundingClientRect().top; want = clamp(top / SCALE * .5, 34, VH / 2); }
+  if (camp){ const now = performance.now(); if (now - shopTopAt > 250){ shopTopAt = now; shopTop = document.getElementById('shop').getBoundingClientRect().top - app.getBoundingClientRect().top; } want = clamp(shopTop / SCALE * .5, 34, VH / 2); }
   camScreenY = camScreenY == null ? want : camScreenY + (want - camScreenY) * Math.min(1, dt * 7);
   const camX = Math.round(h.x - VW / 2 + sx), camY = Math.round(h.y - camScreenY + sy);
   lastCamX = camX; lastCamY = camY;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalCompositeOperation = 'source-over';
   // ground
-  const tx0 = Math.floor(camX / TILE), ty0 = Math.floor(camY / TILE);
-  for (let ty = ty0; ty <= ty0 + Math.ceil(VH / TILE) + 1; ty++) for (let tx = tx0; tx <= tx0 + Math.ceil(VW / TILE) + 1; tx++){
-    ctx.drawImage(TILES[hash(tx, ty) % 4], tx * TILE - camX, ty * TILE - camY);
+  const tx0 = Math.floor(camX / TILE), ty0 = Math.floor(camY / TILE), cols = Math.ceil(VW / TILE) + 2, rows = Math.ceil(VH / TILE) + 2;
+  const gk = tx0 + ',' + ty0 + ',' + cols + ',' + rows + ',' + settings.quality;
+  if (gk !== groundKey){
+    groundKey = gk; groundCv.width = cols * TILE; groundCv.height = rows * TILE; const g = groundCtx;
+    for (let ty = 0; ty < rows; ty++) for (let tx = 0; tx < cols; tx++) g.drawImage(TILES[hash(tx0 + tx, ty0 + ty) % 4], tx * TILE, ty * TILE);
+    if (settings.quality !== 'low') for (let ty = -1; ty < rows; ty++) for (let tx = -1; tx < cols; tx++){
+      const hv = hash(tx0 + tx + 999, ty0 + ty - 77), r = hv % 40;
+      const px = tx * TILE + (hv >>> 8) % 20, py = ty * TILE + (hv >>> 16) % 20;
+      if (r === 0) g.drawImage(SPR.stone, px, py);
+      else if (r === 1) g.drawImage(SPR.bones, px, py);
+      else if (r === 2 || r === 3 || r === 4) g.drawImage(SPR.tuft, px, py);
+      else if (r === 5) g.drawImage(SPR.tree, px, py);
+    }
   }
-  for (let ty = ty0; ty <= ty0 + Math.ceil(VH / TILE) + 1; ty++) for (let tx = tx0; tx <= tx0 + Math.ceil(VW / TILE) + 1; tx++){
-    const hv = hash(tx + 999, ty - 77), r = hv % 40;
-    const px = tx * TILE - camX + (hv >>> 8) % 20, py = ty * TILE - camY + (hv >>> 16) % 20;
-    if (r === 0) ctx.drawImage(SPR.stone, px, py);
-    else if (r === 1) ctx.drawImage(SPR.bones, px, py);
-    else if (r === 2 || r === 3 || r === 4) ctx.drawImage(SPR.tuft, px, py);
-    else if (r === 5) ctx.drawImage(SPR.tree, px, py);
-  }
+  ctx.drawImage(groundCv, tx0 * TILE - camX, ty0 * TILE - camY);
   ctx.translate(-camX, -camY);
 
   // telegraphs
@@ -2440,7 +2642,8 @@ function render(dt){
   if (st.corpses) st.corpses = st.corpses.filter(c => c.life > 0);
   for (const z of st.haz || []){
     const fade = clamp(z.life / .6, 0, 1);
-    if (z.kind === 'ice'){ ctx.globalAlpha = clamp(z.life / z.max, 0, 1) * .5; ctx.fillStyle = '#c8ecff'; ctx.beginPath(); ctx.ellipse(z.x, z.y, z.r, z.ry, 0, 0, 6.283); ctx.fill(); }
+    if (z.kind === 'ember'){ const k = clamp(z.life / z.max, 0, 1); ctx.globalAlpha = k * (.45 + .2 * Math.sin(st.time * 14 + z.x)); ctx.fillStyle = k > .5 ? '#ff8a1e' : '#c4501a'; ctx.beginPath(); ctx.ellipse(z.x, z.y, z.r * (.6 + .4 * k), z.ry * (.6 + .4 * k), 0, 0, 6.283); ctx.fill(); if (Math.random() < .08 && S && mode === 'combat') st.parts.push({ x: z.x + rand(-5, 5), y: z.y - 2, vx: 0, vy: rand(-24, -10), life: .4, max: .4, col: pick(['#ff5b2e', '#ffb347']), s: 1, add: true }); }
+    else if (z.kind === 'ice'){ ctx.globalAlpha = clamp(z.life / z.max, 0, 1) * .5; ctx.fillStyle = '#c8ecff'; ctx.beginPath(); ctx.ellipse(z.x, z.y, z.r, z.ry, 0, 0, 6.283); ctx.fill(); }
     else if (z.t < z.arm){
       const k = z.t / z.arm; ctx.globalAlpha = .85; ctx.strokeStyle = '#b98cff'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(z.x, z.y, z.r, z.ry, 0, 0, 6.283); ctx.stroke();
       ctx.globalAlpha = .12 + k * .28; ctx.fillStyle = '#9a78d6'; ctx.beginPath(); ctx.ellipse(z.x, z.y, z.r * k, z.ry * k, 0, 0, 6.283); ctx.fill();
@@ -2485,19 +2688,28 @@ function render(dt){
   const ct = performance.now() / 1000, fireX = h.x, fireY = h.y + 34;
   if (camp){
     ctx.fillStyle = 'rgba(5,6,10,.62)'; ctx.fillRect(camX - 20, camY - 20, VW + 40, VH + 40);
-    ctx.globalCompositeOperation = 'lighter';
+    if (settings.quality !== 'low'){ ctx.globalCompositeOperation = 'lighter';
     const gl = ctx.createRadialGradient(fireX, fireY - 8, 4, fireX, fireY - 8, 78 + Math.sin(ct * 9) * 3);
     gl.addColorStop(0, 'rgba(255,140,60,.38)'); gl.addColorStop(.5, 'rgba(255,90,30,.12)'); gl.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(fireX, fireY - 8, 82, 0, 6.283); ctx.fill();
-    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalCompositeOperation = 'source-over'; }
     ctx.fillStyle = '#3d2818'; ctx.fillRect(Math.round(fireX) - 6, Math.round(fireY) + 1, 12, 2); ctx.fillStyle = '#6a4428'; ctx.fillRect(Math.round(fireX) - 5, Math.round(fireY), 4, 1); ctx.fillRect(Math.round(fireX) + 1, Math.round(fireY) + 2, 4, 1);
     for (let k = 0; k < 9; k++){ const fh = 2 + ((Math.sin(ct * 13 + k * 2.1) + 1) * 2.4) | 0, fx = Math.round(fireX) - 4 + k; for (let j = 0; j < fh; j++){ ctx.fillStyle = j > fh - 2 ? '#ffe2a0' : j > fh / 2 ? '#ffb347' : '#ff5b2e'; ctx.fillRect(fx, Math.round(fireY) - j, 1, 1); } }
     campEmber -= dt; if (campEmber <= 0 && S){ campEmber = .08; S.parts.push({ x: fireX + rand(-3, 3), y: fireY - 4, vx: rand(-6, 6), vy: rand(-30, -16), life: rand(.6, 1.2), max: 1.2, col: pick(['#ff8a3c', '#ffd27a', '#ff5b2e']), s: 1, add: true }); }
+    if (S && S.event){
+      const k = S.event.type, sp = NPC[k], nx = Math.round(fireX + 44), ny = Math.round(fireY - 4);
+      const gc = k === 'merchant' ? '255,200,110' : k === 'shrine' ? '255,59,43' : '185,140,255';
+      ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(nx, ny - 6, 2, nx, ny - 6, 26 + Math.sin(ct * 5) * 2); gr.addColorStop(0, `rgba(${gc},.28)`); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(nx, ny - 6, 30, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+      shadow(nx, ny + sp.height / 2 - 1, sp.width * .35);
+      ctx.drawImage(sp, Math.round(nx - sp.width / 2), Math.round(ny - sp.height / 2 + (k === 'merchant' ? Math.sin(ct * 2) * .6 : 0)));
+      if (k === 'altar' && Math.random() < .3) S.parts.push({ x: nx + rand(-6, 6), y: ny - 4, vx: rand(-3, 3), vy: rand(-22, -10), life: .6, max: .6, col: pick(['#b98cff', '#d6b8ff']), s: 1, add: true });
+    }
     st.board.forEach((u, i) => { if (!u || i >= slotCount()) return; u.x = h.x + SLOT_OFF[i].x; u.y = h.y + SLOT_OFF[i].y; u.face = u.x < fireX ? 1 : u.x > fireX ? -1 : u.face; u.hz = 0; u.leap = null; });
   }
   // entities, y-sorted
   const ents = [];
-  if (!camp) for (const e of st.enemies) ents.push({ y: e.y, e });
+  const fairX = h.x, fairHalf = FW / 2 + 6, inFair = (x, pad) => Math.abs(x - fairX) <= fairHalf + (pad || 0);
+  if (!camp) for (const e of st.enemies) if (inFair(e.x, e.w / 2)) ents.push({ y: e.y, e });
   st.board.forEach((u, i) => { if (u && (!S || i < slotCount())) ents.push({ y: u.y, u }); });
   ents.push({ y: h.y, hero: true });
   ents.sort((a, b) => a.y - b.y);
@@ -2541,7 +2753,7 @@ function render(dt){
       drawSprite(sname, e.x, e.y + bob, e.sc, e.face, e.flash > 0);
       if (e.shield > 0){ ctx.globalAlpha = .55 + .2 * Math.sin(st.time * 5); ctx.strokeStyle = '#b98cff'; ctx.lineWidth = 1; ctx.setLineDash([2, 2]); ctx.beginPath(); ctx.arc(Math.round(e.x), Math.round(e.y + bob), e.r + 5, st.time, st.time + 6.283); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; }
       if (isMB && e.flash <= 0){ const sp = SPR[sname]; bossFX(ctx, e.d.boss, e.design, sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
-      if (e.d.wisp){ ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 10); gr.addColorStop(0, 'rgba(190,255,230,.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(e.x, e.y, 10, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over'; }
+      if (e.d.wisp && settings.quality !== 'low'){ ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 10); gr.addColorStop(0, 'rgba(190,255,230,.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(e.x, e.y, 10, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over'; }
       if (isF && e.flash <= 0){ const sp = SPR[sname]; fenrirFX(ctx, e.design || 'B', sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
       if (e.frz > 0){ ctx.globalAlpha = .55; drawSprite(sname, e.x, e.y + bob, e.sc, e.face, true); ctx.globalAlpha = 1; }
       if (e.stun > 0){ ctx.fillStyle = '#ffe066'; for (let k = 0; k < 3; k++){ const a = st.time * 8 + k * 2.09; ctx.fillRect(Math.round(e.x + Math.cos(a) * 5), Math.round(e.y - e.h / 2 - 3 + Math.sin(a) * 1.5), 1, 1); } }
@@ -2591,6 +2803,7 @@ function render(dt){
   }
   // projectiles
   if (!camp) for (const p of st.projs){
+    if (!inFair(p.x, 4)) continue;
     if (p.kind === 'spear'){
       const l = Math.hypot(p.vx, p.vy) || 1, ux = p.vx / l, uy = p.vy / l; ctx.strokeStyle = '#8a5a34'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(p.x - ux * 14, p.y - uy * 14); ctx.lineTo(p.x, p.y); ctx.stroke(); ctx.fillStyle = '#e6ebf5'; ctx.fillRect(Math.round(p.x + ux * 2) - 1, Math.round(p.y + uy * 2) - 1, 3, 3);
     } else if (p.kind === 'axe'){
@@ -2615,6 +2828,7 @@ function render(dt){
     }
   }
   if (!camp) for (const p of st.eprojs){
+    if (!inFair(p.x, 4)) continue;
     ctx.fillStyle = p.col === '#ff5b2e' ? 'rgba(255,60,30,.45)' : p.col === '#bfe9ff' ? 'rgba(134,212,255,.45)' : 'rgba(190,120,255,.45)'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 2, 0, 6.283); ctx.fill();
     ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * .6, 0, 6.283); ctx.fill();
   }
@@ -2627,7 +2841,8 @@ function render(dt){
   }
   ctx.globalAlpha = 1;
   st.parts = st.parts.filter(p => p.life > 0);
-  if (st.parts.length > 1400) st.parts.splice(0, st.parts.length - 1400);
+  const pcap = settings.quality === 'low' ? 300 : settings.quality === 'medium' ? 700 : 1400;
+  if (st.parts.length > pcap) st.parts.splice(0, st.parts.length - pcap);
   // rings & slashes
   ctx.globalCompositeOperation = 'lighter';
   for (const r of st.rings){
@@ -2666,13 +2881,16 @@ function render(dt){
 
 
 
-  // vignette + atmosphere
+  // the mist beyond the fair zone: the world continues, but nothing in it can be seen
   ctx.setTransform(1, 0, 0, 1, 0, 0);
+  drawMist(h.x - camX, st.time || 0);
+  // vignette + atmosphere
   const hx = h.x - camX, hy = h.y - camY;
-  const g = ctx.createRadialGradient(hx, hy, 80, hx, hy, Math.max(VW, VH) * .75);
+  const g = ctx.createRadialGradient(hx, hy, 80, hx, hy, Math.max(FW, VH) * .75);
   g.addColorStop(0, 'rgba(5,6,10,0)'); g.addColorStop(1, 'rgba(5,6,10,.7)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
-  if (st.hurt > 0){ ctx.fillStyle = `rgba(196,33,63,${st.hurt * .9})`; ctx.fillRect(0, 0, VW, VH); }
+  if (st.hurt > 0){ ctx.fillStyle = `rgba(196,33,63,${st.hurt * (settings.calm ? .3 : .9)})`; ctx.fillRect(0, 0, VW, VH); }
+  if (flashA > 0){ ctx.fillStyle = `rgba(${flashCol},${Math.min(.6, flashA)})`; ctx.fillRect(0, 0, VW, VH); flashA = Math.max(0, flashA - dt * 2.5); }
   // Devour the Sun: darkness with a small circle of light around the hero; the shadow wolves' eyes show where they will strike
   if (st.eclipse > 0){
     const k = Math.min(1, (st.eclipseMax - st.eclipse) / .6, st.eclipse / .6);
@@ -2713,7 +2931,7 @@ function drawMinimap(){
   mctx.fillStyle = '#0d1018'; mctx.fillRect(0, 0, MINI, MINI);
   // view rectangle
   mctx.strokeStyle = '#2c3346'; mctx.lineWidth = 1;
-  mctx.strokeRect(half - VW / 2 * k + .5, half - VH / 2 * k + .5, VW * k, VH * k);
+  mctx.strokeRect(half - FW / 2 * k + .5, half - VH / 2 * k + .5, FW * k, VH * k);
   const toMini = (x, y, clampIt) => {
     let mx = (x - h.x) * k, my = (y - h.y) * k, edge = false;
     if (clampIt){ const m = Math.max(Math.abs(mx), Math.abs(my)); if (m > half - 5){ const s = (half - 5) / m; mx *= s; my *= s; edge = true; } }
@@ -2771,12 +2989,17 @@ function setMode(m){
   $('#bossbar').hidden = true;
   renderAbilBar();
   $('#dock').hidden = m !== 'combat';
-  if (m !== 'combat'){ paused = false; $('#pause').hidden = true; }
+  paused = false; $('#pause').hidden = true; // any screen change closes the pause menu
   if (m === 'title') renderTitle();
   if (m === 'meta') renderMeta();
 }
 let shopReadyAt = 0;
-function openShop(){ shopReadyAt = performance.now() + 800; S.rollN = 0; S.xpN = 0; S.healN = 0; setMode('shop'); $('#info').innerHTML = DEFAULT_INFO; renderShop(); }
+function openShop(){
+  shopReadyAt = performance.now() + 800; S.rollN = 0; S.xpN = 0; S.healN = 0; S.selRelic = null;
+  if (!S.relics) S.relics = [];
+  if (S.resumed) S.resumed = false; // a continued raid keeps its saved event
+  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 3; setTimeout(() => toast("Naglfar's Chest: +3 gold"), 400); } }
+  setMode('shop'); $('#info').innerHTML = DEFAULT_INFO; renderShop(); }
 const DEFAULT_INFO = 'Click a card to buy it. Lock a card with its padlock to keep it through rerolls and into the next shop. Reroll, XP and healing get 50% more expensive each time you use them in the same shop. Health only refills by itself after a boss. Drag a unit onto a slot to move or swap it, or right-click to send it between bench and formation. Three of a kind combine into one more star.';
 let toastT = 0;
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; toastT = 1.8; }
@@ -2837,6 +3060,9 @@ function renderShop(){
   computeTraits();
   $('#sGold').textContent = S.gold;
   $('#btnSaveQuit').hidden = !!S.tutorial;
+  if (!S.relics) S.relics = [];
+  renderEvent();
+  $('#relicRow').innerHTML = Array.from({ length: MAX_RELICS }, (_, i) => { const k = S.relics[i]; return k ? `<button class="rl${S.selRelic === k ? ' sel' : ''}" type="button" data-r="${k}" aria-label="${RELICS[k].name}"><img src="${RELIC_ICON[k]}" alt=""></button>` : '<div class="rl empty" aria-hidden="true"></div>'; }).join('');
   $('#sLvl').textContent = S.level;
   const maxed = S.level >= MAX_LVL;
   $('#sXp').textContent = maxed ? 'max' : `${S.xp}/${XPN[S.level]}`;
@@ -2878,11 +3104,14 @@ function renderShop(){
   };
   $('#bench').innerHTML = S.bench.map((u, i) => slotHTML(u, 'bench', i, false)).join('');
   const R = 66;
+  const nine = hasR('raven_banner') || !!S.board[8];
+  $('#formation').classList.toggle('nine', nine);
   $('#formation').innerHTML = `<img class="px hero" src="${ICON.hero}" alt="The hero">` + S.board.map((u, i) => {
+    if (i === 8) return nine ? slotHTML(u, 'board', 8, 8 >= slotCount(), 'left:70px;top:184px;') : '';
     const a = -Math.PI / 2 + i * Math.PI / 4, x = 90 + Math.cos(a) * R - 20, y = 90 + Math.sin(a) * R - 20;
     return slotHTML(u, 'board', i, i >= slotCount(), `left:${x}px;top:${y}px;`);
   }).join('');
-  $('#slotNote').textContent = `${S.board.filter(Boolean).length} units · ${slotCount()} of 8 slots open`;
+  $('#slotNote').textContent = `${S.board.filter(Boolean).length} units · ${slotCount()} of ${hasR('raven_banner') ? 9 : 8} slots open`;
   $('#shopAbil').innerHTML = S.abil.map((a, i) => {
     if (!a) return `<div class="abt empty${S.selAb === i ? ' sel' : ''}" data-ai="${i}" role="button" tabindex="0" aria-label="Empty ability slot ${i + 1}"><span class="k">${i + 1}</span></div>`;
     const A = ABILITIES[a.key];
@@ -3019,11 +3248,22 @@ function showBestiary(on){
 }
 $('#btnBest').onclick = () => showBestiary(true);
 $('#btnBestBack').onclick = () => showBestiary(false);
-$('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () => { togglePause(false); gameOver(false, true); };
+$('#event').addEventListener('click', e => { const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
+$('#event').addEventListener('mouseover', e => { const r = e.target.closest('.relic-card'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, false); });
+$('#relicRow').addEventListener('click', e => { const r = e.target.closest('.rl[data-r]'); if (!r) return; S.selRelic = S.selRelic === r.dataset.r ? null : r.dataset.r; renderShop(); $('#info').innerHTML = describeRelic(r.dataset.r, true); });
+$('#relicRow').addEventListener('mouseover', e => { const r = e.target.closest('.rl[data-r]'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, true); });
+$('#info').addEventListener('click', e => { const b = e.target.closest('#btnRelicSell'); if (b) sellRelic(b.dataset.r); });
+$('#btnSavePause').onclick = () => { togglePause(false); saveAndQuit(); };
+$('#btnShopMenu').onclick = e => { e.currentTarget.blur(); togglePause(true); };
+$('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e => {
+  const b = e.currentTarget;
+  if (b.dataset.armed !== '1'){ b.dataset.armed = '1'; b.textContent = 'Really give up?'; b.classList.add('warn'); setTimeout(() => { b.dataset.armed = ''; b.textContent = 'Give up'; b.classList.remove('warn'); }, 3000); return; }
+  b.dataset.armed = ''; b.textContent = 'Give up'; b.classList.remove('warn'); togglePause(false); gameOver(false, true);
+};
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.10.0'; // major.minor.patch
+const VERSION = '0.13.0'; // major.minor.patch
 const BUILD = ''; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3135,7 +3375,7 @@ function castAbility(i){
   const sl = S.abil[i]; if (!sl) return;
   if (sl.cd > 0){ toast(`${ABILITIES[sl.key].name} is ready in ${Math.ceil(sl.cd)} s`); return; }
   const l = sl.lvl, h = S.hero, { dx, dy } = aimDir();
-  sl.cd = ABILITIES[sl.key].cd[l - 1];
+  sl.cd = ABILITIES[sl.key].cd[l - 1]; sfx('cast');
   addText(h.x, h.y - 16, ABILITIES[sl.key].name, ABILITIES[sl.key].col, true);
   if (sl.key === 'bash'){ h.bash = { t: 0, dur: .2, dx, dy, dist: [70, 85, 100][l - 1], hit: new Set(), dmg: abilDmg(30, l), l }; h.inv = Math.max(h.inv, .3); }
   else if (sl.key === 'spear'){ S.projs.push({ kind: 'spear', x: h.x, y: h.y - 3, vx: dx * 420, vy: dy * 420, dmg: abilDmg(45, l), dtype: 'phys', u: null, r: 4, life: 3, hits: new Set(), dist: 0, maxd: 330, back: l >= 3, ret: false }); }
@@ -3212,7 +3452,7 @@ function renderPick(){
   }
 }
 function choosePick(i){
-  const P = picking; if (!P) return;
+  const P = picking; if (!P) return; sfx('level');
   if (P.step === 'replace'){ if (i >= 0 && i < 3) S.abil[i] = { key: P.chosen, lvl: 1, cd: 0 }; return closePick(); }
   const o = P.opts[i]; if (!o) return;
   if (o.type === 'gold'){ S.gold += 25; return closePick(); }
@@ -3223,6 +3463,7 @@ function choosePick(i){
 }
 function closePick(){ picking = null; renderPick(); renderAbilBar(); if (mode === 'shop') renderShop(); }
 function renderAbilBar(){
+  renderRelicBar();
   const bar = $('#abil'); if (!bar) return;
   bar.hidden = !(mode === 'combat' && S);
   if (bar.hidden) return;
@@ -3456,6 +3697,9 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.13.0', 'Smoother and fairer', ['Interface size setting, picked automatically from your screen height', 'Graphics quality (High, Medium, Low), Reduce flashing and Show FPS in Settings. If the game runs slowly it offers to switch to Low', 'The shop fits short screens: the Start wave row stays visible, and the shop no longer stretches on ultrawide screens', 'Faster drawing of the ground and faster hit checks in crowded waves', 'Raven Banner now opens a 9th slot behind the hero at any level', 'Give up asks for confirmation', 'Fixed: the shop no longer jumps up and down when you hover cards and units. Long descriptions scroll inside the info box', 'The game fills the whole screen. Everyone sees exactly the same 16:9 battlefield, and on wider screens the sides fill with mist that hides anything in it', 'On wide screens the ability and health bar moves into the mist at the side, and the shop uses the extra width']],
+  ['0.12.0', 'The Wandering Merchant', ['Shop events from wave 3: now and then a visitor waits at the campfire', 'The Wandering Merchant sells relics, items that twist a rule for the rest of the raid. Carry up to 3 and sell them back for half', '12 relics, such as Iron Oath, Ember Boots, Twin Souls and Raven Banner', 'A Blood Shrine trades health for gold. A Cursed Altar makes the next wave harder and pays with a free relic', "Sleipnir's Stride no longer appears once every dash slot is unlocked", 'A mute button in Settings, and M mutes or unmutes anywhere']],
+  ['0.11.0', 'Sound and feel', ['Music and sound effects, all made in the game: war drums in battle, a campfire tune in the shop, a roar for every boss', 'Settings menu on the title screen and in the pause menu: volume, screen shake, damage numbers and tooltips', 'Big hits freeze the action for a moment, boss attacks flash the screen, and a boss dies in slow motion', 'Merging units bursts with light', 'The pause menu also opens in the shop: press Esc or P, or click Menu. It has Save and quit there too']],
   ['0.10.0', 'How to play', ['A short guided tutorial on the main menu: How to play', 'The synergies panel shows progress pips. Hover or click a synergy to see each step, which one is active and which units count', 'Unit descriptions say which synergies the unit counts toward']],
   ['0.9.0', 'The horde gets teeth', ['The game has its own tab icon', 'A Bestiary in the pause screen shows every enemy and elite trait', 'New looks for the draugr, wolves, ravens, Iron Draugr, Seiðkonur, Barrow Wights and Soul Wisps, with walk animations and their own deaths', 'Some draugr claw up out of the ground nearby', 'Wolves circle and pounce (from wave 2). Ravens mark a line and dive (wave 3)', 'Seiðkonur curse the ground under you (wave 4). Iron Draugr slam their hammers (wave 7)', 'Elites have a trait: Frozen leaves an icy trail, Burning explodes on death, Warded has a shield, Swift is fast']],
   ['0.8.1', 'Small fixes', ['The Sort button explains how it sorts the bench']],
@@ -3508,6 +3752,7 @@ $('#ups').addEventListener('click', e => {
 
 function gameOver(win, quit){
   if (S && S.tutorial){ endTutorial(); return; }
+  sfx(win ? 'victory' : 'death');
   const won = win || S.won, ew = S.endless ? Math.max(0, S.wave - WAVES.length - 1) : 0;
   lastRun = runSummary(S.endless ? `Endless, ${quit ? 'left' : 'fell'} on wave ${S.wave}` : win ? 'Won the raid' : quit ? `Gave up on wave ${S.wave}` : `Fell on wave ${S.wave}`);
   const cleared = won ? 20 : S.wave - 1;
@@ -3525,9 +3770,10 @@ function gameOver(win, quit){
   try { $('#lbName').value = localStorage.getItem('valhalla.name') || ''; } catch (e) {}
   setMode('over');
 }
-function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; if (!paused || !$('#bestiary').hidden) showBestiary(false); }
+function togglePause(v){ if (mode !== 'combat' && mode !== 'shop') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; $('#pause').classList.toggle('over-shop', mode === 'shop'); $('#btnSavePause').hidden = !(mode === 'shop' && S && !S.tutorial); if (!paused || !$('#bestiary').hidden) showBestiary(false); }
 
 addEventListener('keydown', e => {
+  if (!$('#settings').hidden){ if (e.code === 'Escape'){ e.preventDefault(); closeSettings(); } return; }
   if (dbg.bot && e.isTrusted && !e.ctrlKey && !e.metaKey && !e.altKey && MOVE_KEYS.includes(e.code) && !(e.target && e.target.closest && e.target.closest('input, textarea, select'))){ setBot(false); toast('Autoplay off. You have control.'); }
   if (e.ctrlKey && e.shiftKey && e.code === 'KeyD'){ e.preventDefault(); toggleDbg(); return; }
   const digit = { Digit1: 0, Digit2: 1, Digit3: 2, Numpad1: 0, Numpad2: 1, Numpad3: 2 }[e.code];
@@ -3536,14 +3782,17 @@ addEventListener('keydown', e => {
   if (mode === 'title' && /^[a-z]$/i.test(e.key)){ titleBuf = (titleBuf + e.key.toLowerCase()).slice(-4); if (titleBuf === 'odin'){ titleBuf = ''; toggleDbg(true); return; } }
   if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return; // typing in a form
   if (!$('#feedback').hidden){ if (e.code === 'Escape') closeFeedback(); return; }
+  if (e.code === 'KeyM' && !e.repeat && !e.ctrlKey && !e.metaKey){ toggleMute(); return; }
   keys[e.code] = true;
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (mode === 'combat' || mode === 'shop')) e.preventDefault();
   if (mode === 'combat'){
-    if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCh > 0 && h.dashT <= 0){ h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; if (S.bind){ S.bind = null; addText(h.x, h.y - 14, 'Broke free!', '#b4bccb', true); } } }
+    if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCh > 0 && h.dashT <= 0){ sfx('dash'); onDash(); h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; if (S.bind){ S.bind = null; addText(h.x, h.y - 14, 'Broke free!', '#b4bccb', true); } } }
     if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
     if (e.code === 'KeyT' && !e.repeat) toggleTips();
     if (e.code === 'KeyB' && !e.repeat) openEndlessShop();
-  } else if (mode === 'shop' && !e.repeat && performance.now() >= shopReadyAt){
+  } else if (mode === 'shop' && !e.repeat && (e.code === 'KeyP' || e.code === 'Escape')){
+    togglePause();
+  } else if (mode === 'shop' && !e.repeat && !paused && performance.now() >= shopReadyAt){
     if (e.code === 'Space') startWave();
     else if (e.code === 'KeyR') reroll();
     else if (e.code === 'KeyF') buyXp();
@@ -3613,6 +3862,303 @@ function updateHud(dt){
 /* ================= LOOP ================= */
 let last = performance.now(), acc = 0;
 const STEP = 1 / 60;
+/* ================= RELICS: items that twist a rule for the rest of the raid ================= */
+const MAX_RELICS = 3;
+const RELICS = {
+  iron_oath:      { name: 'Iron Oath', price: 10, desc: 'Iron units count double for the Iron synergy.' },
+  ember_boots:    { name: 'Ember Boots', price: 12, desc: 'Dashing leaves a trail of fire that burns enemies.' },
+  odins_eye:      { name: "Odin's Eye", price: 9, desc: 'Every 4th reroll in a shop is free.' },
+  draugr_pact:    { name: "Draugr's Pact", price: 13, desc: 'All units deal 40% more damage, but the hero has 30% less maximum health.' },
+  huginn_feather: { name: "Huginn's Feather", price: 10, desc: 'A random power-up appears near you at the start of every wave.' },
+  twin_souls:     { name: 'Twin Souls', price: 14, desc: 'Units with two or more stars count as two for synergies.' },
+  gleipnir_link:  { name: 'Gleipnir Link', price: 11, desc: 'Your first dash each wave stuns nearby enemies for 1.5 seconds.' },
+  usurer_coin:    { name: "Usurer's Coin", price: 8, desc: 'Interest goes up to 8 gold instead of 5, but healing costs double.' },
+  mead_hall:      { name: 'Horn of the Mead Hall', price: 9, desc: 'The hero heals 1.5 health every second.' },
+  berserk_mark:   { name: "Berserker's Mark", price: 11, desc: 'While the hero is below 40% health, all units attack 50% faster.' },
+  raven_banner:   { name: 'Raven Banner', price: 15, desc: 'One extra formation slot.' },
+  naglfar_chest:  { name: "Naglfar's Chest", price: 10, desc: 'Gain 3 gold every time the shop opens.' },
+};
+const RELIC_ART = {
+  iron_oath:      [['..XXXXX..', '.X.....X.', 'X...Y...X', 'X..YYY..X', 'X...Y...X', 'X...Y...X', 'X.......X', '.X.....X.', '..XXXXX..'], { X: '#a9aeb8', Y: '#e8ecf2' }],
+  ember_boots:    [['.........', '..XXX....', '..XXX....', '..XXX....', '..XXXX...', '..XXXXXX.', '.YXXXXXX.', 'Y.Y.Y....', '.Y.Y.Y...'], { X: '#8a5a34', Y: '#ff8a1e' }],
+  odins_eye:      [['.........', '..XXXXX..', '.X.....X.', 'X..YYY..X', 'X.YYKYY.X', 'X..YYY..X', '.X.....X.', '..XXXXX..', '.........'], { X: '#e2b24c', Y: '#86d4ff', K: '#0b0d13' }],
+  draugr_pact:    [['..XXXXX..', '.XXXXXXX.', 'XXKXXXKXX', 'XXKXXXKXX', 'XXXXKXXXX', '.XXXXXXX.', '..X.X.X..', '..XXXXX..', '.........'], { X: '#c8c2b0', K: '#c2185b' }],
+  huginn_feather: [['.......Y.', '......XY.', '.....XXY.', '....XXY..', '...XXY...', '..XXY....', '.XXY.....', '.YY......', 'Y........'], { X: '#5e4a80', Y: '#b98cff' }],
+  twin_souls:     [['..X...Y..', '.XX..YY..', '.XXX.YYY.', 'XXXXYYYYY', 'XWXXYYWYY', 'XXXXYYYYY', '.XXX.YYY.', '..X...Y..', '.........'], { X: '#6fc7a0', Y: '#86d4ff', W: '#ffffff' }],
+  gleipnir_link:  [['.XX......', 'X..X.....', 'X..XXX...', '.XX..X...', '...X..X..', '...XXX..X', '.....X..X', '......XX.', '.........'], { X: '#d6d8de' }],
+  usurer_coin:    [['..XXXXX..', '.XYYYYYX.', 'XYYXYYYYX', 'XYYXXYYYX', 'XYYXYXYYX', 'XYYXYYYYX', 'XYYYYYYYX', '.XYYYYYX.', '..XXXXX..'], { X: '#8a6420', Y: '#ecc860' }],
+  mead_hall:      [['.........', 'X........', 'XX.......', '.XXX.....', '..XXXX...', '...XXXXYY', '....XXXYY', '.....XXX.', '.........'], { X: '#c89a3a', Y: '#7dc46a' }],
+  berserk_mark:   [['....X....', '...XXX...', '..X.X.X..', '.X..X..X.', '....X....', '....X....', '...X.X...', '..X...X..', '.X.....X.'], { X: '#ff3b2b' }],
+  raven_banner:   [['X........', 'XYYYYYY..', 'XYYKKYYY.', 'XYKKKKYY.', 'XYYKKYYY.', 'XYYYYYY..', 'X........', 'X........', 'X........'], { X: '#8a5a34', Y: '#8e1232', K: '#14101c' }],
+  naglfar_chest:  [['.........', '.XXXXXXX.', 'XYYYYYYYX', 'XXXXKXXXX', 'XYYYKYYYX', 'XYYYYYYYX', 'XXXXXXXXX', '.........', '.........'], { X: '#8a6420', Y: '#5a3a2a', K: '#ecc860' }],
+};
+const RELIC_ICON = {};
+for (const k in RELIC_ART){ const c = makeSprite(RELIC_ART[k][0], RELIC_ART[k][1]); RELIC_ICON[k] = c.toDataURL(); }
+const hasR = k => !!(S && S.relics && S.relics.includes(k));
+const relicSell = k => Math.floor(RELICS[k].price / 2);
+function relicsChanged(){
+  if (!hasR('raven_banner') && S.board[8]){ const f = S.bench.indexOf(null); if (f >= 0){ S.bench[f] = S.board[8]; S.board[8] = null; } }
+  const h = S.hero, ratio = h.hp / h.maxHp; computeTraits(); h.maxHp = heroMaxHp(); h.hp = Math.max(1, Math.min(h.maxHp, Math.round(h.maxHp * ratio)));
+}
+function gainRelic(k){ if (!S.relics) S.relics = []; if (S.relics.length >= MAX_RELICS || S.relics.includes(k)) return false; S.relics.push(k); relicsChanged(); return true; }
+function buyRelic(k){
+  const R = RELICS[k]; if (!R || !S.event || S.event.type !== 'merchant' || S.event.bought.includes(k)) return;
+  if (S.relics.length >= MAX_RELICS) return toast('Your relic slots are full. Sell a relic first.');
+  if (!dbg.infGold && S.gold < R.price) return toast('Not enough gold');
+  if (!dbg.infGold) S.gold -= R.price;
+  gainRelic(k); S.event.bought.push(k); sfx('merge'); toast(`${R.name} is yours`);
+  renderShop(); $('#info').innerHTML = describeRelic(k, true);
+}
+function sellRelic(k){
+  const i = S.relics.indexOf(k); if (i < 0) return;
+  S.relics.splice(i, 1); S.gold += relicSell(k); S.selRelic = null; relicsChanged(); sfx('sell');
+  toast(`Sold ${RELICS[k].name} for ${relicSell(k)} gold`); renderShop(); $('#info').innerHTML = DEFAULT_INFO;
+}
+function describeRelic(k, owned){
+  const R = RELICS[k];
+  return `<strong>${R.name}</strong><br>${R.desc}<br><span style="color:var(--muted)">Relic. Lasts for the rest of the raid.</span>` + (owned ? `<br><button class="btn sm" id="btnRelicSell" type="button" data-r="${k}">Sell for ${relicSell(k)} gold</button>` : `<br><span style="color:var(--gold)">${R.price} gold</span>`);
+}
+function renderRelicBar(){
+  const bar = $('#relicBar'); if (!bar) return;
+  const list = mode === 'combat' && S && S.relics ? S.relics : [];
+  bar.hidden = !list.length;
+  bar.innerHTML = list.map(k => `<img src="${RELIC_ICON[k]}" alt="${RELICS[k].name}" title="${RELICS[k].name}: ${RELICS[k].desc}">`).join('');
+}
+
+/* ================= SHOP EVENTS: the Wandering Merchant, a Blood Shrine, a Cursed Altar ================= */
+function makeEvent(type){
+  if (type === 'merchant'){
+    const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
+    if (!pool.length) type = 'shrine';
+    else { const offers = []; while (offers.length < 3 && pool.length) offers.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]); return { type, offers, bought: [] }; }
+  }
+  if (type === 'shrine') return { type, cost: Math.round(S.hero.maxHp * .2), gold: 8 + S.wave, done: false };
+  return { type: 'altar', done: false };
+}
+function rollEvent(){
+  S.event = null;
+  if (S.tutorial || S.wave < 3 || picking && picking.kind === 'start') return;
+  S.sinceEvent = (S.sinceEvent || 0) + 1;
+  const chance = S.sinceEvent >= 5 ? 1 : S.sinceEvent >= 3 ? .35 : 0;
+  if (Math.random() >= chance) return;
+  S.sinceEvent = 0;
+  const altarOk = !S.endless && !waveDef(S.wave).boss;
+  S.event = makeEvent(weighted({ merchant: 6, shrine: 2, altar: altarOk ? 2 : 0 }));
+}
+function renderEvent(){
+  const el = $('#event'), E = S.event;
+  el.hidden = !E;
+  if (!E) return;
+  if (E.type === 'merchant'){
+    const full = S.relics.length >= MAX_RELICS;
+    el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.merchant}" alt=""><div><h4>The Wandering Merchant</h4><p>"Rare goods, for those who live long enough to use them." Relics twist a rule for the rest of the raid. You can carry ${MAX_RELICS}.${full ? ' <b>Your relic slots are full. Click a relic under Relics to sell it.</b>' : ''}</p></div></div>
+      <div class="ev-items">${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>`;
+  } else if (E.type === 'shrine'){
+    const can = S.hero.hp > E.cost + 1;
+    el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.shrine}" alt=""><div><h4>Blood Shrine</h4><p>${E.done ? 'The gods have taken their due.' : `Offer blood to the gods: lose ${E.cost} health and gain ${E.gold} gold.`}</p></div></div>
+      ${E.done ? '' : `<div class="row"><button class="btn sm" type="button" data-ev="accept" ${can ? '' : 'disabled'}>Offer blood</button><button class="btn sm" type="button" data-ev="leave">Walk away</button>${can ? '' : '<span class="note">Not enough health</span>'}</div>`}`;
+  } else {
+    el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.altar}" alt=""><div><h4>Cursed Altar</h4><p>${E.done ? (S.altarPending ? 'The curse is on you. The next wave is harder, and the altar will reward you if you survive it.' : 'You walked away from the altar.') : 'Accept the curse: the next wave has 40% tougher enemies and 25% more of them. Survive it and the altar grants you a free relic.'}</p></div></div>
+      ${E.done ? '' : '<div class="row"><button class="btn sm" type="button" data-ev="accept">Accept the curse</button><button class="btn sm" type="button" data-ev="leave">Walk away</button></div>'}`;
+  }
+}
+function eventAction(a){
+  const E = S.event; if (!E || E.done) return;
+  if (a === 'leave'){ E.done = true; if (E.type === 'shrine') S.event = null; renderShop(); return; }
+  if (E.type === 'shrine'){ if (S.hero.hp <= E.cost + 1) return; S.hero.hp -= E.cost; S.gold += E.gold; E.done = true; sfx('hurt'); sfx('coin'); toast(`The shrine takes ${E.cost} health and gives ${E.gold} gold`); }
+  if (E.type === 'altar'){ S.altarPending = true; E.done = true; sfx('bosscast', 'herald'); toast('The curse is on you'); }
+  renderShop();
+}
+// small sprites for the event visitors at the campfire
+function buildNpc(k){
+  if (k === 'merchant') return pxBuild(16, 18, [
+    { m: ['#4a3a2c', '#5e4a38', '#33281e'], draw: a => a.poly([[1, 6], [6, 5], [6, 15], [1, 15]]) },
+    { m: ['#3a3440', '#4e4656', '#26222c'], draw: a => a.poly([[4, 6], [10, 5], [12, 17.6], [3, 17.6]]) },
+    { m: ['#2a2430', '#3c3444', '#18141e'], edge: true, draw: a => a.poly([[4.4, 5.6], [7, 1], [10.4, 4], [10.8, 8], [5, 8.4]]) },
+    { m: ['#6a4428', '#8a6440', '#44301c'], draw: a => a.line(10.6, 8, 13.6, 12, 1.2) },
+    { m: ['#c89a3a', '#ecc860', '#8a6420'], draw: a => a.rect(12.4, 12, 3, 3.4) },
+  ], put => { put(8, 5, '#ffd27a'); put(9, 5, '#ffd27a'); put(13, 13, '#fff2b0'); put(14, 13, '#ffd27a'); put(13, 14, '#ffb347'); [[2, 8], [2, 11], [4, 9]].forEach(([x, y]) => put(x, y, '#7a5a3a')); });
+  if (k === 'shrine') return pxBuild(12, 16, [
+    { m: ['#5a5c66', '#7a7c88', '#3a3c44'], draw: a => a.poly([[3, 15], [3.4, 3], [6, .6], [8.6, 2.6], [9, 15]]) },
+    { m: ['#4a2020', '#6a2a2a', '#2a1010'], draw: a => a.ell(6, 14.6, 4.6, 1.4) },
+  ], put => { [[6, 4], [5, 5], [6, 6], [7, 7], [6, 8], [6, 10], [5, 11], [7, 11]].forEach(([x, y]) => put(x, y, '#ff3b2b')); put(5, 14, '#c2185b'); put(7, 14, '#8e1232'); });
+  return pxBuild(16, 13, [
+    { m: ['#2a2430', '#3c3444', '#18141e'], draw: a => { a.poly([[2, 6], [14, 6], [13, 12.6], [3, 12.6]]); a.rect(1, 5, 14, 2); } },
+    { m: ['#c8c2b0', '#e8e3d6', '#9a9488'], edge: true, draw: a => a.ell(8, 3.4, 2.2, 2) },
+  ], put => { put(7, 3, '#5a3a92'); put(9, 3, '#5a3a92'); [[2, 4], [2, 3], [13, 4], [13, 3], [3, 2], [12, 2]].forEach(([x, y]) => put(x, y, '#b98cff')); });
+}
+const NPC = {}, NPC_ICON = {};
+for (const k of ['merchant', 'shrine', 'altar']){ NPC[k] = buildNpc(k); const c = document.createElement('canvas'), z = 3; c.width = NPC[k].width * z; c.height = NPC[k].height * z; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; g.drawImage(NPC[k], 0, 0, c.width, c.height); NPC_ICON[k] = c.toDataURL(); }
+
+
+/* ================= SOUND: everything is synthesised with Web Audio, no files ================= */
+const AU = { ctx: null, master: null, music: null, sfx: null, noise: null, last: {}, voices: 0, track: null, next: 0, beat: 0, drone: null, mel: 4 };
+function auInit(){
+  if (AU.ctx){ if (AU.ctx.state === 'suspended') AU.ctx.resume().catch(() => {}); return; }
+  const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+  try { AU.ctx = new C(); } catch (e) { return; }
+  const c = AU.ctx;
+  const comp = c.createDynamicsCompressor(); comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 5; comp.attack.value = .004; comp.release.value = .2;
+  const makeup = c.createGain(); makeup.gain.value = 3.4; comp.connect(makeup); makeup.connect(c.destination); AU.out = makeup;
+  AU.master = c.createGain(); AU.master.connect(comp);
+  AU.music = c.createGain(); AU.music.connect(AU.master);
+  AU.sfx = c.createGain(); AU.sfx.connect(AU.master);
+  const buf = c.createBuffer(1, c.sampleRate, c.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; AU.noise = buf;
+  auVolumes();
+  setInterval(musicTick, 90);
+}
+function auVolumes(){
+  if (!AU.ctx) return; const t = AU.ctx.currentTime, v = x => Math.pow(x / 100, 1.4);
+  AU.master.gain.setTargetAtTime(settings.muted ? 0 : v(settings.master), t, .05); AU.music.gain.setTargetAtTime(v(settings.music) * .9, t, .05); AU.sfx.gain.setTargetAtTime(v(settings.sfx), t, .05);
+}
+addEventListener('pointerdown', auInit, true); addEventListener('keydown', auInit, true);
+const auOn = () => AU.ctx && AU.ctx.state === 'running';
+function tone(f, dur, o = {}){
+  const c = AU.ctx, t = Math.max(c.currentTime, o.at || c.currentTime + (o.delay || 0)), g = c.createGain(), osc = c.createOscillator();
+  osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(f, t); if (o.to) osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.to), t + dur);
+  if (o.det) osc.detune.value = o.det;
+  const v = o.vol == null ? .2 : o.vol, a = o.a == null ? .005 : o.a;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + Math.max(a + .01, dur));
+  let node = osc; if (o.lp){ const fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = o.lp; osc.connect(fl); node = fl; }
+  node.connect(g); g.connect(o.bus || AU.sfx); osc.start(t); osc.stop(t + dur + .05);
+  AU.voices++; osc.onended = () => { AU.voices--; g.disconnect(); };
+}
+function noise(dur, o = {}){
+  const c = AU.ctx, t = Math.max(c.currentTime, o.at || c.currentTime + (o.delay || 0)), src = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = AU.noise; src.loop = true;
+  fl.type = o.ft || 'bandpass'; fl.frequency.setValueAtTime(o.f || 1000, t); if (o.to) fl.frequency.exponentialRampToValueAtTime(o.to, t + dur); fl.Q.value = o.q == null ? 1 : o.q;
+  const v = o.vol == null ? .2 : o.vol, a = o.a == null ? .003 : o.a;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + Math.max(a + .01, dur));
+  src.connect(fl); fl.connect(g); g.connect(o.bus || AU.sfx); src.start(t, Math.random() * .5); src.stop(t + dur + .05);
+  AU.voices++; src.onended = () => { AU.voices--; g.disconnect(); };
+}
+const SFX_GAP = { hit: .05, crit: .09, axe: .07, arrow: .06, fire: .08, holy: .1, soul: .035, coin: .06, zap: .08, bones: .06, yelp: .08, caw: .08, clang: .1, shriek: .12, spirit: .08, warn: .15, slam: .08, hurt: .15, click: .03, burn: .3 };
+const SFX_KEY = { horn: 1, roar: 1, bossdie: 1, victory: 1, death: 1, merge: 1, level: 1, cast: 1, power: 1, dash: 1, hurt: 1, warn: 1, slam: 1 };
+const RUN = ['jarl', 'giant', 'herald', 'fenrir'];
+function sfx(name, p){
+  if (!auOn() || settings.muted || settings.master <= 0 || settings.sfx <= 0) return;
+  const now = AU.ctx.currentTime, gap = SFX_GAP[name] == null ? .04 : SFX_GAP[name];
+  if (now - (AU.last[name] || 0) < gap) return;
+  if (AU.voices > 46 && !SFX_KEY[name]) return;
+  AU.last[name] = now;
+  const r = (a, b) => a + Math.random() * (b - a);
+  switch (name){
+    case 'hit': noise(.06, { f: r(500, 800), ft: 'lowpass', vol: .07 }); tone(r(140, 180), .06, { type: 'triangle', vol: .04, to: 80 }); break;
+    case 'crit': tone(r(900, 1100), .1, { type: 'triangle', vol: .07, to: 1500 }); noise(.08, { f: 3000, ft: 'highpass', vol: .05 }); break;
+    case 'axe': noise(.14, { f: 2200, to: 700, q: 3, vol: .06 }); break;
+    case 'arrow': noise(.07, { f: 5000, to: 2500, ft: 'highpass', vol: .045 }); tone(r(1500, 1800), .05, { type: 'triangle', vol: .015, to: 900 }); break;
+    case 'fire': noise(.25, { f: 900, to: 300, ft: 'lowpass', vol: .08 }); tone(180, .2, { type: 'sawtooth', vol: .025, to: 90, lp: 600 }); break;
+    case 'holy': tone(r(1046, 1100), .25, { vol: .035 }); tone(1568, .3, { vol: .02, delay: .02 }); break;
+    case 'zap': noise(.12, { f: 4000, ft: 'highpass', vol: .06 }); tone(r(80, 120), .1, { type: 'square', vol: .025, lp: 900 }); break;
+    case 'leap': noise(.3, { f: 300, to: 1500, vol: .07 }); break;
+    case 'boom': tone(90, .5, { to: 35, vol: .24 }); noise(.4, { f: 400, to: 80, ft: 'lowpass', vol: .2 }); break;
+    case 'bigfire': noise(.45, { f: 600, to: 200, ft: 'lowpass', vol: .14 }); tone(110, .4, { type: 'sawtooth', to: 55, lp: 500, vol: .05 }); break;
+    case 'volley': for (let i = 0; i < 4; i++) noise(.06, { delay: i * .03, f: 5000, ft: 'highpass', vol: .04 }); break;
+    case 'heal': [784, 988, 1175].forEach((f, i) => tone(f, .3, { vol: .035, delay: i * .06 })); break;
+    case 'soul': tone(r(1500, 1900), .07, { vol: .025, to: 2400 }); break;
+    case 'coin': tone(1568, .08, { type: 'square', vol: .02, lp: 5000 }); tone(2093, .2, { type: 'square', vol: .02, lp: 5000, delay: .06 }); break;
+    case 'buy': tone(660, .1, { type: 'triangle', vol: .07 }); tone(880, .12, { type: 'triangle', vol: .05, delay: .05 }); break;
+    case 'sell': tone(880, .08, { type: 'triangle', vol: .05 }); tone(587, .14, { type: 'triangle', vol: .05, delay: .05 }); break;
+    case 'reroll': for (let i = 0; i < 5; i++) noise(.04, { delay: i * .035, f: r(1500, 3000), q: 4, vol: .04 }); break;
+    case 'xp': tone(440, .14, { type: 'triangle', vol: .05, to: 660 }); break;
+    case 'level': [523, 659, 784, 1047].forEach((f, i) => tone(f, .16, { type: 'triangle', vol: .06, delay: i * .07 })); break;
+    case 'merge': [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .22, { type: 'triangle', vol: .07, delay: i * .06 })); noise(.5, { f: 7000, ft: 'highpass', vol: .03, delay: .25, a: .05 }); break;
+    case 'dash': noise(.18, { f: 500, to: 2500, q: 1.5, vol: .08 }); break;
+    case 'horn': [[110, 0], [164.8, 6], [82.4, -4]].forEach(([f, d]) => tone(f, 1.4, { type: 'sawtooth', lp: 650, a: .14, vol: .06, det: d })); break;
+    case 'clear': [392, 523, 659].forEach((f, i) => tone(f, .35, { type: 'triangle', vol: .06, delay: i * .1 })); break;
+    case 'warn': tone(r(300, 340), .1, { type: 'square', vol: .03, lp: 1500 }); tone(r(300, 340), .1, { type: 'square', vol: .03, lp: 1500, delay: .13 }); break;
+    case 'slam': tone(70, .3, { to: 40, vol: .16 }); noise(.25, { f: 300, to: 80, ft: 'lowpass', vol: .14 }); break;
+    case 'hurt': tone(220, .15, { type: 'square', to: 110, vol: .05, lp: 1200 }); noise(.1, { f: 600, ft: 'lowpass', vol: .07 }); break;
+    case 'cast': tone(300, .3, { to: 900, type: 'triangle', vol: .06 }); noise(.3, { f: 1500, to: 4000, vol: .035 }); break;
+    case 'power': [880, 1175, 1568].forEach((f, i) => tone(f, .22, { vol: .05, delay: i * .05 })); break;
+    case 'click': tone(1200, .03, { type: 'triangle', vol: .02 }); break;
+    case 'burn': noise(.2, { f: 1200, to: 400, vol: .02 }); break;
+    case 'bones': for (let i = 0; i < 3; i++) tone(r(600, 900), .04, { type: 'triangle', vol: .022, delay: i * .03 }); noise(.08, { f: 1200, vol: .025 }); break;
+    case 'yelp': tone(r(800, 900), .15, { type: 'triangle', to: 450, vol: .035 }); break;
+    case 'caw': tone(r(600, 700), .14, { type: 'sawtooth', to: 420, vol: .025, lp: 1800 }); noise(.1, { f: 1500, vol: .02 }); break;
+    case 'clang': tone(r(900, 1000), .4, { vol: .035 }); tone(1430, .35, { vol: .025 }); tone(2210, .25, { vol: .018 }); noise(.05, { f: 5000, ft: 'highpass', vol: .035 }); break;
+    case 'shriek': tone(1100, .3, { vol: .025, to: 700 }); break;
+    case 'spirit': tone(r(500, 700), .3, { to: 1200, vol: .022 }); break;
+    case 'roar': { // each boss has its own voice
+      const b = { jarl: 70, giant: 45, herald: 150, fenrir: 55 }[p] || 60;
+      tone(b, 1, { type: 'sawtooth', to: b * .7, lp: 900, a: .08, vol: .1 }); tone(b * 1.5, .9, { type: 'sawtooth', to: b, lp: 700, a: .1, vol: .06, det: 12 });
+      noise(1, { f: 500, to: 150, ft: 'lowpass', a: .08, vol: .14 });
+      if (p === 'herald') tone(620, 1.2, { to: 300, vol: .04, a: .2 });
+      if (p === 'fenrir') tone(380, 1.4, { to: 620, type: 'triangle', vol: .045, a: .3, delay: .3 });
+      break;
+    }
+    case 'bosscast': { const b = { jarl: 140, giant: 90, herald: 300, fenrir: 110 }[p] || 120; tone(b, .45, { type: 'sawtooth', to: b * .6, lp: 800, vol: .06 }); noise(.4, { f: 800, to: 300, ft: 'lowpass', vol: .06 }); break; }
+    case 'bossdie': tone(60, 1.6, { to: 25, vol: .3 }); noise(1.4, { f: 600, to: 60, ft: 'lowpass', vol: .25 }); [659, 523, 392, 330].forEach((f, i) => tone(f, .6, { type: 'triangle', vol: .05, delay: .4 + i * .14 })); break;
+    case 'victory': [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, i === 4 ? 1.4 : .35, { type: 'triangle', vol: .07, delay: i * .16 })); break;
+    case 'death': [392, 330, 262, 196].forEach((f, i) => tone(f, .7, { type: 'triangle', vol: .06, delay: i * .3, lp: 1500 })); break;
+  }
+}
+
+/* ---------- music: a tiny sequencer that schedules notes a little ahead ---------- */
+const NOTE = { D2: 73.42, A1: 55, C2: 65.41, F2: 87.31, D3: 146.83, F3: 174.61, G3: 196, A3: 220, C4: 261.63, D4: 293.66, F4: 349.23, G4: 392, A4: 440 };
+const MEL = [NOTE.D3, NOTE.F3, NOTE.G3, NOTE.A3, NOTE.C4, NOTE.D4, NOTE.F4, NOTE.G4, NOTE.A4];
+function setMusic(name){
+  if (AU.track === name) return; AU.track = name; AU.beat = 0;
+  if (!AU.ctx) return;
+  const c = AU.ctx, t = c.currentTime;
+  AU.next = t + .15;
+  if (AU.drone){ const old = AU.drone; old.g.gain.setTargetAtTime(0, t, .5); setTimeout(() => { old.nodes.forEach(n => { try { n.stop(); } catch (e) {} }); old.g.disconnect(); }, 3000); }
+  const g = c.createGain(); g.gain.value = 0; g.connect(AU.music); const nodes = [];
+  const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.connect(g);
+  const osc = (f, type, det) => { const o = c.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = det || 0; o.connect(lp); o.start(); nodes.push(o); };
+  if (name === 'battle'){ lp.frequency.value = 260; osc(NOTE.D2, 'sawtooth', -6); osc(NOTE.D2 * 1.5, 'sawtooth', 5); g.gain.setTargetAtTime(.09, t, 1); }
+  else if (name === 'camp'){ lp.frequency.value = 600; osc(NOTE.D3, 'triangle'); osc(NOTE.A3, 'triangle', 4); g.gain.setTargetAtTime(.035, t, 1.2); }
+  else { // the title wind: filtered noise that slowly sweeps
+    lp.frequency.value = 900; const src = c.createBufferSource(); src.buffer = AU.noise; src.loop = true; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2; bp.frequency.value = 500;
+    const lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = .07; lg.gain.value = 300; lfo.connect(lg); lg.connect(bp.frequency); lfo.start(); nodes.push(lfo);
+    src.connect(bp); bp.connect(lp); src.start(); nodes.push(src); osc(NOTE.D2, 'sine'); g.gain.setTargetAtTime(.1, t, 1.5);
+  }
+  AU.drone = { g, nodes };
+}
+function musicTick(){
+  if (!AU.ctx || !AU.track || AU.ctx.state !== 'running') return;
+  const c = AU.ctx;
+  if (AU.next < c.currentTime) AU.next = c.currentTime + .05;
+  const intense = AU.track === 'battle' && S && mode === 'combat' && (S.boss || (!S.endless && WAVE_DUR - S.waveT < 8));
+  const bpm = AU.track === 'battle' ? (intense ? 116 : 96) : AU.track === 'camp' ? 72 : 56, step = 60 / bpm / 2;
+  while (AU.next < c.currentTime + .4){ musicStep(AU.next, AU.beat, intense, step); AU.beat++; AU.next += step; }
+}
+function musicStep(t, b, intense, step){
+  const m = { bus: AU.music, at: t }, s8 = b % 8, bar = Math.floor(b / 8);
+  const mel = (dur, vol, type, lp) => { AU.mel = clamp(AU.mel + pick([-2, -1, -1, 1, 1, 2, 0]), 0, MEL.length - 1); tone(MEL[AU.mel], dur, Object.assign({ type, vol, lp, a: .02 }, m)); };
+  if (AU.track === 'battle'){
+    if (s8 === 0 || s8 === 4 || (intense && (s8 === 3 || s8 === 6))) tone(100, .25, Object.assign({ to: 40, vol: .28 }, m));
+    if (s8 === 2 || s8 === 6){ noise(.18, Object.assign({ f: 250, ft: 'lowpass', vol: .12 }, m)); tone(140, .15, Object.assign({ to: 90, vol: .06 }, m)); }
+    if (intense) noise(.03, Object.assign({ f: 6000, ft: 'highpass', vol: .018 }, m));
+    if (s8 === 0){ const root = [NOTE.D2, NOTE.D2, NOTE.C2, NOTE.A1][bar % 4]; tone(root, step * 7, Object.assign({ type: 'sawtooth', lp: 320, vol: .07, a: .03 }, m)); }
+    if (bar % 2 === 1 && (s8 === 0 || s8 === 3 || s8 === 6) && Math.random() < .85) mel(step * 2.6, .045, 'triangle', 1300);
+  } else if (AU.track === 'camp'){
+    const chord = [[NOTE.D3, NOTE.F3, NOTE.A3, NOTE.D4], [NOTE.C4 / 2, NOTE.G3, NOTE.C4, NOTE.G4 / 2 * 2], [NOTE.F3, NOTE.A3, NOTE.C4, NOTE.F4], [NOTE.A3 / 2 * 2, NOTE.D4, NOTE.F4, NOTE.A4]][bar % 4];
+    if (Math.random() < .75) tone(chord[s8 % 4], step * 3, Object.assign({ type: 'triangle', vol: .04, lp: 2400 }, m));
+    if (Math.random() < .45) noise(.015, Object.assign({ f: r2(1800, 4000), ft: 'highpass', vol: .03 }, m));
+  } else {
+    if (b % 16 === 0) tone(pick([NOTE.D3, NOTE.F3, NOTE.A3, NOTE.C4]) / 2, 3.4, Object.assign({ type: 'sawtooth', lp: 420, a: .6, vol: .04 }, m));
+    if (b % 16 === 8 && Math.random() < .6) mel(1.6, .022, 'sine', 2000);
+  }
+}
+const r2 = (a, b) => a + Math.random() * (b - a);
+
+/* ================= GAME FEEL ================= */
+let hitStop = 0, slowMo = 0, flashA = 0, flashCol = '255,255,255', kickX = 0, kickY = 0, lastStop = 0;
+function stopFor(sec){ const n = performance.now(); if (n - lastStop < 250) return; lastStop = n; hitStop = Math.max(hitStop, sec); }
+function flash(col, a){ if (settings.calm) return; flashCol = col; flashA = Math.max(flashA, a); }
+function kick(dx, dy, k){ if (!settings.shake) return; const d = Math.hypot(dx, dy) || 1; kickX += dx / d * k; kickY += dy / d * k; }
+// warnings for boss attacks: listen for new telegraphs, chains, lunges and thrown things
+let watch = { tele: 0, chains: 0, lunges: 0, axes: 0, boulders: 0, bstate: '' };
+function watchFx(){
+  if (!S) return;
+  const n = { tele: S.tele.filter(t => t.kind !== 'fire').length, chains: S.chains.length, lunges: S.lunges.length, axes: S.bossAxes.length, boulders: S.boulders.length };
+  if (n.tele > watch.tele || n.chains > watch.chains || n.lunges > watch.lunges || n.axes > watch.axes || n.boulders > watch.boulders) sfx('warn');
+  const bs = S.boss && !S.boss.dead ? S.boss.state : '';
+  if (bs === 'cast' && watch.bstate !== 'cast') sfx('bosscast', S.boss.d.boss);
+  n.bstate = bs; watch = n;
+}
+
 /* ================= TUTORIAL: a short guided raid that never touches saves ================= */
 const TUT_KEY = 'valhalla.tut';
 let tut = null;
@@ -3759,7 +4305,37 @@ function tutTick(force){
     const i = tut.i; setTimeout(() => { if (tut && tut.i === i) tutGo(i + 1); }, 800);
   }
 }
+/* ---------- settings screen ---------- */
+function syncSettings(){
+  for (const [k, id] of [['master', 'setMaster'], ['music', 'setMusic'], ['sfx', 'setSfx']]){ $('#' + id).value = settings[k]; $('#' + id + 'V').textContent = settings[k]; }
+  const tog = (id, on) => { const b = $('#' + id); b.textContent = on ? 'On' : 'Off'; b.setAttribute('aria-pressed', String(on)); };
+  const mb = $('#setMute'); mb.textContent = settings.muted ? 'Muted' : 'Sound on'; mb.setAttribute('aria-pressed', String(settings.muted)); mb.classList.toggle('muted', settings.muted);
+  for (const id of ['setMaster', 'setMusic', 'setSfx']) $('#' + id).disabled = settings.muted;
+  $('#setUi').value = String(settings.ui); $('#setQ').value = settings.quality; tog('setCalm', settings.calm); tog('setFps', settings.fps);
+  tog('setShake', settings.shake); tog('setDmg', settings.dmgNum); tog('setTips', showTips);
+}
+function openSettings(){ syncSettings(); $('#settings').hidden = false; $('#setBack').focus(); }
+function closeSettings(){ $('#settings').hidden = true; const b = mode === 'title' ? $('#btnSettings') : $('#btnSetPause'); b && b.focus(); }
+for (const [k, id, demo] of [['master', 'setMaster', 'coin'], ['music', 'setMusic', null], ['sfx', 'setSfx', 'coin']]){
+  $('#' + id).addEventListener('input', e => { settings[k] = +e.target.value; $('#' + id + 'V').textContent = settings[k]; auVolumes(); saveSettings(); });
+  if (demo) $('#' + id).addEventListener('change', () => sfx(demo));
+}
+function toggleMute(){ settings.muted = !settings.muted; saveSettings(); auVolumes(); if (!$('#settings').hidden) syncSettings(); toast(settings.muted ? 'Sound muted · press M to unmute' : 'Sound on'); }
+$('#setMute').onclick = toggleMute;
+$('#setUi').onchange = e => { settings.ui = e.target.value; saveSettings(); applyUi(); shopTopAt = 0; };
+$('#setQ').onchange = e => { settings.quality = e.target.value; saveSettings(); groundKey = ''; };
+$('#setCalm').onclick = () => { settings.calm = !settings.calm; saveSettings(); syncSettings(); };
+$('#setFps').onclick = () => { settings.fps = !settings.fps; saveSettings(); syncSettings(); $('#fps').hidden = !settings.fps; };
+$('#perfYes').onclick = () => { settings.quality = 'low'; saveSettings(); groundKey = ''; $('#perfTip').hidden = true; toast('Graphics set to Low. Change it any time in Settings'); };
+$('#perfNo').onclick = () => { $('#perfTip').hidden = true; };
+$('#fps').hidden = !settings.fps;
+$('#setShake').onclick = () => { settings.shake = !settings.shake; saveSettings(); syncSettings(); };
+$('#setDmg').onclick = () => { settings.dmgNum = !settings.dmgNum; saveSettings(); syncSettings(); };
+$('#setTips').onclick = () => { toggleTips(); syncSettings(); };
+$('#setTut').onclick = () => { try { localStorage.removeItem(TUT_KEY); } catch (e) {} $('#tutDot').hidden = false; toast('The tutorial is marked as new again'); };
+$('#btnSettings').onclick = openSettings; $('#btnSetPause').onclick = openSettings; $('#setBack').onclick = closeSettings;
 $('#btnTut').onclick = startTutorial;
+document.addEventListener('click', e => { if (e.target.closest && e.target.closest('button') && !e.target.closest('#cards')) sfx('click'); });
 $('#tutNext').onclick = () => tut && tutGo(tut.i + 1);
 $('#tutBack').onclick = () => tut && tut.i > 0 && tutGo(tut.i - 1);
 $('#tutSkip').onclick = () => endTutorial();
@@ -3808,7 +4384,7 @@ function botCombat(dt){
   for (const z of S.haz) if (z.kind === 'curse'){ const dx = h.x - z.x, dy = h.y - z.y, d2 = dx * dx + dy * dy + 1; if (d2 < 40 * 40){ fx += dx / d2 * 4; fy += dy / d2 * 4; } }
   fx += -h.y * .00002 - h.x * .00001; fy += h.x * .00002 - h.y * .00001; // drift in slow circles around the start
   keys.KeyA = fx < -.002; keys.KeyD = fx > .002; keys.KeyW = fy < -.002; keys.KeyS = fy > .002;
-  const dash = (nx, ny) => { if (h.dashCh <= 0 || h.dashT > 0) return; h.dx = nx; h.dy = ny; h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; S.bind = null; };
+  const dash = (nx, ny) => { if (h.dashCh <= 0 || h.dashT > 0) return; sfx('dash'); onDash(); h.dx = nx; h.dy = ny; h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; S.bind = null; };
   if (S.bind) dash(-h.dx, -h.dy);
   for (const c of S.chains) if (!c.snapped && c.t > c.wind - .12){ const ex = Math.cos(c.a), ey = Math.sin(c.a), rx = h.x - c.x, ry = h.y - c.y; if (Math.abs(rx * ey - ry * ex) < 10 && rx * ex + ry * ey > 0) dash(-ey, ex); }
   for (const L of S.lunges) if (L.state === 'wind' && L.t > L.wind - .1) dash(-L.uy, L.ux);
@@ -3829,13 +4405,30 @@ function botMeta(dt){
   if (mode === 'victory'){ enterEndless(); return; }
   if (mode === 'over' && $('#dbgBotLoop').checked){ botT = 2.5; newRun(); return; }
 }
+$('#dbg').addEventListener('click', e => { const b = e.target.closest('button[data-ev]'); if (!b || !S) return; if (mode !== 'shop') return toast('Open the shop first'); S.event = makeEvent(b.dataset.ev); renderShop(); });
 $('#dbgBot').addEventListener('change', e => { setBot(e.target.checked); toast(dbg.bot ? 'Autoplay on' : 'Autoplay off'); });
 
+// frame-rate counter, and a one-time suggestion to lower the graphics when combat stays slow
+const perf = { acc: 0, n: 0, fps: 60, slow: 0, asked: false };
+function perfWatch(dt){
+  perf.acc += dt; perf.n++;
+  if (perf.acc < .5) return;
+  perf.fps = Math.round(perf.n / perf.acc); perf.acc = 0; perf.n = 0;
+  if (settings.fps){ const f = $('#fps'); f.hidden = false; f.textContent = perf.fps + ' FPS'; }
+  if (mode === 'combat' && !paused && !document.hidden && settings.quality !== 'low' && !perf.asked){
+    perf.slow = perf.fps < 40 ? perf.slow + .5 : Math.max(0, perf.slow - 1);
+    if (perf.slow >= 8){ perf.asked = true; $('#perfTip').hidden = false; }
+  }
+}
 function frame(now){
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
-  if (mode === 'combat' && !paused && !picking){ acc += dt * dbg.speed; let n = 0; const lim = 4 * Math.ceil(dbg.speed); while (acc >= STEP && n < lim){ if (dbg.bot) botCombat(STEP); update(STEP); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= lim) acc = 0; }
+  let ts = dbg.speed;
+  if (hitStop > 0){ hitStop -= dt; ts *= .05; } else if (slowMo > 0){ slowMo = Math.max(0, slowMo - dt); ts *= 1 - .75 * Math.min(1, slowMo / 1.2); }
+  setMusic(mode === 'combat' ? 'battle' : mode === 'shop' ? 'camp' : 'title');
+  if (mode === 'combat' && !paused && !picking){ acc += dt * ts; let n = 0; const lim = 4 * Math.ceil(dbg.speed); while (acc >= STEP && n < lim){ if (dbg.bot) botCombat(STEP); update(STEP); watchFx(); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= lim) acc = 0; }
   if (dbg.bot && mode !== 'combat') botMeta(dt);
   if (tut) tutTick(false);
+  perfWatch(dt);
   dbgTick(dt);
   render(mode === 'combat' && paused ? 0 : dt);
   updateTips();
@@ -3847,7 +4440,7 @@ requestAnimationFrame(frame);
 cloudStartup();
 
 // small hook for automated playtesting
-window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy };
+window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup };
 })();
 </script>
 
