@@ -59,6 +59,11 @@ The game uses major.minor.patch numbers (for example 0.8.0). A new feature batch
 
 ## Ideas for later
 
+Planned next:
+
+- 0.12.0 The Wandering Merchant: shop events that sell relics, items that twist a rule (max 3), plus shrines and cursed altars. Also: stop spawning Sleipnir's Stride once every dash slot is unlocked
+- 0.13.0 Optimising and polish: graphics and effects settings to help slower machines, performance work for crowded late waves, bug fixing
+
 Saved for when the core game is solid:
 
 - More heroes, each with their own sprite and ability pool (the ability system is already built per hero). Ideas: a Shieldmaiden who blocks and counters, a Seiðr Völva who curses

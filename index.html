@@ -318,6 +318,12 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .best-sub{margin:6px 0 0;font-size:22px;font-weight:400;color:var(--gold)}
 .best-intro{margin:0;text-align:left}
 #feedback{z-index:5;background:rgba(7,8,12,.94)}
+#settings{z-index:8;background:rgba(7,8,12,.985)}
+.set-grid{display:grid;grid-template-columns:auto minmax(0,1fr) 3.2ch;gap:12px 16px;align-items:center;font-size:20px;margin:8px 0 4px}
+.set-grid input[type=range]{width:100%;accent-color:var(--ember)}
+.set-grid output{font-variant-numeric:tabular-nums;color:var(--gold);text-align:right}
+.set-grid .btn{justify-self:start}
+.tog[aria-pressed="false"]{color:var(--muted)}
 .fb fieldset{border:0;padding:0;margin:0;display:grid;gap:6px}
 .fb legend{color:var(--fg);padding:0;margin-bottom:6px;font-size:20px}
 .choices{display:flex;flex-wrap:wrap;gap:6px}
@@ -459,7 +465,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.10.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
+      <div class="eyebrow">Prototype <span id="verTxt">0.11.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
@@ -468,6 +474,7 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="btn tut-btn" id="btnTut" type="button">How to play<span class="dot" id="tutDot" hidden></span></button>
         <button class="btn" id="btnMeta" type="button">Rune Forge · <span class="runes" id="tRunes">0</span> runes</button>
         <button class="btn" id="btnLb" type="button">Leaderboard</button>
+        <button class="btn" id="btnSettings" type="button">Settings</button>
         <button class="btn" id="btnFbTitle" type="button">Send feedback</button>
       </div>
       <dl class="keys">
@@ -588,7 +595,7 @@ a.btn{text-decoration:none;display:inline-block}
       <h2>Paused</h2>
       <p class="note">Press <kbd>P</kbd> to resume</p>
       <dl class="pu-list" id="puList"></dl>
-      <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnBest" type="button">Bestiary</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
+      <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnBest" type="button">Bestiary</button><button class="btn" id="btnSetPause" type="button">Settings</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
     </div>
     <div class="box best" id="bestiary" hidden aria-labelledby="bestTitle">
       <div class="best-head"><h2 id="bestTitle">Bestiary</h2><button class="btn sm" id="btnBestBack" type="button">Back</button></div>
@@ -600,6 +607,24 @@ a.btn{text-decoration:none;display:inline-block}
       </div>
     </div>
   </div>
+
+  <section id="settings" class="screen" hidden aria-labelledby="setTitle">
+    <div class="screen-inner" style="width:min(560px,100%)">
+      <div class="eyebrow">Options</div>
+      <h2 id="setTitle">Settings</h2>
+      <div class="set-grid">
+        <label for="setMaster">Master volume</label><input type="range" id="setMaster" min="0" max="100" step="5"><output id="setMasterV" for="setMaster"></output>
+        <label for="setMusic">Music</label><input type="range" id="setMusic" min="0" max="100" step="5"><output id="setMusicV" for="setMusic"></output>
+        <label for="setSfx">Sound effects</label><input type="range" id="setSfx" min="0" max="100" step="5"><output id="setSfxV" for="setSfx"></output>
+        <span>Screen shake</span><button class="btn sm tog" id="setShake" type="button" aria-pressed="true">On</button><span></span>
+        <span>Damage numbers</span><button class="btn sm tog" id="setDmg" type="button" aria-pressed="true">On</button><span></span>
+        <span>Power-up tooltips <kbd>T</kbd></span><button class="btn sm tog" id="setTips" type="button" aria-pressed="true">On</button><span></span>
+        <span>Tutorial</span><button class="btn sm" id="setTut" type="button">Mark as new again</button><span></span>
+      </div>
+      <p class="note">Sound starts after your first click or key press. Browsers block it until then.</p>
+      <div class="row"><button class="btn primary" id="setBack" type="button">Back</button></div>
+    </div>
+  </section>
 
   <section id="feedback" class="screen" hidden aria-labelledby="fbTitle">
     <form class="screen-inner fb" id="fbForm" novalidate>
@@ -1517,12 +1542,19 @@ function buyHeal(){
   const h = S.hero;
   if (h.hp >= h.maxHp) return toast('Already at full health');
   const c = healCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold');
+  sfx('heal');
   if (!dbg.infGold) S.gold -= c; S.healN++;
   const before = h.hp; healHero(h.maxHp * HEAL_PCT);
   toast(`Healed ${Math.round(h.hp - before)} health`);
   renderShop();
 }
 const cardName = c => `${MODS[c.mod].name} ${CLASSES[c.cls].name}`;
+function mergeFx(u){
+  const col = MODS[u.mod].col, x = u.x || S.hero.x, y = u.y || S.hero.y;
+  burst(x, y - 3, 26, [col, '#ffd27a', '#ffffff'], 70); S.rings.push({ x, y, r: 16, life: .4, max: .4, col: '#ffd27a' });
+  const el = [...document.querySelectorAll('#formation .slot, #bench .slot')].find(s => s.dataset.key === gkey(u));
+  if (el && el.animate && !matchMedia('(prefers-reduced-motion: reduce)').matches) el.animate([{ transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255,210,122,0)' }, { transform: 'scale(1.18)', boxShadow: '0 0 18px 4px rgba(255,210,122,.8)', offset: .3 }, { transform: 'scale(1)', boxShadow: '0 0 0 0 rgba(255,210,122,0)' }], { duration: 650, easing: 'ease-out' });
+}
 function sameCount(cls, mod, star){ return allUnits().filter(u => u.cls === cls && u.mod === mod && u.star === star).length; }
 function buy(i){
   const c = S.shop[i]; if (!c) return;
@@ -1536,8 +1568,10 @@ function buy(i){
   let temp = null;
   if (free >= 0) S.bench[free] = u; else temp = u;
   const merged = tryMerge(c.cls, c.mod, 1, temp);
+  sfx(merged ? 'merge' : 'buy');
   if (merged) toast(`${cardName(c)} upgraded to ${'★'.repeat(merged.star)}`);
   S.sel = null; renderShop();
+  if (merged) mergeFx(merged);
 }
 function tryMerge(cls, mod, star, temp){
   if (star >= 3) return null;
@@ -1554,17 +1588,17 @@ function tryMerge(cls, mod, star, temp){
 function sellValue(u){ return MODS[u.mod].tier * [1, 3, 9][u.star - 1]; }
 function sellAt(where, i){
   const u = S[where][i]; if (!u) return;
-  S.gold += sellValue(u); S[where][i] = null; S.sel = null;
+  S.gold += sellValue(u); S[where][i] = null; S.sel = null; sfx('sell');
   toast(`Sold ${cardName(u)} for ${sellValue(u)} gold`);
   computeTraits(); renderShop();
 }
 function sellSel(){ if (S.sel) sellAt(S.sel.where, S.sel.i); }
-function reroll(){ const c = rollCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.rollN++; rollShop(); renderShop(); }
-function buyXp(){ if (S.level >= MAX_LVL) return; const c = xpCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.xpN++; addXp(XP_GAIN); renderShop(); }
+function reroll(){ const c = rollCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.rollN++; sfx('reroll'); rollShop(); renderShop(); }
+function buyXp(){ if (S.level >= MAX_LVL) return; const c = xpCost(); if (!dbg.infGold && S.gold < c) return toast('Not enough gold'); if (!dbg.infGold) S.gold -= c; S.xpN++; sfx('xp'); addXp(XP_GAIN); renderShop(); }
 function addXp(n){
   if (S.level >= MAX_LVL) return;
   S.xp += n;
-  while (S.level < MAX_LVL && S.xp >= XPN[S.level]){ S.xp -= XPN[S.level]; S.level++; toast(`Level ${S.level}: ${slotCount()} formation slots`); }
+  while (S.level < MAX_LVL && S.xp >= XPN[S.level]){ S.xp -= XPN[S.level]; S.level++; sfx('level'); toast(`Level ${S.level}: ${slotCount()} formation slots`); }
   if (S.level >= MAX_LVL) S.xp = 0;
 }
 function sortBench(){
@@ -1616,6 +1650,7 @@ function startWave(){
     S.board[i] = S.bench[b]; S.bench[b] = null; moved++;
   }
   if (!S.board.some(Boolean)) return toast('Buy at least one card first');
+  sfx('horn');
   computeTraits();
   const ratio = S.hero.hp / S.hero.maxHp; S.hero.maxHp = heroMaxHp(); S.hero.hp = Math.max(1, Math.round(S.hero.maxHp * ratio));
   S.board.forEach(u => { if (u){ u.st = calcStats(u); u.cd = rand(0, .4); u.mana = 0; } });
@@ -1635,7 +1670,7 @@ function startWave(){
 }
 function spawnBoss(type, design){
   const a = rand(0, Math.PI * 2);
-  S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110);
+  S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110); sfx('roar', type); flash('255,255,255', .25);
   if (type === 'fenrir'){
     const d = design || (dbg.fenrir !== 'auto' ? dbg.fenrir : S.wave > WAVES.length ? 'A' : 'B');
     S.boss.design = d; S.boss.title = d === 'A' ? 'Fenrir, Gleipnir-Bound' : 'Fenrir, the World-Eater';
@@ -1661,6 +1696,7 @@ function endlessNext(){
   if (W.boss) showPick('boss');
 }
 function showVictory(){
+  sfx('victory');
   S.won = true; meta.wins++; saveMeta();
   $('#vStats').innerHTML = `<dt>Enemies slain</dt><dd>${S.kills}</dd><dt>Bosses slain</dt><dd>${S.bosses}</dd><dt>Best endless wave</dt><dd>${meta.bestEndless ? meta.bestEndless : 'not tried yet'}</dd>`;
   setMode('victory');
@@ -1677,7 +1713,7 @@ function openEndlessShop(){
   rollShop(); openShop();
 }
 function endWave(){
-  const W = waveDef(S.wave);
+  const W = waveDef(S.wave); sfx('clear');
   S.enemies.forEach(e => burst(e.x, e.y, 6, ['#6f9479', '#bfe9ff'], 40));
   S.enemies = []; S.eprojs = []; S.tele = []; S.pups = []; S.corpses = []; clearBossFx();
   S.orbs.forEach(o => gainSouls(o.v)); S.orbs = [];
@@ -1734,6 +1770,7 @@ function spawnPowerup(){
   S.pups.push({ type, x: h.x + Math.cos(a) * d, y: h.y + Math.sin(a) * d, life: 35, max: 35, t: 0 });
 }
 function takePowerup(p){
+  sfx('power');
   const h = S.hero, P = POWERUPS[p.type];
   addText(h.x, h.y - 16, P.name, P.col, true);
   burst(p.x, p.y, 26, [P.col, '#ffffff'], 90);
@@ -1774,7 +1811,9 @@ function hit(e, raw, dtype, u, opt){
   const warded = e.shield > 0, shown = d;
   if (warded){ const ab = Math.min(e.shield, d); e.shield -= ab; d -= ab; if (e.shield <= 0){ burst(e.x, e.y, 16, ['#b98cff', '#d6b8ff', '#ffffff'], 70); addText(e.x, e.y - e.h / 2 - 6, 'Ward broken', '#d6b8ff', true); } }
   e.hp -= d; e.flash = .07;
-  addText(e.x, e.y - e.h / 2, Math.round(shown), warded ? '#b98cff' : crit ? '#ffd27a' : dtype === 'magic' ? '#d6b8ff' : '#e9e4d8', crit);
+  sfx(crit ? 'crit' : 'hit');
+  if (crit && shown >= 40 && shown >= e.max * .3 && !e.d.boss) stopFor(.035);
+  if (settings.dmgNum) addText(e.x, e.y - e.h / 2, Math.round(shown), warded ? '#b98cff' : crit ? '#ffd27a' : dtype === 'magic' ? '#d6b8ff' : '#e9e4d8', crit);
   if (u && !opt.noMod){
     const m = u.mod, p = modPow(m);
     if (m === 'ild' || opt.burn){ e.burn = 3; e.burnD = Math.max(e.burnD, raw * .35 * (m === 'ild' ? p : 1) / 3); }
@@ -1793,7 +1832,7 @@ function chain(from, dmg, u){
     if (!best) break;
     done.add(best); pts.push([best.x, best.y]); hit(best, dmg, 'magic', u, { noMod: true }); cur = best;
   }
-  if (pts.length > 1) S.bolts.push({ pts, life: .16 });
+  if (pts.length > 1){ S.bolts.push({ pts, life: .16 }); sfx('zap'); }
 }
 function kill(e){
   if (e.dead) return;
@@ -1805,14 +1844,14 @@ function kill(e){
   const n = e.d.boss ? 12 : 1;
   for (let i = 0; i < n; i++) S.orbs.push({ x: e.x + rand(-6, 6) * (n > 1), y: e.y + rand(-6, 6) * (n > 1), v: Math.ceil(v / n), big: e.elite || e.d.boss, t: 0 });
   if (e.elite) S.gold += 1;
-  if (e.d.boss){ S.bosses++; S.shake = 10; S.endDelay = 1.6; S.boss = null; clearBossFx(); S.enemies.forEach(o => { if (!o.d.boss && !o.dead){ o.dead = true; burst(o.x, o.y, 5, ['#6f9479', '#bfe9ff'], 40); } }); }
+  if (e.d.boss){ sfx('bossdie'); slowMo = 1.2; flash('255,214,122', .5); S.bosses++; S.shake = 10; S.endDelay = 1.6; S.boss = null; clearBossFx(); S.enemies.forEach(o => { if (!o.d.boss && !o.dead){ o.dead = true; burst(o.x, o.y, 5, ['#6f9479', '#bfe9ff'], 40); } }); }
 }
-function gainSouls(v){ S.souls += v; while (S.souls >= 10){ S.souls -= 10; S.gold++; } }
+function gainSouls(v){ S.souls += v; sfx('soul'); while (S.souls >= 10){ S.souls -= 10; S.gold++; sfx('coin'); } }
 function healHero(n){ const h = S.hero; h.hp = Math.min(h.maxHp, h.hp + n); }
 function heroDamage(d){
   const h = S.hero;
   if (dbg.god || S.tutorial || h.inv > 0 || h.dashT > 0 || S.wall > 0 || mode !== 'combat') return;
-  d *= S.dmgTaken; h.hp -= d; h.inv = .5; S.hurt = .25; S.shake = Math.min(7, S.shake + 3);
+  d *= S.dmgTaken; h.hp -= d; h.inv = .5; S.hurt = .25; sfx('hurt'); stopFor(.05); S.shake = Math.min(7, S.shake + 3);
   addText(h.x, h.y - 10, Math.round(d), '#ff6b6b', true);
   if (h.hp <= 0){ h.hp = 0; gameOver(false); }
 }
@@ -1822,11 +1861,11 @@ function attack(u, t){
   u.anim = .12; u.face = t.x < u.x ? -1 : 1;
   if (c === 'warrior'){ // a spinning axe that cuts through enemies, then flies back
     const a = Math.atan2(t.y - u.y, t.x - u.x), sp = 210;
-    S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: st.dmg, dtype: 'phys', u, kind: 'axe', r: 4, life: 2.4, aoe: 0, pierce: 2, hits: new Set(), dist: 0, maxd: st.range + 20, ret: false, spin: 0 });
+    sfx('axe'); S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: st.dmg, dtype: 'phys', u, kind: 'axe', r: 4, life: 2.4, aoe: 0, pierce: 2, hits: new Set(), dist: 0, maxd: st.range + 20, ret: false, spin: 0 });
   } else {
     const a = Math.atan2(t.y - u.y, t.x - u.x);
     const kind = c === 'archer' ? 'arrow' : c === 'mage' ? 'fire' : 'holy';
-    const sp = kind === 'arrow' ? 290 : kind === 'fire' ? 175 : 215;
+    const sp = kind === 'arrow' ? 290 : kind === 'fire' ? 175 : 215; sfx(kind);
     S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: st.dmg, dtype: st.dtype, u, kind, r: kind === 'fire' ? 3 : 2.5, life: 1.1, aoe: kind === 'fire' ? 16 : 0, pierce: 0, hits: null });
     if (kind === 'holy') healHero(.35 * u.star);
   }
@@ -1842,23 +1881,24 @@ function ability(u, t){
     }
     best = best || t;
     u.leap = { t: 0, dur: .42, sx: u.x, sy: u.y, tx: best.x, ty: best.y, dmg: st.dmg * 3 };
-    addText(u.x, u.y - 14, 'Berserker Leap', '#ffb7a3', true);
+    addText(u.x, u.y - 14, 'Berserker Leap', '#ffb7a3', true); sfx('leap');
   } else if (u.cls === 'archer'){
-    const a0 = Math.atan2(t.y - u.y, t.x - u.x);
+    const a0 = Math.atan2(t.y - u.y, t.x - u.x); sfx('volley');
     for (let k = -3; k <= 3; k++){ const a = a0 + k * .14; S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * 300, vy: Math.sin(a) * 300, dmg: st.dmg * 1.2, dtype: 'phys', u, kind: 'arrow', r: 2.5, life: 1, aoe: 0, pierce: 2, hits: new Set() }); }
   } else if (u.cls === 'mage'){
     const a = Math.atan2(t.y - u.y, t.x - u.x);
     S.projs.push({ x: u.x, y: u.y - 4, vx: Math.cos(a) * 150, vy: Math.sin(a) * 150, dmg: st.dmg * 4, dtype: 'magic', u, kind: 'bigfire', r: 6, life: 1.6, aoe: 50, pierce: 0, hits: null, burn: true });
-    addText(u.x, u.y - 14, "Muspel's Fire", '#ff8a5c', true);
+    addText(u.x, u.y - 14, "Muspel's Fire", '#ff8a5c', true); sfx('fire');
   } else {
     const h = S.hero;
-    healHero(6 + 5 * u.star + h.maxHp * .06);
+    healHero(6 + 5 * u.star + h.maxHp * .06); sfx('heal');
     for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, h.x, h.y) < 56 * 56) hit(e, st.dmg * 2.2, 'magic', u);
     S.rings.push({ x: h.x, y: h.y, r: 56, life: .45, max: .45, col: '#ffe9a0' });
     burst(h.x, h.y, 22, ['#fff2b0', '#ffd27a'], 70);
   }
 }
 function leapLand(u, L){
+  sfx('boom'); kick(0, 1, 2);
   for (const e of S.enemies){
     if (e.dead || dist2(e.x, e.y, u.x, u.y) > (46 + e.r) ** 2) continue;
     const a = Math.atan2(e.y - u.y, e.x - u.x);
@@ -1978,7 +2018,7 @@ function updateBossFx(dt){
 }
 
 function explode(p){
-  const big = p.kind === 'bigfire';
+  const big = p.kind === 'bigfire'; if (big) sfx('bigfire');
   for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, p.x, p.y) < (p.aoe + e.r) ** 2) hit(e, p.dmg, p.dtype, p.u, { burn: p.burn });
   S.rings.push({ x: p.x, y: p.y, r: p.aoe, life: big ? .4 : .18, max: big ? .4 : .18, col: big ? '#ff5b2e' : '#ff8a5c', fill: big });
   burst(p.x, p.y, big ? 70 : 9, big ? ['#ff2a1a', '#ff5b2e', '#ff8a3c', '#ffd27a', '#fff3c4'] : ['#ff5b2e', '#ffb05a'], big ? 150 : 60, true);
@@ -2153,7 +2193,9 @@ function update(dt){
       t.done = true;
       if (t.cancel) continue;
       const L = TELE_LOOK[t.kind] || TELE_LOOK.frost;
-      if (dist2(h.x, h.y, t.x, t.y) < t.r * t.r) heroDamage(t.dmg);
+      sfx(t.kind === 'fire' ? 'bigfire' : 'slam');
+      if (dist2(h.x, h.y, t.x, t.y) < (t.r + 40) ** 2) kick(h.x - t.x, h.y - t.y, t.kind ? 2 : 4);
+      if (dist2(h.x, h.y, t.x, t.y) < t.r * t.r){ heroDamage(t.dmg); if (!t.kind) flash('255,255,255', .3); }
       burst(t.x, t.y, t.kind ? 18 : 30, L.burst, t.kind ? 80 : 110);
       S.rings.push({ x: t.x, y: t.y, r: t.r, life: .3, max: .3, col: L.ring });
       S.shake = Math.min(8, S.shake + L.shake);
@@ -2231,6 +2273,8 @@ function enemyFrame(e){
   return Math.floor(e.t * ENEMY_ANIM[t]) % 2 ? t + '1' : t;
 }
 function deathFx(e){
+  sfx({ draugr: 'bones', armored: 'clang', wolf: 'yelp', raven: 'caw', witch: 'shriek' }[e.type] || 'spirit');
+  if (e.elite) stopFor(.04);
   const t = e.type, P = (n, o) => { for (let i = 0; i < n; i++) S.parts.push(Object.assign({ x: e.x + rand(-3, 3), y: e.y + rand(-4, 3), vx: rand(-30, 30), vy: rand(-30, 10), life: rand(.4, .8), max: .8, s: 1, add: false }, o())); };
   if (t === 'draugr'){ P(7, () => ({ col: pick(['#e8e3d6', '#c8c2b0', '#9a9488']), s: Math.random() < .4 ? 2 : 1 })); P(4, () => ({ col: '#456552', smoke: true, s: 2, vy: rand(-14, -4) })); addCorpse('bones', e); }
   else if (t === 'armored'){ P(10, () => ({ col: pick(['#ffd27a', '#ffffff', '#c8ced8']), add: true, vx: rand(-60, 60), vy: rand(-60, 0), life: rand(.2, .45) })); P(4, () => ({ col: '#7d8494', s: 2 })); addCorpse('ironhelm', e); }
@@ -2371,7 +2415,8 @@ function render(dt){
   const st = S || { hero: { x: 0, y: 0, face: 1, walk: 0 }, board: [], enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], halfDeath: null, breath: null, chill: 0, eclipse: 0, eclipseMax: 1, shake: 0, hurt: 0, time: performance.now() / 1000 };
   const h = st.hero;
   let sx = 0, sy = 0;
-  if (st.shake > 0){ sx = rand(-st.shake, st.shake); sy = rand(-st.shake, st.shake); st.shake = Math.max(0, st.shake - dt * 30); }
+  if (st.shake > 0){ const k = settings.shake ? 1 : 0; sx = rand(-st.shake, st.shake) * k; sy = rand(-st.shake, st.shake) * k; st.shake = Math.max(0, st.shake - dt * 30); }
+  sx += kickX; sy += kickY; kickX *= Math.max(0, 1 - dt * 12); kickY *= Math.max(0, 1 - dt * 12);
   // while the shop is open the camera lifts so the resting warband sits in the space above the shop panel
   const camp = !!(S && mode === 'shop');
   let want = VH / 2;
@@ -2673,6 +2718,7 @@ function render(dt){
   g.addColorStop(0, 'rgba(5,6,10,0)'); g.addColorStop(1, 'rgba(5,6,10,.7)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
   if (st.hurt > 0){ ctx.fillStyle = `rgba(196,33,63,${st.hurt * .9})`; ctx.fillRect(0, 0, VW, VH); }
+  if (flashA > 0){ ctx.fillStyle = `rgba(${flashCol},${Math.min(.6, flashA)})`; ctx.fillRect(0, 0, VW, VH); flashA = Math.max(0, flashA - dt * 2.5); }
   // Devour the Sun: darkness with a small circle of light around the hero; the shadow wolves' eyes show where they will strike
   if (st.eclipse > 0){
     const k = Math.min(1, (st.eclipseMax - st.eclipse) / .6, st.eclipse / .6);
@@ -3023,7 +3069,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () =
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.10.0'; // major.minor.patch
+const VERSION = '0.11.0'; // major.minor.patch
 const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3135,7 +3181,7 @@ function castAbility(i){
   const sl = S.abil[i]; if (!sl) return;
   if (sl.cd > 0){ toast(`${ABILITIES[sl.key].name} is ready in ${Math.ceil(sl.cd)} s`); return; }
   const l = sl.lvl, h = S.hero, { dx, dy } = aimDir();
-  sl.cd = ABILITIES[sl.key].cd[l - 1];
+  sl.cd = ABILITIES[sl.key].cd[l - 1]; sfx('cast');
   addText(h.x, h.y - 16, ABILITIES[sl.key].name, ABILITIES[sl.key].col, true);
   if (sl.key === 'bash'){ h.bash = { t: 0, dur: .2, dx, dy, dist: [70, 85, 100][l - 1], hit: new Set(), dmg: abilDmg(30, l), l }; h.inv = Math.max(h.inv, .3); }
   else if (sl.key === 'spear'){ S.projs.push({ kind: 'spear', x: h.x, y: h.y - 3, vx: dx * 420, vy: dy * 420, dmg: abilDmg(45, l), dtype: 'phys', u: null, r: 4, life: 3, hits: new Set(), dist: 0, maxd: 330, back: l >= 3, ret: false }); }
@@ -3212,7 +3258,7 @@ function renderPick(){
   }
 }
 function choosePick(i){
-  const P = picking; if (!P) return;
+  const P = picking; if (!P) return; sfx('level');
   if (P.step === 'replace'){ if (i >= 0 && i < 3) S.abil[i] = { key: P.chosen, lvl: 1, cd: 0 }; return closePick(); }
   const o = P.opts[i]; if (!o) return;
   if (o.type === 'gold'){ S.gold += 25; return closePick(); }
@@ -3456,6 +3502,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.11.0', 'Sound and feel', ['Music and sound effects, all made in the game: war drums in battle, a campfire tune in the shop, a roar for every boss', 'Settings menu on the title screen and in the pause menu: volume, screen shake, damage numbers and tooltips', 'Big hits freeze the action for a moment, boss attacks flash the screen, and a boss dies in slow motion', 'Merging units bursts with light']],
   ['0.10.0', 'How to play', ['A short guided tutorial on the main menu: How to play', 'The synergies panel shows progress pips. Hover or click a synergy to see each step, which one is active and which units count', 'Unit descriptions say which synergies the unit counts toward']],
   ['0.9.0', 'The horde gets teeth', ['The game has its own tab icon', 'A Bestiary in the pause screen shows every enemy and elite trait', 'New looks for the draugr, wolves, ravens, Iron Draugr, Seiðkonur, Barrow Wights and Soul Wisps, with walk animations and their own deaths', 'Some draugr claw up out of the ground nearby', 'Wolves circle and pounce (from wave 2). Ravens mark a line and dive (wave 3)', 'Seiðkonur curse the ground under you (wave 4). Iron Draugr slam their hammers (wave 7)', 'Elites have a trait: Frozen leaves an icy trail, Burning explodes on death, Warded has a shield, Swift is fast']],
   ['0.8.1', 'Small fixes', ['The Sort button explains how it sorts the bench']],
@@ -3508,6 +3555,7 @@ $('#ups').addEventListener('click', e => {
 
 function gameOver(win, quit){
   if (S && S.tutorial){ endTutorial(); return; }
+  sfx(win ? 'victory' : 'death');
   const won = win || S.won, ew = S.endless ? Math.max(0, S.wave - WAVES.length - 1) : 0;
   lastRun = runSummary(S.endless ? `Endless, ${quit ? 'left' : 'fell'} on wave ${S.wave}` : win ? 'Won the raid' : quit ? `Gave up on wave ${S.wave}` : `Fell on wave ${S.wave}`);
   const cleared = won ? 20 : S.wave - 1;
@@ -3528,6 +3576,7 @@ function gameOver(win, quit){
 function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; if (!paused || !$('#bestiary').hidden) showBestiary(false); }
 
 addEventListener('keydown', e => {
+  if (!$('#settings').hidden){ if (e.code === 'Escape'){ e.preventDefault(); closeSettings(); } return; }
   if (dbg.bot && e.isTrusted && !e.ctrlKey && !e.metaKey && !e.altKey && MOVE_KEYS.includes(e.code) && !(e.target && e.target.closest && e.target.closest('input, textarea, select'))){ setBot(false); toast('Autoplay off. You have control.'); }
   if (e.ctrlKey && e.shiftKey && e.code === 'KeyD'){ e.preventDefault(); toggleDbg(); return; }
   const digit = { Digit1: 0, Digit2: 1, Digit3: 2, Numpad1: 0, Numpad2: 1, Numpad3: 2 }[e.code];
@@ -3539,7 +3588,7 @@ addEventListener('keydown', e => {
   keys[e.code] = true;
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (mode === 'combat' || mode === 'shop')) e.preventDefault();
   if (mode === 'combat'){
-    if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCh > 0 && h.dashT <= 0){ h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; if (S.bind){ S.bind = null; addText(h.x, h.y - 14, 'Broke free!', '#b4bccb', true); } } }
+    if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCh > 0 && h.dashT <= 0){ sfx('dash'); h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; if (S.bind){ S.bind = null; addText(h.x, h.y - 14, 'Broke free!', '#b4bccb', true); } } }
     if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
     if (e.code === 'KeyT' && !e.repeat) toggleTips();
     if (e.code === 'KeyB' && !e.repeat) openEndlessShop();
@@ -3613,6 +3662,179 @@ function updateHud(dt){
 /* ================= LOOP ================= */
 let last = performance.now(), acc = 0;
 const STEP = 1 / 60;
+/* ================= SETTINGS ================= */
+const SET_KEY = 'valhalla.settings';
+const settings = Object.assign({ master: 70, music: 50, sfx: 75, shake: true, dmgNum: true }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
+function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(settings)); } catch (e) {} }
+
+/* ================= SOUND: everything is synthesised with Web Audio, no files ================= */
+const AU = { ctx: null, master: null, music: null, sfx: null, noise: null, last: {}, voices: 0, track: null, next: 0, beat: 0, drone: null, mel: 4 };
+function auInit(){
+  if (AU.ctx){ if (AU.ctx.state === 'suspended') AU.ctx.resume().catch(() => {}); return; }
+  const C = window.AudioContext || window.webkitAudioContext; if (!C) return;
+  try { AU.ctx = new C(); } catch (e) { return; }
+  const c = AU.ctx;
+  const comp = c.createDynamicsCompressor(); comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 5; comp.attack.value = .004; comp.release.value = .2;
+  const makeup = c.createGain(); makeup.gain.value = 3.4; comp.connect(makeup); makeup.connect(c.destination); AU.out = makeup;
+  AU.master = c.createGain(); AU.master.connect(comp);
+  AU.music = c.createGain(); AU.music.connect(AU.master);
+  AU.sfx = c.createGain(); AU.sfx.connect(AU.master);
+  const buf = c.createBuffer(1, c.sampleRate, c.sampleRate), d = buf.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; AU.noise = buf;
+  auVolumes();
+  setInterval(musicTick, 90);
+}
+function auVolumes(){
+  if (!AU.ctx) return; const t = AU.ctx.currentTime, v = x => Math.pow(x / 100, 1.4);
+  AU.master.gain.setTargetAtTime(v(settings.master), t, .05); AU.music.gain.setTargetAtTime(v(settings.music) * .9, t, .05); AU.sfx.gain.setTargetAtTime(v(settings.sfx), t, .05);
+}
+addEventListener('pointerdown', auInit, true); addEventListener('keydown', auInit, true);
+const auOn = () => AU.ctx && AU.ctx.state === 'running';
+function tone(f, dur, o = {}){
+  const c = AU.ctx, t = Math.max(c.currentTime, o.at || c.currentTime + (o.delay || 0)), g = c.createGain(), osc = c.createOscillator();
+  osc.type = o.type || 'sine'; osc.frequency.setValueAtTime(f, t); if (o.to) osc.frequency.exponentialRampToValueAtTime(Math.max(20, o.to), t + dur);
+  if (o.det) osc.detune.value = o.det;
+  const v = o.vol == null ? .2 : o.vol, a = o.a == null ? .005 : o.a;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + Math.max(a + .01, dur));
+  let node = osc; if (o.lp){ const fl = c.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = o.lp; osc.connect(fl); node = fl; }
+  node.connect(g); g.connect(o.bus || AU.sfx); osc.start(t); osc.stop(t + dur + .05);
+  AU.voices++; osc.onended = () => { AU.voices--; g.disconnect(); };
+}
+function noise(dur, o = {}){
+  const c = AU.ctx, t = Math.max(c.currentTime, o.at || c.currentTime + (o.delay || 0)), src = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain();
+  src.buffer = AU.noise; src.loop = true;
+  fl.type = o.ft || 'bandpass'; fl.frequency.setValueAtTime(o.f || 1000, t); if (o.to) fl.frequency.exponentialRampToValueAtTime(o.to, t + dur); fl.Q.value = o.q == null ? 1 : o.q;
+  const v = o.vol == null ? .2 : o.vol, a = o.a == null ? .003 : o.a;
+  g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + a); g.gain.exponentialRampToValueAtTime(.0005, t + Math.max(a + .01, dur));
+  src.connect(fl); fl.connect(g); g.connect(o.bus || AU.sfx); src.start(t, Math.random() * .5); src.stop(t + dur + .05);
+  AU.voices++; src.onended = () => { AU.voices--; g.disconnect(); };
+}
+const SFX_GAP = { hit: .05, crit: .09, axe: .07, arrow: .06, fire: .08, holy: .1, soul: .035, coin: .06, zap: .08, bones: .06, yelp: .08, caw: .08, clang: .1, shriek: .12, spirit: .08, warn: .15, slam: .08, hurt: .15, click: .03, burn: .3 };
+const SFX_KEY = { horn: 1, roar: 1, bossdie: 1, victory: 1, death: 1, merge: 1, level: 1, cast: 1, power: 1, dash: 1, hurt: 1, warn: 1, slam: 1 };
+const RUN = ['jarl', 'giant', 'herald', 'fenrir'];
+function sfx(name, p){
+  if (!auOn() || settings.master <= 0 || settings.sfx <= 0) return;
+  const now = AU.ctx.currentTime, gap = SFX_GAP[name] == null ? .04 : SFX_GAP[name];
+  if (now - (AU.last[name] || 0) < gap) return;
+  if (AU.voices > 46 && !SFX_KEY[name]) return;
+  AU.last[name] = now;
+  const r = (a, b) => a + Math.random() * (b - a);
+  switch (name){
+    case 'hit': noise(.06, { f: r(500, 800), ft: 'lowpass', vol: .07 }); tone(r(140, 180), .06, { type: 'triangle', vol: .04, to: 80 }); break;
+    case 'crit': tone(r(900, 1100), .1, { type: 'triangle', vol: .07, to: 1500 }); noise(.08, { f: 3000, ft: 'highpass', vol: .05 }); break;
+    case 'axe': noise(.14, { f: 2200, to: 700, q: 3, vol: .06 }); break;
+    case 'arrow': noise(.07, { f: 5000, to: 2500, ft: 'highpass', vol: .045 }); tone(r(1500, 1800), .05, { type: 'triangle', vol: .015, to: 900 }); break;
+    case 'fire': noise(.25, { f: 900, to: 300, ft: 'lowpass', vol: .08 }); tone(180, .2, { type: 'sawtooth', vol: .025, to: 90, lp: 600 }); break;
+    case 'holy': tone(r(1046, 1100), .25, { vol: .035 }); tone(1568, .3, { vol: .02, delay: .02 }); break;
+    case 'zap': noise(.12, { f: 4000, ft: 'highpass', vol: .06 }); tone(r(80, 120), .1, { type: 'square', vol: .025, lp: 900 }); break;
+    case 'leap': noise(.3, { f: 300, to: 1500, vol: .07 }); break;
+    case 'boom': tone(90, .5, { to: 35, vol: .24 }); noise(.4, { f: 400, to: 80, ft: 'lowpass', vol: .2 }); break;
+    case 'bigfire': noise(.45, { f: 600, to: 200, ft: 'lowpass', vol: .14 }); tone(110, .4, { type: 'sawtooth', to: 55, lp: 500, vol: .05 }); break;
+    case 'volley': for (let i = 0; i < 4; i++) noise(.06, { delay: i * .03, f: 5000, ft: 'highpass', vol: .04 }); break;
+    case 'heal': [784, 988, 1175].forEach((f, i) => tone(f, .3, { vol: .035, delay: i * .06 })); break;
+    case 'soul': tone(r(1500, 1900), .07, { vol: .025, to: 2400 }); break;
+    case 'coin': tone(1568, .08, { type: 'square', vol: .02, lp: 5000 }); tone(2093, .2, { type: 'square', vol: .02, lp: 5000, delay: .06 }); break;
+    case 'buy': tone(660, .1, { type: 'triangle', vol: .07 }); tone(880, .12, { type: 'triangle', vol: .05, delay: .05 }); break;
+    case 'sell': tone(880, .08, { type: 'triangle', vol: .05 }); tone(587, .14, { type: 'triangle', vol: .05, delay: .05 }); break;
+    case 'reroll': for (let i = 0; i < 5; i++) noise(.04, { delay: i * .035, f: r(1500, 3000), q: 4, vol: .04 }); break;
+    case 'xp': tone(440, .14, { type: 'triangle', vol: .05, to: 660 }); break;
+    case 'level': [523, 659, 784, 1047].forEach((f, i) => tone(f, .16, { type: 'triangle', vol: .06, delay: i * .07 })); break;
+    case 'merge': [523, 659, 784, 1047, 1319].forEach((f, i) => tone(f, .22, { type: 'triangle', vol: .07, delay: i * .06 })); noise(.5, { f: 7000, ft: 'highpass', vol: .03, delay: .25, a: .05 }); break;
+    case 'dash': noise(.18, { f: 500, to: 2500, q: 1.5, vol: .08 }); break;
+    case 'horn': [[110, 0], [164.8, 6], [82.4, -4]].forEach(([f, d]) => tone(f, 1.4, { type: 'sawtooth', lp: 650, a: .14, vol: .06, det: d })); break;
+    case 'clear': [392, 523, 659].forEach((f, i) => tone(f, .35, { type: 'triangle', vol: .06, delay: i * .1 })); break;
+    case 'warn': tone(r(300, 340), .1, { type: 'square', vol: .03, lp: 1500 }); tone(r(300, 340), .1, { type: 'square', vol: .03, lp: 1500, delay: .13 }); break;
+    case 'slam': tone(70, .3, { to: 40, vol: .16 }); noise(.25, { f: 300, to: 80, ft: 'lowpass', vol: .14 }); break;
+    case 'hurt': tone(220, .15, { type: 'square', to: 110, vol: .05, lp: 1200 }); noise(.1, { f: 600, ft: 'lowpass', vol: .07 }); break;
+    case 'cast': tone(300, .3, { to: 900, type: 'triangle', vol: .06 }); noise(.3, { f: 1500, to: 4000, vol: .035 }); break;
+    case 'power': [880, 1175, 1568].forEach((f, i) => tone(f, .22, { vol: .05, delay: i * .05 })); break;
+    case 'click': tone(1200, .03, { type: 'triangle', vol: .02 }); break;
+    case 'burn': noise(.2, { f: 1200, to: 400, vol: .02 }); break;
+    case 'bones': for (let i = 0; i < 3; i++) tone(r(600, 900), .04, { type: 'triangle', vol: .022, delay: i * .03 }); noise(.08, { f: 1200, vol: .025 }); break;
+    case 'yelp': tone(r(800, 900), .15, { type: 'triangle', to: 450, vol: .035 }); break;
+    case 'caw': tone(r(600, 700), .14, { type: 'sawtooth', to: 420, vol: .025, lp: 1800 }); noise(.1, { f: 1500, vol: .02 }); break;
+    case 'clang': tone(r(900, 1000), .4, { vol: .035 }); tone(1430, .35, { vol: .025 }); tone(2210, .25, { vol: .018 }); noise(.05, { f: 5000, ft: 'highpass', vol: .035 }); break;
+    case 'shriek': tone(1100, .3, { vol: .025, to: 700 }); break;
+    case 'spirit': tone(r(500, 700), .3, { to: 1200, vol: .022 }); break;
+    case 'roar': { // each boss has its own voice
+      const b = { jarl: 70, giant: 45, herald: 150, fenrir: 55 }[p] || 60;
+      tone(b, 1, { type: 'sawtooth', to: b * .7, lp: 900, a: .08, vol: .1 }); tone(b * 1.5, .9, { type: 'sawtooth', to: b, lp: 700, a: .1, vol: .06, det: 12 });
+      noise(1, { f: 500, to: 150, ft: 'lowpass', a: .08, vol: .14 });
+      if (p === 'herald') tone(620, 1.2, { to: 300, vol: .04, a: .2 });
+      if (p === 'fenrir') tone(380, 1.4, { to: 620, type: 'triangle', vol: .045, a: .3, delay: .3 });
+      break;
+    }
+    case 'bosscast': { const b = { jarl: 140, giant: 90, herald: 300, fenrir: 110 }[p] || 120; tone(b, .45, { type: 'sawtooth', to: b * .6, lp: 800, vol: .06 }); noise(.4, { f: 800, to: 300, ft: 'lowpass', vol: .06 }); break; }
+    case 'bossdie': tone(60, 1.6, { to: 25, vol: .3 }); noise(1.4, { f: 600, to: 60, ft: 'lowpass', vol: .25 }); [659, 523, 392, 330].forEach((f, i) => tone(f, .6, { type: 'triangle', vol: .05, delay: .4 + i * .14 })); break;
+    case 'victory': [392, 523, 659, 784, 1047].forEach((f, i) => tone(f, i === 4 ? 1.4 : .35, { type: 'triangle', vol: .07, delay: i * .16 })); break;
+    case 'death': [392, 330, 262, 196].forEach((f, i) => tone(f, .7, { type: 'triangle', vol: .06, delay: i * .3, lp: 1500 })); break;
+  }
+}
+
+/* ---------- music: a tiny sequencer that schedules notes a little ahead ---------- */
+const NOTE = { D2: 73.42, A1: 55, C2: 65.41, F2: 87.31, D3: 146.83, F3: 174.61, G3: 196, A3: 220, C4: 261.63, D4: 293.66, F4: 349.23, G4: 392, A4: 440 };
+const MEL = [NOTE.D3, NOTE.F3, NOTE.G3, NOTE.A3, NOTE.C4, NOTE.D4, NOTE.F4, NOTE.G4, NOTE.A4];
+function setMusic(name){
+  if (AU.track === name) return; AU.track = name; AU.beat = 0;
+  if (!AU.ctx) return;
+  const c = AU.ctx, t = c.currentTime;
+  AU.next = t + .15;
+  if (AU.drone){ const old = AU.drone; old.g.gain.setTargetAtTime(0, t, .5); setTimeout(() => { old.nodes.forEach(n => { try { n.stop(); } catch (e) {} }); old.g.disconnect(); }, 3000); }
+  const g = c.createGain(); g.gain.value = 0; g.connect(AU.music); const nodes = [];
+  const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.connect(g);
+  const osc = (f, type, det) => { const o = c.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = det || 0; o.connect(lp); o.start(); nodes.push(o); };
+  if (name === 'battle'){ lp.frequency.value = 260; osc(NOTE.D2, 'sawtooth', -6); osc(NOTE.D2 * 1.5, 'sawtooth', 5); g.gain.setTargetAtTime(.09, t, 1); }
+  else if (name === 'camp'){ lp.frequency.value = 600; osc(NOTE.D3, 'triangle'); osc(NOTE.A3, 'triangle', 4); g.gain.setTargetAtTime(.035, t, 1.2); }
+  else { // the title wind: filtered noise that slowly sweeps
+    lp.frequency.value = 900; const src = c.createBufferSource(); src.buffer = AU.noise; src.loop = true; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2; bp.frequency.value = 500;
+    const lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = .07; lg.gain.value = 300; lfo.connect(lg); lg.connect(bp.frequency); lfo.start(); nodes.push(lfo);
+    src.connect(bp); bp.connect(lp); src.start(); nodes.push(src); osc(NOTE.D2, 'sine'); g.gain.setTargetAtTime(.1, t, 1.5);
+  }
+  AU.drone = { g, nodes };
+}
+function musicTick(){
+  if (!AU.ctx || !AU.track || AU.ctx.state !== 'running') return;
+  const c = AU.ctx;
+  if (AU.next < c.currentTime) AU.next = c.currentTime + .05;
+  const intense = AU.track === 'battle' && S && mode === 'combat' && (S.boss || (!S.endless && WAVE_DUR - S.waveT < 8));
+  const bpm = AU.track === 'battle' ? (intense ? 116 : 96) : AU.track === 'camp' ? 72 : 56, step = 60 / bpm / 2;
+  while (AU.next < c.currentTime + .4){ musicStep(AU.next, AU.beat, intense, step); AU.beat++; AU.next += step; }
+}
+function musicStep(t, b, intense, step){
+  const m = { bus: AU.music, at: t }, s8 = b % 8, bar = Math.floor(b / 8);
+  const mel = (dur, vol, type, lp) => { AU.mel = clamp(AU.mel + pick([-2, -1, -1, 1, 1, 2, 0]), 0, MEL.length - 1); tone(MEL[AU.mel], dur, Object.assign({ type, vol, lp, a: .02 }, m)); };
+  if (AU.track === 'battle'){
+    if (s8 === 0 || s8 === 4 || (intense && (s8 === 3 || s8 === 6))) tone(100, .25, Object.assign({ to: 40, vol: .28 }, m));
+    if (s8 === 2 || s8 === 6){ noise(.18, Object.assign({ f: 250, ft: 'lowpass', vol: .12 }, m)); tone(140, .15, Object.assign({ to: 90, vol: .06 }, m)); }
+    if (intense) noise(.03, Object.assign({ f: 6000, ft: 'highpass', vol: .018 }, m));
+    if (s8 === 0){ const root = [NOTE.D2, NOTE.D2, NOTE.C2, NOTE.A1][bar % 4]; tone(root, step * 7, Object.assign({ type: 'sawtooth', lp: 320, vol: .07, a: .03 }, m)); }
+    if (bar % 2 === 1 && (s8 === 0 || s8 === 3 || s8 === 6) && Math.random() < .85) mel(step * 2.6, .045, 'triangle', 1300);
+  } else if (AU.track === 'camp'){
+    const chord = [[NOTE.D3, NOTE.F3, NOTE.A3, NOTE.D4], [NOTE.C4 / 2, NOTE.G3, NOTE.C4, NOTE.G4 / 2 * 2], [NOTE.F3, NOTE.A3, NOTE.C4, NOTE.F4], [NOTE.A3 / 2 * 2, NOTE.D4, NOTE.F4, NOTE.A4]][bar % 4];
+    if (Math.random() < .75) tone(chord[s8 % 4], step * 3, Object.assign({ type: 'triangle', vol: .04, lp: 2400 }, m));
+    if (Math.random() < .45) noise(.015, Object.assign({ f: r2(1800, 4000), ft: 'highpass', vol: .03 }, m));
+  } else {
+    if (b % 16 === 0) tone(pick([NOTE.D3, NOTE.F3, NOTE.A3, NOTE.C4]) / 2, 3.4, Object.assign({ type: 'sawtooth', lp: 420, a: .6, vol: .04 }, m));
+    if (b % 16 === 8 && Math.random() < .6) mel(1.6, .022, 'sine', 2000);
+  }
+}
+const r2 = (a, b) => a + Math.random() * (b - a);
+
+/* ================= GAME FEEL ================= */
+let hitStop = 0, slowMo = 0, flashA = 0, flashCol = '255,255,255', kickX = 0, kickY = 0, lastStop = 0;
+function stopFor(sec){ const n = performance.now(); if (n - lastStop < 250) return; lastStop = n; hitStop = Math.max(hitStop, sec); }
+function flash(col, a){ flashCol = col; flashA = Math.max(flashA, a); }
+function kick(dx, dy, k){ if (!settings.shake) return; const d = Math.hypot(dx, dy) || 1; kickX += dx / d * k; kickY += dy / d * k; }
+// warnings for boss attacks: listen for new telegraphs, chains, lunges and thrown things
+let watch = { tele: 0, chains: 0, lunges: 0, axes: 0, boulders: 0, bstate: '' };
+function watchFx(){
+  if (!S) return;
+  const n = { tele: S.tele.filter(t => t.kind !== 'fire').length, chains: S.chains.length, lunges: S.lunges.length, axes: S.bossAxes.length, boulders: S.boulders.length };
+  if (n.tele > watch.tele || n.chains > watch.chains || n.lunges > watch.lunges || n.axes > watch.axes || n.boulders > watch.boulders) sfx('warn');
+  const bs = S.boss && !S.boss.dead ? S.boss.state : '';
+  if (bs === 'cast' && watch.bstate !== 'cast') sfx('bosscast', S.boss.d.boss);
+  n.bstate = bs; watch = n;
+}
+
 /* ================= TUTORIAL: a short guided raid that never touches saves ================= */
 const TUT_KEY = 'valhalla.tut';
 let tut = null;
@@ -3759,7 +3981,25 @@ function tutTick(force){
     const i = tut.i; setTimeout(() => { if (tut && tut.i === i) tutGo(i + 1); }, 800);
   }
 }
+/* ---------- settings screen ---------- */
+function syncSettings(){
+  for (const [k, id] of [['master', 'setMaster'], ['music', 'setMusic'], ['sfx', 'setSfx']]){ $('#' + id).value = settings[k]; $('#' + id + 'V').textContent = settings[k]; }
+  const tog = (id, on) => { const b = $('#' + id); b.textContent = on ? 'On' : 'Off'; b.setAttribute('aria-pressed', String(on)); };
+  tog('setShake', settings.shake); tog('setDmg', settings.dmgNum); tog('setTips', showTips);
+}
+function openSettings(){ syncSettings(); $('#settings').hidden = false; $('#setBack').focus(); }
+function closeSettings(){ $('#settings').hidden = true; const b = mode === 'title' ? $('#btnSettings') : $('#btnSetPause'); b && b.focus(); }
+for (const [k, id, demo] of [['master', 'setMaster', 'coin'], ['music', 'setMusic', null], ['sfx', 'setSfx', 'coin']]){
+  $('#' + id).addEventListener('input', e => { settings[k] = +e.target.value; $('#' + id + 'V').textContent = settings[k]; auVolumes(); saveSettings(); });
+  if (demo) $('#' + id).addEventListener('change', () => sfx(demo));
+}
+$('#setShake').onclick = () => { settings.shake = !settings.shake; saveSettings(); syncSettings(); };
+$('#setDmg').onclick = () => { settings.dmgNum = !settings.dmgNum; saveSettings(); syncSettings(); };
+$('#setTips').onclick = () => { toggleTips(); syncSettings(); };
+$('#setTut').onclick = () => { try { localStorage.removeItem(TUT_KEY); } catch (e) {} $('#tutDot').hidden = false; toast('The tutorial is marked as new again'); };
+$('#btnSettings').onclick = openSettings; $('#btnSetPause').onclick = openSettings; $('#setBack').onclick = closeSettings;
 $('#btnTut').onclick = startTutorial;
+document.addEventListener('click', e => { if (e.target.closest && e.target.closest('button') && !e.target.closest('#cards')) sfx('click'); });
 $('#tutNext').onclick = () => tut && tutGo(tut.i + 1);
 $('#tutBack').onclick = () => tut && tut.i > 0 && tutGo(tut.i - 1);
 $('#tutSkip').onclick = () => endTutorial();
@@ -3808,7 +4048,7 @@ function botCombat(dt){
   for (const z of S.haz) if (z.kind === 'curse'){ const dx = h.x - z.x, dy = h.y - z.y, d2 = dx * dx + dy * dy + 1; if (d2 < 40 * 40){ fx += dx / d2 * 4; fy += dy / d2 * 4; } }
   fx += -h.y * .00002 - h.x * .00001; fy += h.x * .00002 - h.y * .00001; // drift in slow circles around the start
   keys.KeyA = fx < -.002; keys.KeyD = fx > .002; keys.KeyW = fy < -.002; keys.KeyS = fy > .002;
-  const dash = (nx, ny) => { if (h.dashCh <= 0 || h.dashT > 0) return; h.dx = nx; h.dy = ny; h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; S.bind = null; };
+  const dash = (nx, ny) => { if (h.dashCh <= 0 || h.dashT > 0) return; sfx('dash'); h.dx = nx; h.dy = ny; h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; S.bind = null; };
   if (S.bind) dash(-h.dx, -h.dy);
   for (const c of S.chains) if (!c.snapped && c.t > c.wind - .12){ const ex = Math.cos(c.a), ey = Math.sin(c.a), rx = h.x - c.x, ry = h.y - c.y; if (Math.abs(rx * ey - ry * ex) < 10 && rx * ex + ry * ey > 0) dash(-ey, ex); }
   for (const L of S.lunges) if (L.state === 'wind' && L.t > L.wind - .1) dash(-L.uy, L.ux);
@@ -3833,7 +4073,10 @@ $('#dbgBot').addEventListener('change', e => { setBot(e.target.checked); toast(d
 
 function frame(now){
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
-  if (mode === 'combat' && !paused && !picking){ acc += dt * dbg.speed; let n = 0; const lim = 4 * Math.ceil(dbg.speed); while (acc >= STEP && n < lim){ if (dbg.bot) botCombat(STEP); update(STEP); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= lim) acc = 0; }
+  let ts = dbg.speed;
+  if (hitStop > 0){ hitStop -= dt; ts *= .05; } else if (slowMo > 0){ slowMo = Math.max(0, slowMo - dt); ts *= 1 - .75 * Math.min(1, slowMo / 1.2); }
+  setMusic(mode === 'combat' ? 'battle' : mode === 'shop' ? 'camp' : 'title');
+  if (mode === 'combat' && !paused && !picking){ acc += dt * ts; let n = 0; const lim = 4 * Math.ceil(dbg.speed); while (acc >= STEP && n < lim){ if (dbg.bot) botCombat(STEP); update(STEP); watchFx(); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= lim) acc = 0; }
   if (dbg.bot && mode !== 'combat') botMeta(dt);
   if (tut) tutTick(false);
   dbgTick(dt);
@@ -3847,7 +4090,7 @@ requestAnimationFrame(frame);
 cloudStartup();
 
 // small hook for automated playtesting
-window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy };
+window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx };
 })();
 </script>
 
