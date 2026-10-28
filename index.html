@@ -260,6 +260,8 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .trait.on{color:var(--fg)}
 .trait b{font-weight:400;font-variant-numeric:tabular-nums}
 .trait.on b{color:var(--gold)}
+.side{display:flex;flex-direction:column;height:0;min-height:100%;overflow:hidden}
+.side .info{flex:1 1 0;min-height:4em;overflow:auto;padding-right:4px}
 .info{font-size:18px;color:#c9cfdb;min-height:5.2em;border-top:1px solid var(--line);padding-top:8px;margin-top:10px}
 .info strong{font-weight:400;color:var(--fg);font-size:20px}
 .next{font-size:19px;color:#c9cfdb;margin:10px 0 0}
@@ -421,6 +423,7 @@ a.btn{text-decoration:none;display:inline-block}
 
 @media (max-width:980px){
   #shop{grid-template-columns:minmax(0,1fr)}
+  .side{height:auto;overflow:visible}
   .cards{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
   .bench{grid-template-columns:repeat(auto-fill,minmax(44px,1fr))}
 }
@@ -520,7 +523,7 @@ a.btn{text-decoration:none;display:inline-block}
       </div>
       <p class="next" id="nextTxt"></p>
     </div>
-    <div>
+    <div class="side">
       <div class="head"><h3>Synergies</h3></div>
       <div class="traits" id="traits"></div>
       <div class="info" id="info"></div>
@@ -3661,7 +3664,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.13.0', 'Smoother and fairer', ['Every screen now shows the same amount of battlefield. Very wide screens get dark edges instead of a wider view', 'Interface size setting, picked automatically from your screen height', 'Graphics quality (High, Medium, Low), Reduce flashing and Show FPS in Settings. If the game runs slowly it offers to switch to Low', 'The shop fits short screens: the Start wave row stays visible, and the shop no longer stretches on ultrawide screens', 'Faster drawing of the ground and faster hit checks in crowded waves', 'Raven Banner now opens a 9th slot behind the hero at any level', 'Give up asks for confirmation']],
+  ['0.13.0', 'Smoother and fairer', ['Every screen now shows the same amount of battlefield. Very wide screens get dark edges instead of a wider view', 'Interface size setting, picked automatically from your screen height', 'Graphics quality (High, Medium, Low), Reduce flashing and Show FPS in Settings. If the game runs slowly it offers to switch to Low', 'The shop fits short screens: the Start wave row stays visible, and the shop no longer stretches on ultrawide screens', 'Faster drawing of the ground and faster hit checks in crowded waves', 'Raven Banner now opens a 9th slot behind the hero at any level', 'Give up asks for confirmation', 'Fixed: the shop no longer jumps up and down when you hover cards and units. Long descriptions scroll inside the info box']],
   ['0.12.0', 'The Wandering Merchant', ['Shop events from wave 3: now and then a visitor waits at the campfire', 'The Wandering Merchant sells relics, items that twist a rule for the rest of the raid. Carry up to 3 and sell them back for half', '12 relics, such as Iron Oath, Ember Boots, Twin Souls and Raven Banner', 'A Blood Shrine trades health for gold. A Cursed Altar makes the next wave harder and pays with a free relic', "Sleipnir's Stride no longer appears once every dash slot is unlocked", 'A mute button in Settings, and M mutes or unmutes anywhere']],
   ['0.11.0', 'Sound and feel', ['Music and sound effects, all made in the game: war drums in battle, a campfire tune in the shop, a roar for every boss', 'Settings menu on the title screen and in the pause menu: volume, screen shake, damage numbers and tooltips', 'Big hits freeze the action for a moment, boss attacks flash the screen, and a boss dies in slow motion', 'Merging units bursts with light', 'The pause menu also opens in the shop: press Esc or P, or click Menu. It has Save and quit there too']],
   ['0.10.0', 'How to play', ['A short guided tutorial on the main menu: How to play', 'The synergies panel shows progress pips. Hover or click a synergy to see each step, which one is active and which units count', 'Unit descriptions say which synergies the unit counts toward']],
