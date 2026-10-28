@@ -59,7 +59,10 @@ The game uses major.minor.patch numbers (for example 0.8.0). A new feature batch
 
 ## Ideas for later
 
-- More heroes, each with their own sprite and ability pool (the ability system is already built per hero)
+Saved for when the core game is solid:
+
+- More heroes, each with their own sprite and ability pool (the ability system is already built per hero). Ideas: a Shieldmaiden who blocks and counters, a Seiðr Völva who curses
+- Expanded Rune Forge: new heroes are unlocked there, plus other unlocks and achievements
 - Android app: touch controls, with abilities aimed by tap or a second thumb stick
 - Android HUD: the health, dash and ability bars may crowd small screens and need a compact layout
 
