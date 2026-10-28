@@ -38,6 +38,29 @@ body{
 }
 #app{position:relative;height:100%;width:100%;overflow:hidden;border:1px solid var(--line);background:#07080c;border-radius:3px}
 #cv{position:absolute;left:0;top:0;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+#app.letterbox{background:radial-gradient(ellipse at 50% 45%,#0b0d13 30%,#040508 80%)}
+#hud,#shop,#dock,#pause,.screen,#btnShopOpen,#toast,#count,#perfTip{zoom:var(--ui,1)}
+#shop{left:max(8px,calc(50% - 820px))!important;right:max(8px,calc(50% - 820px))!important}
+.bench{grid-template-columns:repeat(8,minmax(0,92px))!important;justify-content:start}
+.cards{max-width:820px}
+.act{position:sticky;bottom:-12px;background:rgba(13,15,22,.97);padding:6px 0 8px;z-index:2;margin-bottom:-6px}
+@media (max-height:820px){
+  #shop{padding:8px 10px;gap:12px}
+  .card{min-height:94px;padding:4px 3px}
+  .card img{width:32px;height:38px}
+  .bench{grid-template-columns:repeat(8,minmax(0,66px))!important}
+  .event{padding:6px 8px;gap:6px;margin-bottom:6px}
+  .ev-head p{font-size:15px}
+  .ev-ic{height:34px}
+  .relic-card .rd{font-size:14px}
+  .info{min-height:3em}
+}
+@media (max-height:700px){
+  .keys{max-height:26vh;overflow:auto;padding-right:6px}
+  #title .screen-inner{gap:12px}
+  #title h1{font-size:clamp(40px,9vh,72px)}
+  .notes-link{position:static;justify-self:end;padding:0}
+}
 button{font:inherit;color:inherit;cursor:pointer}
 button:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
 .px{image-rendering:pixelated;image-rendering:crisp-edges}
@@ -222,6 +245,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 @keyframes readyPulse{50%{box-shadow:0 0 0 1px var(--gold),0 0 2px rgba(226,178,76,.2)}}
 .formation{position:relative;width:180px;height:180px;margin:0 auto}
 .formation .slot{position:absolute;width:40px;height:40px}
+.formation.nine{height:228px}
 .formation .hero{position:absolute;left:50%;top:50%;width:34px;transform:translate(-50%,-50%)}
 .traits{display:grid;gap:4px;font-size:19px}
 .trait{display:flex;align-items:center;gap:8px;color:var(--muted);cursor:help;padding:1px 4px;margin:0 -4px;border-radius:2px}
@@ -269,6 +293,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #pause{z-index:6}
 #pause.over-shop{background:rgba(7,8,12,.96)}
 .tut-btn{position:relative}
+#btnQuit.warn{border-color:var(--hp,#c4213f);color:#ff8a8a}
 .tut-btn .dot{position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--ember);box-shadow:0 0 8px var(--ember)}
 #tut{position:absolute;inset:0;z-index:30;pointer-events:none}
 .tut-spot{position:absolute;left:50%;top:50%;width:0;height:0;border-radius:4px;box-shadow:0 0 0 200vmax rgba(5,6,10,.66);outline:2px solid var(--gold);outline-offset:3px;transition:left .45s cubic-bezier(.2,.8,.2,1),top .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1),height .45s cubic-bezier(.2,.8,.2,1),border-radius .45s;animation:tutPulse 1.6s ease-in-out infinite}
@@ -343,10 +368,17 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .best-intro{margin:0;text-align:left}
 #feedback{z-index:5;background:rgba(7,8,12,.94)}
 #settings{z-index:8;background:rgba(7,8,12,.985)}
-.set-grid{display:grid;grid-template-columns:auto minmax(0,1fr) 3.2ch;gap:12px 16px;align-items:center;font-size:20px;margin:8px 0 4px}
+.set-grid{display:grid;grid-template-columns:auto minmax(0,1fr) 3.2ch;gap:8px 16px;align-items:center;font-size:20px;margin:8px 0 4px}
 .set-grid input[type=range]{width:100%;accent-color:var(--ember)}
 .set-grid output{font-variant-numeric:tabular-nums;color:var(--gold);text-align:right}
 .set-grid .btn{justify-self:start}
+.set-grid select{font:inherit;font-size:18px;color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:2px;padding:3px 8px;justify-self:start;max-width:100%}
+.set-h{grid-column:1 / -1;margin:8px 0 0;font-size:16px;font-weight:400;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+#settings .screen-inner{gap:10px}
+#settings{place-items:start center}
+#settings .screen-inner{margin:auto 0}
+#fps{position:absolute;left:8px;top:8px;z-index:4;font-size:16px;color:#7dc46a;background:rgba(7,8,12,.7);padding:1px 6px;border-radius:2px;pointer-events:none;font-variant-numeric:tabular-nums}
+#perfTip{position:absolute;left:50%;top:96px;transform:translateX(-50%);z-index:4;background:var(--panel);border:1px solid var(--gold);border-radius:2px;padding:8px 12px;display:flex;gap:10px;align-items:center;font-size:18px;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
 .tog[aria-pressed="false"]{color:var(--muted)}
 #setMute{color:var(--fg)}
 #setMute.muted{color:var(--ember);border-color:var(--ember)}
@@ -480,7 +512,7 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="cards" id="cards"></div>
       <div class="head"><h3>Bench</h3><button class="btn sm" id="btnSort" type="button" title="Sort the bench: highest stars first, then by class (Warrior, Archer, Mage, Priest), then rarer elements first (Lightning and Rune, then Fire and Blood, then Iron and Frost). Matching units end up side by side.">Sort <kbd>Q</kbd></button></div>
       <div class="bench" id="bench"></div>
-      <div class="row" style="margin-top:12px;align-items:center">
+      <div class="row act" style="margin-top:12px;align-items:center">
         <button class="btn primary" id="btnStart" type="button">Start wave 1 <kbd>Space</kbd></button>
         <button class="btn" id="btnSell" type="button" disabled>Sell <kbd>E</kbd></button>
         <button class="btn" id="btnSaveQuit" type="button">Save and quit</button>
@@ -497,7 +529,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.12.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
+      <div class="eyebrow">Prototype <span id="verTxt">0.13.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
@@ -610,6 +642,8 @@ a.btn{text-decoration:none;display:inline-block}
     </div>
   </section>
 
+  <div id="fps" hidden></div>
+  <div id="perfTip" hidden role="status"><span>The game is running slowly. Switch to Low graphics?</span><button class="btn sm primary" id="perfYes" type="button">Switch to Low</button><button class="btn sm" id="perfNo" type="button">No thanks</button></div>
   <div id="tut" hidden>
     <div class="tut-spot" id="tutSpot"></div>
     <div class="tut-hand" id="tutHand" hidden aria-hidden="true"><svg viewBox="0 0 11 16" width="22" height="32" shape-rendering="crispEdges"><path d="M0 0h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v2H7v1h1v2H6v-2H5v-1H4v1H3v1H1v1H0z" fill="#0b0d13"/><path d="M1 2h1v1h1v1h1v1h1v1h1v1h1v1h1v1h1v1H6v1h1v2H6v-2H5v-1H4v1H3v1H1z" fill="#f4efe2"/></svg></div>
@@ -650,6 +684,12 @@ a.btn{text-decoration:none;display:inline-block}
         <label for="setMaster">Master volume</label><input type="range" id="setMaster" min="0" max="100" step="5"><output id="setMasterV" for="setMaster"></output>
         <label for="setMusic">Music</label><input type="range" id="setMusic" min="0" max="100" step="5"><output id="setMusicV" for="setMusic"></output>
         <label for="setSfx">Sound effects</label><input type="range" id="setSfx" min="0" max="100" step="5"><output id="setSfxV" for="setSfx"></output>
+        <h3 class="set-h">Display</h3>
+        <label for="setUi">Interface size</label><select id="setUi"><option value="auto">Auto</option><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option><option value="115">115%</option><option value="130">130%</option><option value="145">145%</option></select><span></span>
+        <label for="setQ">Graphics quality</label><select id="setQ"><option value="high">High</option><option value="medium">Medium</option><option value="low">Low (fastest)</option></select><span></span>
+        <span>Reduce flashing</span><button class="btn sm tog" id="setCalm" type="button" aria-pressed="false">Off</button><span></span>
+        <span>Show FPS</span><button class="btn sm tog" id="setFps" type="button" aria-pressed="false">Off</button><span></span>
+        <h3 class="set-h">Gameplay</h3>
         <span>Screen shake</span><button class="btn sm tog" id="setShake" type="button" aria-pressed="true">On</button><span></span>
         <span>Damage numbers</span><button class="btn sm tog" id="setDmg" type="button" aria-pressed="true">On</button><span></span>
         <span>Power-up tooltips <kbd>T</kbd></span><button class="btn sm tog" id="setTips" type="button" aria-pressed="true">On</button><span></span>
@@ -714,7 +754,7 @@ a.btn{text-decoration:none;display:inline-block}
     </fieldset>
     <fieldset><legend>Spawn</legend>
       <div class="r"><select id="dbgBoss" aria-label="Boss"><option value="jarl:A">Jarl, Barrow King (A)</option><option value="jarl:B">Jarl, Mound-Dweller (B)</option><option value="giant:A">Giant, Rime-Jötunn (A)</option><option value="giant:B">Giant, Hrímþurs (B)</option><option value="herald:A">Herald, Half-Faced (A)</option><option value="herald:B">Herald, Hel's Valkyrie (B)</option><option value="fenrir:B">Fenrir, World-Eater</option><option value="fenrir:A">Fenrir, Gleipnir-Bound</option></select><button type="button" id="dbgSpawnBoss">Spawn boss</button></div>
-      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Seiðkona</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
+      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Seiðkona</option><option value="wight">Barrow Wight</option><option value="wisp">Soul Wisp</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
       <div class="r"><select id="dbgPu" aria-label="Power-up"></select><button type="button" id="dbgSpawnPu">Spawn power-up</button></div>
     </fieldset>
     <fieldset><legend>Economy and units</legend>
@@ -755,6 +795,10 @@ function weighted(o){ let t = 0; for (const k in o) t += o[k]; let r = Math.rand
 const META_KEY = 'valhalla.meta.v1';
 const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, dash: 0, best: 0, runs: 0, wins: 0, bestEndless: 0 };
 try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.parse(s)); } catch (e) {}
+/* ================= SETTINGS ================= */
+const SET_KEY = 'valhalla.settings';
+const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true, ui: 'auto', quality: 'high', calm: false, fps: false }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
+function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(settings)); } catch (e) {} }
 const RUN_KEY = 'valhalla.run', STAMP_KEY = 'valhalla.stamp';
 function bumpStamp(){ try { localStorage.setItem(STAMP_KEY, String(Date.now())); } catch (e) {} try { cloudQueue(); } catch (e) {} }
 function localStamp(){ try { return +localStorage.getItem(STAMP_KEY) || 0; } catch (e) { return 0; } }
@@ -1078,7 +1122,7 @@ const BOSS_DESIGNS = {
 // layers are drawn back to front; each layer is one material with base / highlight / shadow colours
 function pxBuild(W, H, layers, details, ol){
   const c = document.createElement('canvas'); c.width = W; c.height = H;
-  const g = c.getContext('2d');
+  const g = c.getContext('2d', { willReadFrequently: true });
   const mat = new Int16Array(W * H).fill(-1);
   const api = {
     poly: pts => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fill(); },
@@ -1459,13 +1503,14 @@ for (let v = 0; v < 4; v++){
 let S = null, uid = 0, mode = 'title', paused = false;
 const keys = {};
 const SLOT_OFF = Array.from({ length: 8 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 4; return { x: Math.cos(a) * 24, y: Math.sin(a) * 20 }; });
+SLOT_OFF.push({ x: 0, y: 34 }); // the 9th slot, opened by the Raven Banner: a rear guard behind the hero
 
 function newRun(R){
   if (R && R.v !== 1) R = null; // called from a click handler: no save to restore
   S = {
     wave: 1, gold: 5 + meta.gold, level: 1, xp: 0,
     hero: { x: 0, y: 0, hp: 100, maxHp: 100, inv: 0, dashSlots: 1, dashCh: 1, dashRt: 0, dashT: 0, dx: 0, dy: 1, face: 1, walk: 0 },
-    bench: Array(8).fill(null), board: Array(8).fill(null), shop: [],
+    bench: Array(8).fill(null), board: Array(9).fill(null), shop: [],
     enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], haz: [], corpses: [], halfDeath: null, breath: null, chill: 0,
     souls: 0, kills: 0, bosses: 0, waveT: 0, spawnAcc: 0, shake: 0, boss: null, endDelay: 0, sel: null,
     debugUsed: dbgUsed, submitted: false,
@@ -1504,7 +1549,7 @@ function applyRun(R){
   S.relics = (Array.isArray(R.relics) ? R.relics : []).filter((k, i, a) => RELICS[k] && a.indexOf(k) === i).slice(0, MAX_RELICS);
   const E = R.event; S.event = E && ['merchant', 'shrine', 'altar'].includes(E.type) ? (E.type === 'merchant' ? { type: 'merchant', offers: (E.offers || []).filter(k => RELICS[k]).slice(0, 3), bought: (E.bought || []).filter(k => RELICS[k]) } : { type: E.type, cost: num(E.cost, 1, 999, 20), gold: num(E.gold, 1, 99, 10), done: !!E.done }) : null;
   S.sinceEvent = num(R.sinceEvent, 0, 9, 0); S.altarPending = !!R.altarPending; S.resumed = true;
-  S.board = Array.from({ length: 8 }, (_, i) => mkU((R.board || [])[i]));
+  S.board = Array.from({ length: 9 }, (_, i) => mkU((R.board || [])[i]));
   S.bench = Array.from({ length: 8 }, (_, i) => mkU((R.bench || [])[i]));
   S.shop = Array.from({ length: 5 }, (_, i) => { const c = (R.shop || [])[i]; return c && CLASSES[c.cls] && MODS[c.mod] ? { cls: c.cls, mod: c.mod, locked: !!c.locked } : null; });
 }
@@ -1534,7 +1579,7 @@ function requestNewRun(e){
 
 /* ================= TRAITS & STATS ================= */
 function allUnits(){ return [...S.board, ...S.bench].filter(Boolean); }
-const slotCount = () => Math.min(8, S.level + (hasR('raven_banner') ? 1 : 0));
+const slotCount = () => hasR('raven_banner') ? Math.min(9, S.level + 1) : Math.min(8, S.level);
 function computeTraits(){
   const cls = { warrior: 0, archer: 0, mage: 0, priest: 0 }, mod = {};
   for (const k in MODS) mod[k] = 0;
@@ -2075,13 +2120,14 @@ function explode(p){
 
 /* ================= EFFECTS ================= */
 function burst(x, y, n, cols, sp, add){
+  if (settings.quality === 'low') n = Math.ceil(n * .35); else if (settings.quality === 'medium') n = Math.ceil(n * .65);
   for (let i = 0; i < n; i++){
     const a = rand(0, Math.PI * 2), v = rand(.2, 1) * sp;
     S.parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: rand(.25, .7), max: .7, col: pick(cols), s: Math.random() < .3 ? 2 : 1, add: add !== false });
   }
 }
 function addText(x, y, txt, col, big){
-  if (!big && S.texts.length > 70) return;
+  if (!big && S.texts.length > (settings.quality === 'low' ? 25 : settings.quality === 'medium' ? 45 : 70)) return;
   S.texts.push({ x: x + rand(-3, 3), y, txt: String(txt), col, life: big ? .9 : .55, max: big ? .9 : .55, big });
 }
 
@@ -2167,7 +2213,11 @@ function update(dt){
     if (u.mana >= 100){ u.mana = 0; ability(u, t); }
   });
 
-  // projectiles
+  // projectiles: enemies are bucketed into a coarse grid so each shot only tests its neighbours
+  const PG = 32, pgrid = new Map();
+  for (const e of S.enemies){ if (e.dead) continue; const k = ((e.x / PG) | 0) * 65536 + ((e.y / PG) | 0); let c = pgrid.get(k); if (!c) pgrid.set(k, c = []); c.push(e); }
+  const near = (x, y, out) => { out.length = 0; const cx = (x / PG) | 0, cy = (y / PG) | 0; for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++){ const c = pgrid.get((cx + i) * 65536 + cy + j); if (c) for (const e of c) out.push(e); } return out; };
+  const nb = [];
   for (const p of S.projs){
     if (p.kind === 'axe'){ updateAxe(p, dt); continue; }
     if (p.kind === 'spear'){ updateSpear(p, dt); continue; }
@@ -2177,7 +2227,7 @@ function update(dt){
       for (let i = 0; i < n; i++) S.parts.push({ x: p.x + rand(-2, 2), y: p.y + rand(-2, 2), vx: -p.vx * .1 + rand(-12, 12), vy: -p.vy * .1 + rand(-12, 12), life: rand(.15, .4), max: .4, col: pick(['#ff2a1a', '#ff5b2e', '#ffb05a', '#ffd27a']), s: p.kind === 'bigfire' ? 2 : 1, add: true });
     }
     if (p.kind === 'holy' && Math.random() < .5) S.parts.push({ x: p.x, y: p.y, vx: 0, vy: 0, life: .2, max: .2, col: '#ffe9a0', s: 1, add: true });
-    for (const e of S.enemies){
+    for (const e of (S.enemies.length > 40 ? near(p.x, p.y, nb) : S.enemies)){
       if (e.dead) continue;
       if (dist2(p.x, p.y, e.x, e.y) > (p.r + e.r) ** 2) continue;
       if (p.hits && p.hits.has(e)) continue;
@@ -2347,7 +2397,7 @@ function deathFx(e){
   else if (t === 'witch'){ P(10, () => ({ col: pick(['#9a78d6', '#d6a2ff', '#3c4f7c']), add: true, vx: rand(-40, 40), vy: rand(-40, 10) })); P(6, () => ({ col: '#22304f', smoke: true, s: 2, vy: rand(-16, -4), life: 1, max: 1 })); addCorpse('rune', e); }
   else P(10, () => ({ col: pick(['#6fc7a0', '#a8f0d4', '#e6fff2']), add: true, vy: rand(-40, -10) }));
 }
-function addCorpse(k, e){ if (S.corpses.length > 40) S.corpses.shift(); S.corpses.push({ k, x: e.x, y: e.y + e.h / 2 - 3, face: e.face, life: 7, max: 7 }); }
+function addCorpse(k, e){ if (settings.quality === 'low') return; if (S.corpses.length > (settings.quality === 'medium' ? 20 : 40)) S.corpses.shift(); S.corpses.push({ k, x: e.x, y: e.y + e.h / 2 - 3, face: e.face, life: 7, max: 7 }); }
 const AFF_COL = { frozen: '#86d4ff', burning: '#ff5b2e', warded: '#b98cff', swift: '#f4e04d' };
 const TELE_LOOK = {
   frost: { line: 'rgba(191,233,255,.7)', fill: '134,212,255', burst: ['#bfe9ff', '#e3edf5', '#86d4ff'], ring: '#bfe9ff', shake: 4 },
@@ -2430,7 +2480,8 @@ function bossAI(e, dt, dx, dy, d, sp){
 }
 
 /* ================= RENDER ================= */
-let VW = 480, VH = 270, SCALE = 2, lastCamX = 0, lastCamY = 0, camScreenY = null, campEmber = 0;
+let VW = 480, VH = 270, SCALE = 2, lastCamX = 0, lastCamY = 0, camScreenY = null, campEmber = 0, shopTop = 0, shopTopAt = 0, groundKey = '';
+const groundCv = document.createElement('canvas'), groundCtx = groundCv.getContext('2d');
 // power-up tooltips are HTML so the text stays sharp at any scale
 const tipsEl = document.getElementById('tips'), tipEls = [];
 let showTips = true;
@@ -2451,17 +2502,25 @@ function updateTips(){
     if (d.dataset.type !== p.type){ d.dataset.type = p.type; d.style.setProperty('--c', P.col); d.innerHTML = `<b>${P.name}</b>${P.short}<i></i>`; }
     d.style.setProperty('--w', Math.max(0, p.life / (p.max || 35) * 100) + '%');
     d.hidden = false;
-    d.style.left = Math.round((p.x - lastCamX) * SCALE) + 'px';
+    d.style.left = Math.round((p.x - lastCamX) * SCALE + cvOffX) + 'px';
     d.style.top = Math.round((p.y - lastCamY - 12) * SCALE) + 'px';
   });
 }
+let cvOffX = 0;
 function resize(){
   const r = app.getBoundingClientRect();
-  SCALE = Math.max(1, Math.floor(Math.min(r.width / 420, r.height / 250)));
-  VW = Math.ceil(r.width / SCALE); VH = Math.ceil(r.height / SCALE);
+  // every screen sees about 270 world pixels of height, and at most a 21:9 slice of width, so nobody sees further than anyone else
+  SCALE = 1; for (let k = 2; k <= 12; k++) if (Math.abs(r.height / k - 270) < Math.abs(r.height / SCALE - 270)) SCALE = k;
+  VH = Math.ceil(r.height / SCALE); VW = Math.min(Math.ceil(r.width / SCALE), Math.ceil(VH * 2.4));
   cv.width = VW; cv.height = VH; cv.style.width = VW * SCALE + 'px'; cv.style.height = VH * SCALE + 'px';
+  cvOffX = Math.max(0, Math.round((r.width - VW * SCALE) / 2)); cv.style.left = cvOffX + 'px';
+  app.classList.toggle('letterbox', cvOffX > 0);
   ctx.imageSmoothingEnabled = false;
+  groundKey = ''; shopTopAt = 0;
+  applyUi();
 }
+function uiScale(){ const h = window.innerHeight; if (settings.ui !== 'auto') return +settings.ui / 100; return Math.round((h >= 1080 ? Math.min(1.5, h / 1080) : Math.max(.8, h / 1000)) * 20) / 20; }
+function applyUi(){ document.documentElement.style.setProperty('--ui', uiScale()); }
 new ResizeObserver(resize).observe(app);
 resize();
 
@@ -2484,25 +2543,28 @@ function render(dt){
   // while the shop is open the camera lifts so the resting warband sits in the space above the shop panel
   const camp = !!(S && mode === 'shop');
   let want = VH / 2;
-  if (camp){ const top = document.getElementById('shop').getBoundingClientRect().top - app.getBoundingClientRect().top; want = clamp(top / SCALE * .5, 34, VH / 2); }
+  if (camp){ const now = performance.now(); if (now - shopTopAt > 250){ shopTopAt = now; shopTop = document.getElementById('shop').getBoundingClientRect().top - app.getBoundingClientRect().top; } want = clamp(shopTop / SCALE * .5, 34, VH / 2); }
   camScreenY = camScreenY == null ? want : camScreenY + (want - camScreenY) * Math.min(1, dt * 7);
   const camX = Math.round(h.x - VW / 2 + sx), camY = Math.round(h.y - camScreenY + sy);
   lastCamX = camX; lastCamY = camY;
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalCompositeOperation = 'source-over';
   // ground
-  const tx0 = Math.floor(camX / TILE), ty0 = Math.floor(camY / TILE);
-  for (let ty = ty0; ty <= ty0 + Math.ceil(VH / TILE) + 1; ty++) for (let tx = tx0; tx <= tx0 + Math.ceil(VW / TILE) + 1; tx++){
-    ctx.drawImage(TILES[hash(tx, ty) % 4], tx * TILE - camX, ty * TILE - camY);
+  const tx0 = Math.floor(camX / TILE), ty0 = Math.floor(camY / TILE), cols = Math.ceil(VW / TILE) + 2, rows = Math.ceil(VH / TILE) + 2;
+  const gk = tx0 + ',' + ty0 + ',' + cols + ',' + rows + ',' + settings.quality;
+  if (gk !== groundKey){
+    groundKey = gk; groundCv.width = cols * TILE; groundCv.height = rows * TILE; const g = groundCtx;
+    for (let ty = 0; ty < rows; ty++) for (let tx = 0; tx < cols; tx++) g.drawImage(TILES[hash(tx0 + tx, ty0 + ty) % 4], tx * TILE, ty * TILE);
+    if (settings.quality !== 'low') for (let ty = -1; ty < rows; ty++) for (let tx = -1; tx < cols; tx++){
+      const hv = hash(tx0 + tx + 999, ty0 + ty - 77), r = hv % 40;
+      const px = tx * TILE + (hv >>> 8) % 20, py = ty * TILE + (hv >>> 16) % 20;
+      if (r === 0) g.drawImage(SPR.stone, px, py);
+      else if (r === 1) g.drawImage(SPR.bones, px, py);
+      else if (r === 2 || r === 3 || r === 4) g.drawImage(SPR.tuft, px, py);
+      else if (r === 5) g.drawImage(SPR.tree, px, py);
+    }
   }
-  for (let ty = ty0; ty <= ty0 + Math.ceil(VH / TILE) + 1; ty++) for (let tx = tx0; tx <= tx0 + Math.ceil(VW / TILE) + 1; tx++){
-    const hv = hash(tx + 999, ty - 77), r = hv % 40;
-    const px = tx * TILE - camX + (hv >>> 8) % 20, py = ty * TILE - camY + (hv >>> 16) % 20;
-    if (r === 0) ctx.drawImage(SPR.stone, px, py);
-    else if (r === 1) ctx.drawImage(SPR.bones, px, py);
-    else if (r === 2 || r === 3 || r === 4) ctx.drawImage(SPR.tuft, px, py);
-    else if (r === 5) ctx.drawImage(SPR.tree, px, py);
-  }
+  ctx.drawImage(groundCv, tx0 * TILE - camX, ty0 * TILE - camY);
   ctx.translate(-camX, -camY);
 
   // telegraphs
@@ -2595,11 +2657,11 @@ function render(dt){
   const ct = performance.now() / 1000, fireX = h.x, fireY = h.y + 34;
   if (camp){
     ctx.fillStyle = 'rgba(5,6,10,.62)'; ctx.fillRect(camX - 20, camY - 20, VW + 40, VH + 40);
-    ctx.globalCompositeOperation = 'lighter';
+    if (settings.quality !== 'low'){ ctx.globalCompositeOperation = 'lighter';
     const gl = ctx.createRadialGradient(fireX, fireY - 8, 4, fireX, fireY - 8, 78 + Math.sin(ct * 9) * 3);
     gl.addColorStop(0, 'rgba(255,140,60,.38)'); gl.addColorStop(.5, 'rgba(255,90,30,.12)'); gl.addColorStop(1, 'rgba(0,0,0,0)');
     ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(fireX, fireY - 8, 82, 0, 6.283); ctx.fill();
-    ctx.globalCompositeOperation = 'source-over';
+    ctx.globalCompositeOperation = 'source-over'; }
     ctx.fillStyle = '#3d2818'; ctx.fillRect(Math.round(fireX) - 6, Math.round(fireY) + 1, 12, 2); ctx.fillStyle = '#6a4428'; ctx.fillRect(Math.round(fireX) - 5, Math.round(fireY), 4, 1); ctx.fillRect(Math.round(fireX) + 1, Math.round(fireY) + 2, 4, 1);
     for (let k = 0; k < 9; k++){ const fh = 2 + ((Math.sin(ct * 13 + k * 2.1) + 1) * 2.4) | 0, fx = Math.round(fireX) - 4 + k; for (let j = 0; j < fh; j++){ ctx.fillStyle = j > fh - 2 ? '#ffe2a0' : j > fh / 2 ? '#ffb347' : '#ff5b2e'; ctx.fillRect(fx, Math.round(fireY) - j, 1, 1); } }
     campEmber -= dt; if (campEmber <= 0 && S){ campEmber = .08; S.parts.push({ x: fireX + rand(-3, 3), y: fireY - 4, vx: rand(-6, 6), vy: rand(-30, -16), life: rand(.6, 1.2), max: 1.2, col: pick(['#ff8a3c', '#ffd27a', '#ff5b2e']), s: 1, add: true }); }
@@ -2659,7 +2721,7 @@ function render(dt){
       drawSprite(sname, e.x, e.y + bob, e.sc, e.face, e.flash > 0);
       if (e.shield > 0){ ctx.globalAlpha = .55 + .2 * Math.sin(st.time * 5); ctx.strokeStyle = '#b98cff'; ctx.lineWidth = 1; ctx.setLineDash([2, 2]); ctx.beginPath(); ctx.arc(Math.round(e.x), Math.round(e.y + bob), e.r + 5, st.time, st.time + 6.283); ctx.stroke(); ctx.setLineDash([]); ctx.globalAlpha = 1; }
       if (isMB && e.flash <= 0){ const sp = SPR[sname]; bossFX(ctx, e.d.boss, e.design, sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
-      if (e.d.wisp){ ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 10); gr.addColorStop(0, 'rgba(190,255,230,.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(e.x, e.y, 10, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over'; }
+      if (e.d.wisp && settings.quality !== 'low'){ ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(e.x, e.y, 0, e.x, e.y, 10); gr.addColorStop(0, 'rgba(190,255,230,.6)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(e.x, e.y, 10, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over'; }
       if (isF && e.flash <= 0){ const sp = SPR[sname]; fenrirFX(ctx, e.design || 'B', sp, Math.round(e.x - sp.width * e.sc / 2), Math.round(e.y + bob - sp.height * e.sc / 2), e.sc, e.face, st.time); }
       if (e.frz > 0){ ctx.globalAlpha = .55; drawSprite(sname, e.x, e.y + bob, e.sc, e.face, true); ctx.globalAlpha = 1; }
       if (e.stun > 0){ ctx.fillStyle = '#ffe066'; for (let k = 0; k < 3; k++){ const a = st.time * 8 + k * 2.09; ctx.fillRect(Math.round(e.x + Math.cos(a) * 5), Math.round(e.y - e.h / 2 - 3 + Math.sin(a) * 1.5), 1, 1); } }
@@ -2745,7 +2807,8 @@ function render(dt){
   }
   ctx.globalAlpha = 1;
   st.parts = st.parts.filter(p => p.life > 0);
-  if (st.parts.length > 1400) st.parts.splice(0, st.parts.length - 1400);
+  const pcap = settings.quality === 'low' ? 300 : settings.quality === 'medium' ? 700 : 1400;
+  if (st.parts.length > pcap) st.parts.splice(0, st.parts.length - pcap);
   // rings & slashes
   ctx.globalCompositeOperation = 'lighter';
   for (const r of st.rings){
@@ -2790,7 +2853,7 @@ function render(dt){
   const g = ctx.createRadialGradient(hx, hy, 80, hx, hy, Math.max(VW, VH) * .75);
   g.addColorStop(0, 'rgba(5,6,10,0)'); g.addColorStop(1, 'rgba(5,6,10,.7)');
   ctx.fillStyle = g; ctx.fillRect(0, 0, VW, VH);
-  if (st.hurt > 0){ ctx.fillStyle = `rgba(196,33,63,${st.hurt * .9})`; ctx.fillRect(0, 0, VW, VH); }
+  if (st.hurt > 0){ ctx.fillStyle = `rgba(196,33,63,${st.hurt * (settings.calm ? .3 : .9)})`; ctx.fillRect(0, 0, VW, VH); }
   if (flashA > 0){ ctx.fillStyle = `rgba(${flashCol},${Math.min(.6, flashA)})`; ctx.fillRect(0, 0, VW, VH); flashA = Math.max(0, flashA - dt * 2.5); }
   // Devour the Sun: darkness with a small circle of light around the hero; the shadow wolves' eyes show where they will strike
   if (st.eclipse > 0){
@@ -3005,11 +3068,14 @@ function renderShop(){
   };
   $('#bench').innerHTML = S.bench.map((u, i) => slotHTML(u, 'bench', i, false)).join('');
   const R = 66;
+  const nine = hasR('raven_banner') || !!S.board[8];
+  $('#formation').classList.toggle('nine', nine);
   $('#formation').innerHTML = `<img class="px hero" src="${ICON.hero}" alt="The hero">` + S.board.map((u, i) => {
+    if (i === 8) return nine ? slotHTML(u, 'board', 8, 8 >= slotCount(), 'left:70px;top:184px;') : '';
     const a = -Math.PI / 2 + i * Math.PI / 4, x = 90 + Math.cos(a) * R - 20, y = 90 + Math.sin(a) * R - 20;
     return slotHTML(u, 'board', i, i >= slotCount(), `left:${x}px;top:${y}px;`);
   }).join('');
-  $('#slotNote').textContent = `${S.board.filter(Boolean).length} units · ${slotCount()} of 8 slots open`;
+  $('#slotNote').textContent = `${S.board.filter(Boolean).length} units · ${slotCount()} of ${hasR('raven_banner') ? 9 : 8} slots open`;
   $('#shopAbil').innerHTML = S.abil.map((a, i) => {
     if (!a) return `<div class="abt empty${S.selAb === i ? ' sel' : ''}" data-ai="${i}" role="button" tabindex="0" aria-label="Empty ability slot ${i + 1}"><span class="k">${i + 1}</span></div>`;
     const A = ABILITIES[a.key];
@@ -3153,11 +3219,15 @@ $('#relicRow').addEventListener('mouseover', e => { const r = e.target.closest('
 $('#info').addEventListener('click', e => { const b = e.target.closest('#btnRelicSell'); if (b) sellRelic(b.dataset.r); });
 $('#btnSavePause').onclick = () => { togglePause(false); saveAndQuit(); };
 $('#btnShopMenu').onclick = e => { e.currentTarget.blur(); togglePause(true); };
-$('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () => { togglePause(false); gameOver(false, true); };
+$('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e => {
+  const b = e.currentTarget;
+  if (b.dataset.armed !== '1'){ b.dataset.armed = '1'; b.textContent = 'Really give up?'; b.classList.add('warn'); setTimeout(() => { b.dataset.armed = ''; b.textContent = 'Give up'; b.classList.remove('warn'); }, 3000); return; }
+  b.dataset.armed = ''; b.textContent = 'Give up'; b.classList.remove('warn'); togglePause(false); gameOver(false, true);
+};
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.12.0'; // major.minor.patch
+const VERSION = '0.13.0'; // major.minor.patch
 const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3591,6 +3661,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.13.0', 'Smoother and fairer', ['Every screen now shows the same amount of battlefield. Very wide screens get dark edges instead of a wider view', 'Interface size setting, picked automatically from your screen height', 'Graphics quality (High, Medium, Low), Reduce flashing and Show FPS in Settings. If the game runs slowly it offers to switch to Low', 'The shop fits short screens: the Start wave row stays visible, and the shop no longer stretches on ultrawide screens', 'Faster drawing of the ground and faster hit checks in crowded waves', 'Raven Banner now opens a 9th slot behind the hero at any level', 'Give up asks for confirmation']],
   ['0.12.0', 'The Wandering Merchant', ['Shop events from wave 3: now and then a visitor waits at the campfire', 'The Wandering Merchant sells relics, items that twist a rule for the rest of the raid. Carry up to 3 and sell them back for half', '12 relics, such as Iron Oath, Ember Boots, Twin Souls and Raven Banner', 'A Blood Shrine trades health for gold. A Cursed Altar makes the next wave harder and pays with a free relic', "Sleipnir's Stride no longer appears once every dash slot is unlocked", 'A mute button in Settings, and M mutes or unmutes anywhere']],
   ['0.11.0', 'Sound and feel', ['Music and sound effects, all made in the game: war drums in battle, a campfire tune in the shop, a roar for every boss', 'Settings menu on the title screen and in the pause menu: volume, screen shake, damage numbers and tooltips', 'Big hits freeze the action for a moment, boss attacks flash the screen, and a boss dies in slow motion', 'Merging units bursts with light', 'The pause menu also opens in the shop: press Esc or P, or click Menu. It has Save and quit there too']],
   ['0.10.0', 'How to play', ['A short guided tutorial on the main menu: How to play', 'The synergies panel shows progress pips. Hover or click a synergy to see each step, which one is active and which units count', 'Unit descriptions say which synergies the unit counts toward']],
@@ -3790,6 +3861,7 @@ for (const k in RELIC_ART){ const c = makeSprite(RELIC_ART[k][0], RELIC_ART[k][1
 const hasR = k => !!(S && S.relics && S.relics.includes(k));
 const relicSell = k => Math.floor(RELICS[k].price / 2);
 function relicsChanged(){
+  if (!hasR('raven_banner') && S.board[8]){ const f = S.bench.indexOf(null); if (f >= 0){ S.bench[f] = S.board[8]; S.board[8] = null; } }
   const h = S.hero, ratio = h.hp / h.maxHp; computeTraits(); h.maxHp = heroMaxHp(); h.hp = Math.max(1, Math.min(h.maxHp, Math.round(h.maxHp * ratio)));
 }
 function gainRelic(k){ if (!S.relics) S.relics = []; if (S.relics.length >= MAX_RELICS || S.relics.includes(k)) return false; S.relics.push(k); relicsChanged(); return true; }
@@ -3882,10 +3954,6 @@ function buildNpc(k){
 const NPC = {}, NPC_ICON = {};
 for (const k of ['merchant', 'shrine', 'altar']){ NPC[k] = buildNpc(k); const c = document.createElement('canvas'), z = 3; c.width = NPC[k].width * z; c.height = NPC[k].height * z; const g = c.getContext('2d'); g.imageSmoothingEnabled = false; g.drawImage(NPC[k], 0, 0, c.width, c.height); NPC_ICON[k] = c.toDataURL(); }
 
-/* ================= SETTINGS ================= */
-const SET_KEY = 'valhalla.settings';
-const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
-function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(settings)); } catch (e) {} }
 
 /* ================= SOUND: everything is synthesised with Web Audio, no files ================= */
 const AU = { ctx: null, master: null, music: null, sfx: null, noise: null, last: {}, voices: 0, track: null, next: 0, beat: 0, drone: null, mel: 4 };
@@ -4042,7 +4110,7 @@ const r2 = (a, b) => a + Math.random() * (b - a);
 /* ================= GAME FEEL ================= */
 let hitStop = 0, slowMo = 0, flashA = 0, flashCol = '255,255,255', kickX = 0, kickY = 0, lastStop = 0;
 function stopFor(sec){ const n = performance.now(); if (n - lastStop < 250) return; lastStop = n; hitStop = Math.max(hitStop, sec); }
-function flash(col, a){ flashCol = col; flashA = Math.max(flashA, a); }
+function flash(col, a){ if (settings.calm) return; flashCol = col; flashA = Math.max(flashA, a); }
 function kick(dx, dy, k){ if (!settings.shake) return; const d = Math.hypot(dx, dy) || 1; kickX += dx / d * k; kickY += dy / d * k; }
 // warnings for boss attacks: listen for new telegraphs, chains, lunges and thrown things
 let watch = { tele: 0, chains: 0, lunges: 0, axes: 0, boulders: 0, bstate: '' };
@@ -4207,6 +4275,7 @@ function syncSettings(){
   const tog = (id, on) => { const b = $('#' + id); b.textContent = on ? 'On' : 'Off'; b.setAttribute('aria-pressed', String(on)); };
   const mb = $('#setMute'); mb.textContent = settings.muted ? 'Muted' : 'Sound on'; mb.setAttribute('aria-pressed', String(settings.muted)); mb.classList.toggle('muted', settings.muted);
   for (const id of ['setMaster', 'setMusic', 'setSfx']) $('#' + id).disabled = settings.muted;
+  $('#setUi').value = String(settings.ui); $('#setQ').value = settings.quality; tog('setCalm', settings.calm); tog('setFps', settings.fps);
   tog('setShake', settings.shake); tog('setDmg', settings.dmgNum); tog('setTips', showTips);
 }
 function openSettings(){ syncSettings(); $('#settings').hidden = false; $('#setBack').focus(); }
@@ -4217,6 +4286,13 @@ for (const [k, id, demo] of [['master', 'setMaster', 'coin'], ['music', 'setMusi
 }
 function toggleMute(){ settings.muted = !settings.muted; saveSettings(); auVolumes(); if (!$('#settings').hidden) syncSettings(); toast(settings.muted ? 'Sound muted · press M to unmute' : 'Sound on'); }
 $('#setMute').onclick = toggleMute;
+$('#setUi').onchange = e => { settings.ui = e.target.value; saveSettings(); applyUi(); shopTopAt = 0; };
+$('#setQ').onchange = e => { settings.quality = e.target.value; saveSettings(); groundKey = ''; };
+$('#setCalm').onclick = () => { settings.calm = !settings.calm; saveSettings(); syncSettings(); };
+$('#setFps').onclick = () => { settings.fps = !settings.fps; saveSettings(); syncSettings(); $('#fps').hidden = !settings.fps; };
+$('#perfYes').onclick = () => { settings.quality = 'low'; saveSettings(); groundKey = ''; $('#perfTip').hidden = true; toast('Graphics set to Low. Change it any time in Settings'); };
+$('#perfNo').onclick = () => { $('#perfTip').hidden = true; };
+$('#fps').hidden = !settings.fps;
 $('#setShake').onclick = () => { settings.shake = !settings.shake; saveSettings(); syncSettings(); };
 $('#setDmg').onclick = () => { settings.dmgNum = !settings.dmgNum; saveSettings(); syncSettings(); };
 $('#setTips').onclick = () => { toggleTips(); syncSettings(); };
@@ -4296,6 +4372,18 @@ function botMeta(dt){
 $('#dbg').addEventListener('click', e => { const b = e.target.closest('button[data-ev]'); if (!b || !S) return; if (mode !== 'shop') return toast('Open the shop first'); S.event = makeEvent(b.dataset.ev); renderShop(); });
 $('#dbgBot').addEventListener('change', e => { setBot(e.target.checked); toast(dbg.bot ? 'Autoplay on' : 'Autoplay off'); });
 
+// frame-rate counter, and a one-time suggestion to lower the graphics when combat stays slow
+const perf = { acc: 0, n: 0, fps: 60, slow: 0, asked: false };
+function perfWatch(dt){
+  perf.acc += dt; perf.n++;
+  if (perf.acc < .5) return;
+  perf.fps = Math.round(perf.n / perf.acc); perf.acc = 0; perf.n = 0;
+  if (settings.fps){ const f = $('#fps'); f.hidden = false; f.textContent = perf.fps + ' FPS'; }
+  if (mode === 'combat' && !paused && !document.hidden && settings.quality !== 'low' && !perf.asked){
+    perf.slow = perf.fps < 40 ? perf.slow + .5 : Math.max(0, perf.slow - 1);
+    if (perf.slow >= 8){ perf.asked = true; $('#perfTip').hidden = false; }
+  }
+}
 function frame(now){
   const dt = Math.max(0, Math.min(.05, (now - last) / 1000)); last = now;
   let ts = dbg.speed;
@@ -4304,6 +4392,7 @@ function frame(now){
   if (mode === 'combat' && !paused && !picking){ acc += dt * ts; let n = 0; const lim = 4 * Math.ceil(dbg.speed); while (acc >= STEP && n < lim){ if (dbg.bot) botCombat(STEP); update(STEP); watchFx(); acc -= STEP; n++; if (mode !== 'combat') break; } if (n >= lim) acc = 0; }
   if (dbg.bot && mode !== 'combat') botMeta(dt);
   if (tut) tutTick(false);
+  perfWatch(dt);
   dbgTick(dt);
   render(mode === 'combat' && paused ? 0 : dt);
   updateTips();
