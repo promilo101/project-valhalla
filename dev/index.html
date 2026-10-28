@@ -4317,7 +4317,7 @@ function setMusic(name){
   const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.connect(g);
   const osc = (f, type, det) => { const o = c.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = det || 0; o.connect(lp); o.start(); nodes.push(o); };
   if (name === 'battle'){ lp.frequency.value = 260; osc(NOTE.D2, 'sawtooth', -6); osc(NOTE.D2 * 1.5, 'sawtooth', 5); g.gain.setTargetAtTime(.09, t, 1); }
-  else if (name === 'camp'){ lp.frequency.value = 420; osc(NOTE.D3, 'sine'); osc(NOTE.A3, 'sine'); g.gain.setTargetAtTime(.018, t, 1.5); }
+  else if (name === 'camp'){ /* no constant drone at the campfire: it hums on small speakers */ }
   else { // the title wind: filtered noise that slowly sweeps
     lp.frequency.value = 900; const src = c.createBufferSource(); src.buffer = AU.noise; src.loop = true; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2; bp.frequency.value = 500;
     const lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = .07; lg.gain.value = 300; lfo.connect(lg); lg.connect(bp.frequency); lfo.start(); nodes.push(lfo);
@@ -4344,6 +4344,7 @@ function musicStep(t, b, intense, step){
     if (bar % 2 === 1 && (s8 === 0 || s8 === 3 || s8 === 6) && Math.random() < .85) mel(step * 2.6, .045, 'triangle', 1300);
   } else if (AU.track === 'camp'){
     const chord = [[NOTE.D3, NOTE.F3, NOTE.A3, NOTE.D4], [NOTE.C4 / 2, NOTE.G3, NOTE.C4, NOTE.G4 / 2 * 2], [NOTE.F3, NOTE.A3, NOTE.C4, NOTE.F4], [NOTE.A3 / 2 * 2, NOTE.D4, NOTE.F4, NOTE.A4]][bar % 4];
+    if (s8 === 0) tone(chord[0] / 2, step * 7.5, Object.assign({ type: 'sine', vol: .022, a: step * 2.5 }, m)); // a soft swell on each chord
     if (Math.random() < .7) tone(chord[s8 % 4], step * 3, Object.assign({ type: 'sine', vol: .045, lp: 1800, a: .01 }, m));
     if (Math.random() < .14) noise(r2(.02, .05), Object.assign({ f: r2(900, 2200), ft: 'bandpass', q: 3, vol: .016 }, m));
   } else {
