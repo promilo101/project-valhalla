@@ -306,6 +306,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .tut-spot.follow{transition:width .45s,height .45s,border-radius .45s}
 @keyframes tutPulse{50%{outline-color:rgba(226,178,76,.3);outline-offset:7px}}
 .tut-card{position:absolute;left:50%;top:50%;width:min(370px,calc(100% - 24px));pointer-events:auto;background:var(--panel);border:1px solid var(--gold);border-radius:3px;padding:12px 14px;display:grid;gap:8px;box-shadow:0 12px 32px rgba(0,0,0,.55);transition:left .45s cubic-bezier(.2,.8,.2,1),top .45s cubic-bezier(.2,.8,.2,1)}
+.tut-card.wide{width:min(640px,calc(100% - 24px))}
 .tut-k{color:var(--muted);font-size:15px;letter-spacing:.12em;text-transform:uppercase}
 .tut-card h3{margin:0;font-family:var(--font-display);font-weight:600;font-size:24px;color:var(--gold);text-wrap:balance}
 .tut-card p{margin:0;font-size:19px;line-height:1.25;color:var(--fg)}
@@ -357,8 +358,15 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #dbg .stats{font-variant-numeric:tabular-nums;color:var(--muted);white-space:pre;font-size:16px}
 #dbg kbd{font-size:14px}
 #pause .box{display:grid;gap:12px;justify-items:center;text-align:center}
-#pause .best{width:min(760px,calc(100% - 24px));max-height:calc(100% - 24px);justify-items:stretch;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:14px 16px;grid-template-rows:auto minmax(0,1fr)}
+#pause .best{width:min(820px,calc(100% - 24px));height:min(860px,calc(100% - 24px));grid-template-rows:auto auto minmax(0,1fr)!important;justify-items:stretch;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:14px 16px;grid-template-rows:auto minmax(0,1fr)}
 .best-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.fg-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.fg-tab{background:none;border:1px solid transparent;border-bottom:0;padding:6px 14px 5px;font-size:20px;color:var(--muted);border-radius:2px 2px 0 0;margin-bottom:-1px}
+.fg-tab small{font-size:15px;color:var(--muted)}
+.fg-tab:hover{color:var(--fg)}
+.fg-tab[aria-selected="true"]{color:var(--gold);background:var(--bg);border-color:var(--line)}
+.fg-tab:focus-visible{outline:2px solid var(--frost);outline-offset:-2px}
+.best-scroll:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
 .best-head h2{margin:0}
 .best-scroll{overflow:auto;display:grid;gap:10px;padding-right:4px;align-content:start}
 .best-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px}
@@ -371,6 +379,15 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .bst p b{color:var(--ember);font-weight:400}
 .best-sub{margin:6px 0 0;font-size:22px;font-weight:400;color:var(--gold)}
 .best-intro{margin:0;text-align:left}
+.best-sub small{font-size:16px;color:var(--muted)}
+.best-relics{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.brl{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--line);border-radius:2px;padding:8px 10px}
+.brl img{width:36px;height:36px;image-rendering:pixelated;image-rendering:crisp-edges}
+.brl.locked img{filter:brightness(0) invert(.32);opacity:.8}
+.brl h4{margin:0;font-size:20px;font-weight:400;color:var(--gold)}
+.brl.locked h4{color:var(--muted)}
+.brl p{margin:0;font-size:16px;line-height:1.2;color:#c3c8d4}
+.brl.locked p{font-style:italic;color:var(--muted)}
 #feedback{z-index:5;background:rgba(7,8,12,.94)}
 #settings{z-index:8;background:rgba(7,8,12,.985)}
 .set-grid{display:grid;grid-template-columns:auto minmax(0,1fr) 3.2ch;gap:8px 16px;align-items:center;font-size:20px;margin:8px 0 4px}
@@ -535,7 +552,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.13.0</span><span id="devTag" hidden> · DEV build</span> · Norse dark fantasy</div>
+      <div class="eyebrow">Prototype <span id="verTxt">0.14.0</span><span id="devTag" hidden> · DEV build</span> · Norse dark fantasy</div>
       <h1>Project <span>Valhalla</span></h1>
       <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
       <div class="row">
@@ -544,6 +561,7 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="btn tut-btn" id="btnTut" type="button">How to play<span class="dot" id="tutDot" hidden></span></button>
         <button class="btn" id="btnMeta" type="button">Rune Forge · <span class="runes" id="tRunes">0</span> runes</button>
         <button class="btn" id="btnLb" type="button">Leaderboard</button>
+        <button class="btn" id="btnGuide" type="button">Field Guide</button>
         <button class="btn" id="btnSettings" type="button">Settings</button>
         <button class="btn" id="btnFbTitle" type="button">Send feedback</button>
       </div>
@@ -668,15 +686,23 @@ a.btn{text-decoration:none;display:inline-block}
       <h2>Paused</h2>
       <p class="note">Press <kbd>P</kbd> or <kbd>Esc</kbd> to resume</p>
       <dl class="pu-list" id="puList"></dl>
-      <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnBest" type="button">Bestiary</button><button class="btn" id="btnSetPause" type="button">Settings</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnSavePause" type="button" hidden>Save and quit</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
+      <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnBest" type="button">Field Guide</button><button class="btn" id="btnSetPause" type="button">Settings</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnSavePause" type="button" hidden>Save and quit</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
     </div>
     <div class="box best" id="bestiary" hidden aria-labelledby="bestTitle">
-      <div class="best-head"><h2 id="bestTitle">Bestiary</h2><button class="btn sm" id="btnBestBack" type="button">Back</button></div>
-      <div class="best-scroll">
+      <div class="best-head"><h2 id="bestTitle">Field Guide</h2><button class="btn sm" id="btnBestBack" type="button">Back</button></div>
+      <div class="fg-tabs" role="tablist" aria-label="Field Guide sections">
+        <button class="fg-tab" role="tab" type="button" id="fgTabBeasts" data-tab="beasts" aria-controls="fgBeasts" aria-selected="true">Beasts</button>
+        <button class="fg-tab" role="tab" type="button" id="fgTabRelics" data-tab="relics" aria-controls="fgRelics" aria-selected="false" tabindex="-1">Relics <small id="bestRelicN"></small></button>
+      </div>
+      <div class="best-scroll" id="fgBeasts" role="tabpanel" aria-labelledby="fgTabBeasts" tabindex="0">
         <div class="best-grid" id="bestList"></div>
         <h3 class="best-sub">Elite traits</h3>
         <p class="note best-intro">Elites have a coloured aura and a health bar. They are tougher and drop more souls and 1 gold. Each one has one trait:</p>
         <div class="best-grid" id="bestElite"></div>
+      </div>
+      <div class="best-scroll" id="fgRelics" role="tabpanel" aria-labelledby="fgTabRelics" tabindex="0" hidden>
+        <p class="note best-intro">Relics are sold by the Wandering Merchant and granted by the Cursed Altar. Each one appears here the first time you find it. Until then you only get a hint.</p>
+        <div class="best-grid best-relics" id="bestRelics"></div>
       </div>
     </div>
   </div>
@@ -759,8 +785,8 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="r"><button type="button" id="dbgKill">Kill all enemies</button><button type="button" id="dbgKillBoss">Kill boss</button><button type="button" id="dbgShopCd">Reset shop cooldown</button></div>
     </fieldset>
     <fieldset><legend>Spawn</legend>
-      <div class="r"><select id="dbgBoss" aria-label="Boss"><option value="jarl:A">Jarl, Barrow King (A)</option><option value="jarl:B">Jarl, Mound-Dweller (B)</option><option value="giant:A">Giant, Rime-Jötunn (A)</option><option value="giant:B">Giant, Hrímþurs (B)</option><option value="herald:A">Herald, Half-Faced (A)</option><option value="herald:B">Herald, Hel's Valkyrie (B)</option><option value="fenrir:B">Fenrir, World-Eater</option><option value="fenrir:A">Fenrir, Gleipnir-Bound</option></select><button type="button" id="dbgSpawnBoss">Spawn boss</button></div>
-      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Seiðkona</option><option value="wight">Barrow Wight</option><option value="wisp">Soul Wisp</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
+      <div class="r"><select id="dbgBoss" aria-label="Boss"><option value="jarl:A">Draugr King, Grave Lord (A)</option><option value="jarl:B">Draugr King, Mound-Dweller (B)</option><option value="giant:A">Giant, Glacier Lord (A)</option><option value="giant:B">Giant, Frostbeard (B)</option><option value="herald:A">Herald, Half-Faced (A)</option><option value="herald:B">Herald, Hel's Valkyrie (B)</option><option value="fenrir:B">Fenrir, World-Eater</option><option value="fenrir:A">Fenrir, the Chained</option></select><button type="button" id="dbgSpawnBoss">Spawn boss</button></div>
+      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Witch</option><option value="wight">Barrow Wight</option><option value="wisp">Soul Wisp</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
       <div class="r"><select id="dbgPu" aria-label="Power-up"></select><button type="button" id="dbgSpawnPu">Spawn power-up</button></div>
     </fieldset>
     <fieldset><legend>Economy and units</legend>
@@ -799,7 +825,7 @@ function weighted(o){ let t = 0; for (const k in o) t += o[k]; let r = Math.rand
 
 /* ================= META (persists between runs) ================= */
 const META_KEY = 'valhalla.meta.v1';
-const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, dash: 0, best: 0, runs: 0, wins: 0, bestEndless: 0 };
+const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, mana: 0, hp: 0, gold: 0, dash: 0, best: 0, runs: 0, wins: 0, bestEndless: 0, relicsSeen: [] };
 try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.parse(s)); } catch (e) {}
 /* ================= SETTINGS ================= */
 const SET_KEY = 'valhalla.settings';
@@ -819,7 +845,7 @@ const UPGRADES = [
   { k: 'mana',    name: 'Mana',            max: 5, d: l => `+${l*10}% mana, abilities fire more often` },
   { k: 'hp',      name: 'Vitality',        max: 5, d: l => `+${l*15} max health for the hero` },
   { k: 'gold',    name: 'War Chest',       max: 3, d: l => `+${l} gold at the start of a raid` },
-  { k: 'dash',    name: "Sleipnir's Hooves", max: 2, cost: l => [40, 80][l], d: l => `Up to ${3 + l} dash slots can be unlocked in a raid` },
+  { k: 'dash',    name: "Extra Dash Slots", max: 2, cost: l => [40, 80][l], d: l => `Up to ${3 + l} dash slots can be unlocked in a raid` },
 ];
 const upCost = l => 4 + l * 4;
 const costOf = (u, l) => u.cost ? u.cost(l) : upCost(l);
@@ -830,8 +856,8 @@ const dashCap = () => 3 + (meta.dash || 0); // dash slots the hero can unlock th
 const CLASSES = {
   warrior: { name: 'Warrior', dtype: 'phys',  range: 95,  atk: 12, as: .95,  rangeTxt: 'short',  ability: 'Berserker Leap', abDesc: 'leaps into the biggest group of enemies and lands with a quake that stuns and knocks them back. Attacks throw an axe that cuts through enemies and flies back' },
   archer:  { name: 'Archer',  dtype: 'phys',  range: 150, atk: 8,  as: 1.35, rangeTxt: 'long',   ability: 'Arrow Rain',    abDesc: 'fires seven piercing arrows in a fan' },
-  mage:    { name: 'Mage',    dtype: 'magic', range: 125, atk: 11, as: 0.75, rangeTxt: 'medium', ability: "Muspel's Fire", abDesc: 'hurls a huge crimson fireball that explodes and burns' },
-  priest:  { name: 'Priest',  dtype: 'magic', range: 115, atk: 6,  as: 0.9,  rangeTxt: 'medium', ability: "Eir's Light",   abDesc: 'heals the hero and sends out a holy wave' },
+  mage:    { name: 'Mage',    dtype: 'magic', range: 125, atk: 11, as: 0.75, rangeTxt: 'medium', ability: "Great Fireball", abDesc: 'hurls a huge crimson fireball that explodes and burns' },
+  priest:  { name: 'Priest',  dtype: 'magic', range: 115, atk: 6,  as: 0.9,  rangeTxt: 'medium', ability: "Healing Light",   abDesc: 'heals the hero and sends out a holy wave' },
 };
 const CLS_ORDER = ['warrior', 'archer', 'mage', 'priest'];
 const MODS = {
@@ -877,9 +903,9 @@ const POWERUPS = {
   mead:  { name: 'Mead Horn',      col: '#7dc46a', short: 'Heal 35%',           desc: 'Heals 35% of the hero’s health' },
   fury:  { name: 'Rune of Fury',   col: '#ff5b2e', short: '+60% attack speed', desc: '+60% attack speed for 10 seconds' },
   thor:  { name: "Thor's Wrath",   col: '#f4e04d', short: 'Strike nearby foes', desc: 'Lightning strikes every enemy nearby' },
-  raven: { name: "Huginn's Call",  col: '#b98cff', short: 'Pull in all souls',  desc: 'Pulls in every soul on the field' },
+  raven: { name: "Raven's Call",  col: '#b98cff', short: 'Pull in all souls',  desc: 'Pulls in every soul on the field' },
   hoard: { name: 'Dwarven Hoard',  col: '#e2b24c', short: 'Bonus gold',         desc: 'Grants gold right away' },
-  stride: { name: "Sleipnir's Stride", col: '#e6ebf5', short: '+1 dash slot',      desc: '+1 dash slot this raid (refills dashes when full)' },
+  stride: { name: "Swift Stride", col: '#e6ebf5', short: '+1 dash slot',      desc: '+1 dash slot this raid (refills dashes when full)' },
   frost: { name: 'Frost Rune',     col: '#a0f0ff', short: 'Freeze all foes',    desc: 'Freezes every enemy for 3 seconds' },
 };
 
@@ -888,8 +914,8 @@ const ENEMIES = {
   wolf:    { name: 'Wolf',            hp: 15,  spd: 52, dmg: 6,  r: 5, armor: 0,   ward: 25,  spr: 'wolf' },
   raven:   { name: 'Raven',           hp: 7,   spd: 64, dmg: 4,  r: 4, armor: 0,   ward: 0,   spr: 'raven', fly: true },
   armored: { name: 'Iron Draugr',     hp: 42,  spd: 22, dmg: 10, r: 6, armor: 140, ward: 10,  spr: 'armored' },
-  witch:   { name: 'Seiðkona',        hp: 20,  spd: 30, dmg: 7,  r: 5, armor: 10,  ward: 120, spr: 'witch', ranged: true },
-  jarl:    { name: 'The Draugr Jarl', hp: 650,  spd: 24, dmg: 14, r: 11, armor: 40, ward: 30,  spr: 'jarlA0',   boss: 'jarl',   scale: 1 },
+  witch:   { name: 'Witch',        hp: 20,  spd: 30, dmg: 7,  r: 5, armor: 10,  ward: 120, spr: 'witch', ranged: true },
+  jarl:    { name: 'The Draugr King', hp: 650,  spd: 24, dmg: 14, r: 11, armor: 40, ward: 30,  spr: 'jarlA0',   boss: 'jarl',   scale: 1 },
   giant:   { name: 'The Frost Giant', hp: 2800, spd: 15, dmg: 22, r: 20, armor: 70, ward: 50,  spr: 'giantA0',  boss: 'giant',  scale: 2 },
   herald:  { name: 'Herald of Hel',   hp: 4600, spd: 26, dmg: 16, r: 11, armor: 30, ward: 70, spr: 'heraldA0', boss: 'herald', scale: 1 },
   wight:   { name: 'Barrow Wight',    hp: 150, spd: 30, dmg: 9,  r: 6, armor: 20, ward: 20, spr: 'wight', fly: true },
@@ -900,11 +926,11 @@ const WAVES = [
   { name: 'The Barrows Wake', d: 'The first draugr claw their way out of the earth.', mix: { draugr: 1 } },
   { name: 'Hour of the Wolf', d: 'Wolves circle you, then pounce. Watch for the crouch.', mix: { wolf: 3, draugr: 1 } },
   { name: 'Shadow of the Ravens', d: "Odin's ravens have turned against you. They mark a line, then dive.", mix: { draugr: 2, raven: 2 } },
-  { name: 'Seiðr in the Mist', d: 'Seiðkonur throw bolts and curse the ground beneath you.', mix: { draugr: 3, witch: 1 } },
-  { name: 'The Draugr Jarl', d: 'Mini-boss. He raises his dead, hurls his axe, and hides in his barrow when wounded.', mix: { draugr: 1 }, boss: 'jarl' },
+  { name: 'Witches in the Mist', d: 'Witches throw bolts and curse the ground beneath you.', mix: { draugr: 3, witch: 1 } },
+  { name: 'The Draugr King', d: 'Mini-boss. He raises his dead, hurls his axe, and hides in his barrow when wounded.', mix: { draugr: 1 }, boss: 'jarl' },
   { name: 'Raven Swarm', d: 'Many weak ravens. Hit many at once.', mix: { raven: 6, draugr: 1 }, rate: 1.7, hp: .8 },
   { name: 'The Iron Dead', d: 'Heavy armor. Magic damage works best. Step out of their hammer slams.', mix: { armored: 3, draugr: 2 } },
-  { name: 'The Witch Circle', d: 'Seiðkonur resist magic. Physical damage works best.', mix: { witch: 3, wolf: 2 } },
+  { name: 'The Witch Circle', d: 'Witches resist magic. Physical damage works best.', mix: { witch: 3, wolf: 2 } },
   { name: 'Blood Moon', d: 'Every enemy is faster tonight.', mix: { draugr: 2, wolf: 2, raven: 1, witch: 1 }, spd: 1.35 },
   { name: 'The Frost Giant', d: 'Mini-boss. Stay out of his stomps and boulders. When wounded, his breath freezes the ground.', mix: { wolf: 1, draugr: 1 }, boss: 'giant' },
   { name: 'Ice Wind', d: 'Wolves and ravens ride the storm.', mix: { wolf: 3, raven: 2, draugr: 2 }, spd: 1.15 },
@@ -913,20 +939,20 @@ const WAVES = [
   { name: 'Blood Moon II', d: 'The moon bleeds again. Everything is faster.', mix: { draugr: 2, wolf: 3, raven: 2, witch: 1 }, spd: 1.35, rate: 1.2 },
   { name: 'Herald of Hel', d: 'Mini-boss. Rings of orbs, and half the arena turns deadly. When wounded, she sends souls after you.', mix: { draugr: 1, witch: 1 }, boss: 'herald' },
   { name: 'The Wolf Pack', d: "Fenrir's offspring gather.", mix: { wolf: 6, draugr: 1 }, rate: 1.4 },
-  { name: 'The Iron Wall', d: 'Armor and seiðr side by side.', mix: { armored: 4, witch: 2 } },
+  { name: 'The Iron Wall', d: 'Armor and witchcraft side by side.', mix: { armored: 4, witch: 2 } },
   { name: 'Omens of Ragnarök', d: 'Everything Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2 }, rate: 1.6 },
   { name: 'The Last Night', d: 'More elites than ever.', mix: { draugr: 2, wolf: 2, armored: 2, witch: 2 }, rate: 1.4, elite: .2 },
-  { name: 'Fenrir', d: "Final boss. He charges when his eyes glow, snaps Gleipnir's chains and, when wounded, devours the sun.", mix: { wolf: 1 }, boss: 'fenrir' },
+  { name: 'Fenrir', d: "Final boss. He charges when his eyes glow, snaps his chains and, when wounded, devours the sun.", mix: { wolf: 1 }, boss: 'fenrir' },
 ];
 const WAVE_DUR = 40;
 const SHOP_CD = 120; // seconds of battle between shop visits in Endless mode
 const ENDLESS_WAVES = [
-  { name: 'Fimbulwinter', d: 'Three winters with no summer. Wolves and ravens ride the cold.', mix: { wolf: 3, raven: 2, draugr: 2 }, spd: 1.15 },
-  { name: "Naglfar's Crew", d: 'The ship of dead men\u2019s nails lands its crew.', mix: { draugr: 4, armored: 3 }, rate: 1.2 },
+  { name: 'The Endless Winter', d: 'Three winters with no summer. Wolves and ravens ride the cold.', mix: { wolf: 3, raven: 2, draugr: 2 }, spd: 1.15 },
+  { name: "Crew of the Ghost Ship", d: 'A ship of the dead lands its crew.', mix: { draugr: 4, armored: 3 }, rate: 1.2 },
   { name: 'The Wild Hunt', d: 'Fast hunters close in from every side.', mix: { wolf: 5, raven: 3 }, spd: 1.3 },
-  { name: "Hel's Tide", d: 'Seiðkonur behind a wall of iron.', mix: { witch: 3, armored: 3, draugr: 2 } },
-  { name: "Garm's Howl", d: 'The hound of Hel calls his pack. More elites.', mix: { wolf: 4, draugr: 2, armored: 1 }, elite: .12 },
-  { name: "Surtr's Embers", d: 'Everything burns and runs faster.', mix: { draugr: 3, wolf: 2, witch: 2, raven: 1 }, spd: 1.25, rate: 1.2 },
+  { name: "Hel's Tide", d: 'Witches behind a wall of iron.', mix: { witch: 3, armored: 3, draugr: 2 } },
+  { name: "The Hellhound's Howl", d: 'The hound of Hel calls his pack. More elites.', mix: { wolf: 4, draugr: 2, armored: 1 }, elite: .12 },
+  { name: "Embers of the Fire Giant", d: 'Everything burns and runs faster.', mix: { draugr: 3, wolf: 2, witch: 2, raven: 1 }, spd: 1.25, rate: 1.2 },
   { name: 'Night Without End', d: 'Every enemy Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2 }, rate: 1.4 },
   { name: 'Children of Loki', d: 'Witches and ravens swarm the field.', mix: { witch: 3, raven: 4 }, rate: 1.3 },
 ];
@@ -940,7 +966,7 @@ function waveDef(n){
   let w;
   if (k % 5 === 0){
     const b = ENDLESS_BOSSES[(k / 5 - 1) % ENDLESS_BOSSES.length];
-    w = { name: b === 'fenrir' ? 'Fenrir returns, Gleipnir-Bound' : `${ENEMIES[b].name} returns`, d: 'Boss. Stronger every time it comes back.', mix: { draugr: 2, wolf: 2, armored: 1, witch: 1 }, boss: b, endless: true };
+    w = { name: b === 'fenrir' ? 'Fenrir returns, the Chained' : `${ENEMIES[b].name} returns`, d: 'Boss. Stronger every time it comes back.', mix: { draugr: 2, wolf: 2, armored: 1, witch: 1 }, boss: b, endless: true };
   } else w = Object.assign({ endless: true }, ENDLESS_WAVES[(k - 1 - Math.floor(k / 5)) % ENDLESS_WAVES.length]);
   return endlessCache[n] = w;
 }
@@ -999,7 +1025,7 @@ function whiteOf(c){ const f = document.createElement('canvas'); f.width = c.wid
 const STAFF = (col, top) => [[9,2,col],[9,3,col],[9,4,col],[9,5,col],[9,6,col],[9,7,col],[9,8,col],[9,9,col],[9,10,col],[9,1,top],[8,1,top]];
 /* ---- Fenrir: two designs, built from shapes, then shaded and detailed pixel by pixel ---- */
 const FENRIR_DESIGNS = {
-  A: { name: 'Gleipnir-Bound', base: '#2e2c38', hi: '#4a4756', lo: '#1c1b23', ol: '#09080c' },
+  A: { name: 'The Chained', base: '#2e2c38', hi: '#4a4756', lo: '#1c1b23', ol: '#09080c' },
   B: { name: 'World-Eater',    base: '#251e34', hi: '#3d3354', lo: '#15101f', ol: '#07050b' },
 };
 function buildFenrirSprite(design, frame){
@@ -1121,8 +1147,8 @@ function fenrirFX(g, design, spr, ox, oy, sc, face, t){
 }
 /* ---- Mini-boss sprites: two designs per boss, built from layered shapes, then shaded and outlined ---- */
 const BOSS_DESIGNS = {
-  jarl:   { A: 'Barrow King', B: 'Mound-Dweller' },
-  giant:  { A: 'Rime-Jötunn', B: 'Hrímþurs' },
+  jarl:   { A: 'Grave Lord', B: 'Mound-Dweller' },
+  giant:  { A: 'Glacier Lord', B: 'Frostbeard' },
   herald: { A: 'Half-Faced',  B: "Hel's Valkyrie" },
 };
 // layers are drawn back to front; each layer is one material with base / highlight / shadow colours
@@ -1206,7 +1232,7 @@ function buildBossSprite(boss, design, frame){
       info.eyes = [[19, 7], [22, 7]]; info.glow = '#bfe9ff';
     });
   }
-  if (boss === 'giant' && design === 'A'){ // Rime-Jötunn: icy skin, icicle beard, glacier club raised
+  if (boss === 'giant' && design === 'A'){ // Glacier Lord: icy skin, icicle beard, glacier club raised
     return pxBuild(36, 40, [
       { m: ['#6a7d8c', '#8ea2b0', '#46545e'], draw: a => { a.poly([[10, 28], [16, 28], [16 + f, 39], [9.4 + f, 39]]); a.poly([[18, 28], [24, 28], [24.6 - f, 39], [18 - f, 39]]); } },
       { m: ['#55809f', '#7aa4c4', '#3a5a76'], draw: a => { a.poly([[4, 14.4], [8.6, 13.6], [8.4, 26], [4.4, 26.6]]); a.ell(6.2, 27.2, 2.8, 2.5); } },
@@ -1224,7 +1250,7 @@ function buildBossSprite(boss, design, frame){
       info.eyes = [[15, 8], [19, 8]]; info.glow = '#bfe9ff';
     });
   }
-  if (boss === 'giant'){ // Hrímþurs: ancient rock-and-ice giant with glowing cracks
+  if (boss === 'giant'){ // Frostbeard: ancient rock-and-ice giant with glowing cracks
     return pxBuild(36, 40, [
       { m: ['#4a505c', '#646c7a', '#30343c'], draw: a => { a.poly([[10, 29], [15.4, 29], [15.8 + f, 39], [9.4 + f, 39]]); a.poly([[20.4, 29], [26, 29], [26.6 - f, 39], [20 - f, 39]]); } },
       { m: ['#4c535f', '#6a7382', '#333842'], draw: a => { a.poly([[1.4, 15.4], [5.4, 14.6], [6, 25.6], [2, 26.4]]); a.ell(3.8, 28.2, 3.4, 3.2); a.poly([[30.6, 14.6], [34.6, 15.4], [34, 26.4], [30, 25.6]]); a.ell(32.2, 28.2, 3.4, 3.2); } },
@@ -1437,7 +1463,7 @@ function buildEnemySprite(type, fr){
       { m: ['#2c3a60', '#3c4f7c', '#1c2640'], edge: true, draw: a => W ? a.line(7.4, 9, 10.4, 10, 1.4) : a.line(7.4, 9, 11.4, 10.6, 1.4) },
       { m: ['#8a6a3a', '#b08a4a', '#5c4424'], draw: a => W ? a.ell(13.8, 1.6, 1.5, 1.5) : a.ell(12, 2.8, 1.5, 1.5) },
     ], (put, at, info) => {
-      put(9, 4, '#d6a2ff'); put(7, 4, '#9a78d6');                                        // seiðr-lit eyes
+      put(9, 4, '#d6a2ff'); put(7, 4, '#9a78d6');                                        // witch-lit eyes
       put(5, 12, '#e8e3d6'); put(6, 13, '#9a78d6'); put(8, 12, '#e8e3d6'); put(7, 13, '#9a78d6'); // bone charms and beads
       [[4, 16], [7, 16], [10, 16]].forEach(([x, y]) => put(x + R(sw), y, '#9a78d6'));      // runes on the hem
       if (W){ put(14, 1, '#ffffff'); put(13, 2, '#d6a2ff'); } else put(12, 2, '#d6a2ff');
@@ -1474,7 +1500,7 @@ function buildSprites(){
   SPR.jarl = H({ H:PAL.x, h:PAL.x, F:PAL.X, E:PAL.C, T:PAL.G, A:PAL.r, a:'#3a0f10' }, [[3,0,'G'],[4,0,'Y'],[5,0,'G'],[6,0,'Y'],[8,2,'S'],[9,2,'S'],[8,3,'S'],[8,4,'B'],[8,5,'B'],[8,6,'B']]);
   SPR.giant = H({ H:'#e3edf5', h:'#9db7cc', F:'#8fb8d4', E:PAL.C, T:'#e3edf5', A:'#3b5c80', a:'#26405d' });
   SPR.herald = H({ H:'#1b0f20', h:PAL.K, F:PAL.W, E:PAL.O, T:PAL.R, A:'#2a1530', a:PAL.K }, STAFF('#2a1530', PAL.O));
-  // wave 20 Fenrir is the World-Eater (B); in Endless he comes back Gleipnir-Bound (A)
+  // wave 20 Fenrir is the World-Eater (B); in Endless he comes back the Chained (A)
   SPR.fenrir = buildFenrirSprite('B', 0);
   SPR.fenrirB0 = SPR.fenrir; SPR.fenrirB1 = buildFenrirSprite('B', 1);
   SPR.fenrirA0 = buildFenrirSprite('A', 0); SPR.fenrirA1 = buildFenrirSprite('A', 1);
@@ -1555,6 +1581,7 @@ function applyRun(R){
   S.relics = (Array.isArray(R.relics) ? R.relics : []).filter((k, i, a) => RELICS[k] && a.indexOf(k) === i).slice(0, MAX_RELICS);
   const E = R.event; S.event = E && ['merchant', 'shrine', 'altar'].includes(E.type) ? (E.type === 'merchant' ? { type: 'merchant', offers: (E.offers || []).filter(k => RELICS[k]).slice(0, 3), bought: (E.bought || []).filter(k => RELICS[k]) } : { type: E.type, cost: num(E.cost, 1, 999, 20), gold: num(E.gold, 1, 99, 10), done: !!E.done }) : null;
   S.sinceEvent = num(R.sinceEvent, 0, 9, 0); S.altarPending = !!R.altarPending; S.resumed = true;
+  if (S.event && S.event.type === 'merchant') S.event.offers.forEach(k => { if (!relicSeen(k)){ if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = []; meta.relicsSeen.push(k); } }); (S.relics || []).forEach(k => { if (!relicSeen(k)){ if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = []; meta.relicsSeen.push(k); } });
   S.board = Array.from({ length: 9 }, (_, i) => mkU((R.board || [])[i]));
   S.bench = Array.from({ length: 8 }, (_, i) => mkU((R.bench || [])[i]));
   S.shop = Array.from({ length: 5 }, (_, i) => { const c = (R.shop || [])[i]; return c && CLASSES[c.cls] && MODS[c.mod] ? { cls: c.cls, mod: c.mod, locked: !!c.locked } : null; });
@@ -1767,7 +1794,7 @@ function spawnBoss(type, design){
   S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110); sfx('roar', type); flash('255,255,255', .25);
   if (type === 'fenrir'){
     const d = design || (dbg.fenrir !== 'auto' ? dbg.fenrir : S.wave > WAVES.length ? 'A' : 'B');
-    S.boss.design = d; S.boss.title = d === 'A' ? 'Fenrir, Gleipnir-Bound' : 'Fenrir, the World-Eater';
+    S.boss.design = d; S.boss.title = d === 'A' ? 'Fenrir, the Chained' : 'Fenrir, the World-Eater';
   } else if (BOSS_LOOK[type]){
     const b = S.boss, d = design || (S.wave > WAVES.length ? BOSS_LOOK[type].endless : BOSS_LOOK[type].main);
     b.design = d; b.spr = type + d + '0'; b.w = SPR[b.spr].width * b.sc; b.h = SPR[b.spr].height * b.sc;
@@ -1987,7 +2014,7 @@ function ability(u, t){
   } else if (u.cls === 'mage'){
     const a = Math.atan2(t.y - u.y, t.x - u.x);
     S.projs.push({ x: u.x, y: u.y - 4, vx: Math.cos(a) * 150, vy: Math.sin(a) * 150, dmg: st.dmg * 4, dtype: 'magic', u, kind: 'bigfire', r: 6, life: 1.6, aoe: 50, pierce: 0, hits: null, burn: true });
-    addText(u.x, u.y - 14, "Muspel's Fire", '#ff8a5c', true); sfx('fire');
+    addText(u.x, u.y - 14, "Great Fireball", '#ff8a5c', true); sfx('fire');
   } else {
     const h = S.hero;
     healHero(6 + 5 * u.star + h.maxHp * .06); sfx('heal');
@@ -2029,12 +2056,12 @@ function updateAxe(p, dt){
 }
 
 /* ================= FENRIR'S NEW ABILITIES ================= */
-// Gleipnir's Snap: chains whip out from Fenrir. A chain that catches the hero binds him and drags him in. Dashing breaks free.
+// Chain Snap: chains whip out from Fenrir. A chain that catches the hero binds him and drags him in. Dashing breaks free.
 function startChains(e, p2){
   const h = S.hero, n = p2 ? 7 : 5, a0 = Math.atan2(h.y - e.y, h.x - e.x);
   for (let k = 0; k < n; k++) S.chains.push({ e, x: e.x, y: e.y, a: a0 + k * Math.PI * 2 / n, len: 260, t: 0, wind: 1, hold: .45, snapped: false, dmg: e.dmg * 1.1 });
   e.state = 'cast'; e.st = 1.6;
-  addText(e.x, e.y - e.h / 2 - 8, "Gleipnir's Snap", '#b4bccb', true);
+  addText(e.x, e.y - e.h / 2 - 8, "Chain Snap", '#b4bccb', true);
 }
 // Devour the Sun: darkness falls, and shadow wolves lunge at the hero from the dark. Their eyes show where they come from.
 function startDevour(e){
@@ -2306,7 +2333,7 @@ function update(dt){
     }
   }
   S.tele = S.tele.filter(t => !t.done);
-  // ground hazards: seiðr curses and frozen trails slow the hero
+  // ground hazards: witch curses and frozen trails slow the hero
   if (hasR('ember_boots') && h.dashT > 0){ S.embT = (S.embT || 0) - dt; if (S.embT <= 0){ S.embT = .025; S.haz.push({ kind: 'ember', x: h.x, y: h.y + 5, r: 10, ry: 5, t: 0, arm: 0, life: 2.2, max: 2.2, tick: 0 }); } }
   for (const z of S.haz){
     z.t += dt; z.life -= dt;
@@ -2334,7 +2361,7 @@ function onDash(){
   if (hasR('gleipnir_link') && !S.gleipUsed){
     S.gleipUsed = true; const h = S.hero;
     for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, h.x, h.y) < 60 * 60) e.stun = Math.max(e.stun, e.d.boss ? .5 : 1.5);
-    S.rings.push({ x: h.x, y: h.y, r: 60, life: .4, max: .4, col: '#d6d8de' }); sfx('zap'); addText(h.x, h.y - 14, 'Gleipnir!', '#d6d8de', true);
+    S.rings.push({ x: h.x, y: h.y, r: 60, life: .4, max: .4, col: '#d6d8de' }); sfx('zap'); addText(h.x, h.y - 14, 'Bound!', '#d6d8de', true);
   }
 }
 function chase(e, dt, dx, dy, d, sp, wob){ e.x += (dx / d - dy / d * wob) * sp * dt; e.y += (dy / d + dx / d * wob) * sp * dt; }
@@ -2442,9 +2469,9 @@ function bossAI(e, dt, dx, dy, d, sp){
       else if (m === 'hurl'){ // Glacier Hurl: a boulder lands on a marked spot and shatters
         S.boulders.push({ sx: e.x + 12 * e.face, sy: e.y - e.h / 2, tx: h.x, ty: h.y, t: 0, dur: 1.3, r: 26, dmg: e.dmg * 1.3 });
         e.state = 'cast'; e.st = .6; e.atkT = 2.6; addText(e.x, e.y - e.h / 2 - 6, 'Glacier Hurl', '#bfe9ff', true);
-      } else { // Fimbulwinter Breath: a marked cone, then frost that slows and leaves ice behind
+      } else { // Frost Breath: a marked cone, then frost that slows and leaves ice behind
         S.breath = { e, ang: Math.atan2(dy, dx), half: .45, len: 160, t: 0, wind: 1.1, dur: .9, dmg: e.dmg * .8, hit: false };
-        e.state = 'cast'; e.st = 2.1; e.atkT = 3.2; addText(e.x, e.y - e.h / 2 - 6, 'Fimbulwinter Breath', '#bfe9ff', true);
+        e.state = 'cast'; e.st = 2.1; e.atkT = 3.2; addText(e.x, e.y - e.h / 2 - 6, 'Frost Breath', '#bfe9ff', true);
       }
     }
   } else if (e.d.boss === 'herald'){
@@ -2618,7 +2645,7 @@ function render(dt){
   ctx.globalAlpha = 1;
   st.cracks = st.cracks.filter(c => c.life > 0);
   if (dbg.hitbox && S) drawHitboxes();
-  // Gleipnir's chains: dashed warning first, then solid links when they snap
+  // Fenrir's chains: dashed warning first, then solid links when they snap
   for (const c of st.chains){
     const ex = Math.cos(c.a), ey = Math.sin(c.a);
     if (!c.snapped){
@@ -2989,7 +3016,7 @@ function setMode(m){
   $('#bossbar').hidden = true;
   renderAbilBar();
   $('#dock').hidden = m !== 'combat';
-  paused = false; $('#pause').hidden = true; // any screen change closes the pause menu
+  paused = false; $('#pause').hidden = true; guideFromTitle = false; $('#bestiary').hidden = true; $('#pause .box:not(.best)').hidden = false; // any screen change closes the pause menu
   if (m === 'title') renderTitle();
   if (m === 'meta') renderMeta();
 }
@@ -2998,7 +3025,7 @@ function openShop(){
   shopReadyAt = performance.now() + 800; S.rollN = 0; S.xpN = 0; S.healN = 0; S.selRelic = null;
   if (!S.relics) S.relics = [];
   if (S.resumed) S.resumed = false; // a continued raid keeps its saved event
-  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 3; setTimeout(() => toast("Naglfar's Chest: +3 gold"), 400); } }
+  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 3; setTimeout(() => toast("Ghost Ship Chest: +3 gold"), 400); } }
   setMode('shop'); $('#info').innerHTML = DEFAULT_INFO; renderShop(); }
 const DEFAULT_INFO = 'Click a card to buy it. Lock a card with its padlock to keep it through rerolls and into the next shop. Reroll, XP and healing get 50% more expensive each time you use them in the same shop. Health only refills by itself after a boss. Drag a unit onto a slot to move or swap it, or right-click to send it between bench and formation. Three of a kind combine into one more star.';
 let toastT = 0;
@@ -3206,7 +3233,7 @@ const BESTIARY = [
   ['draugr', 'Draugr', 1, 'The common dead. Slow but many.', '<b>Grave rise:</b> some claw up out of the ground near you. They can\'t move while rising.'],
   ['wolf', 'Wolf', 2, 'Fast and fragile. Hunts in packs.', '<b>Pounce:</b> circles you, then crouches behind a red line and leaps along it. Step sideways.'],
   ['raven', 'Raven', 3, 'Very fast flyer with little health.', '<b>Dive:</b> marks a dashed red line, then dives along it and past you.'],
-  ['witch', 'Seiðkona', 4, 'Keeps her distance and throws bolts. Resists magic.', '<b>Curse:</b> marks the ground under you. The patch slows you for a few seconds.'],
+  ['witch', 'Witch', 4, 'Keeps her distance and throws bolts. Resists magic.', '<b>Curse:</b> marks the ground under you. The patch slows you for a few seconds.'],
   ['armored', 'Iron Draugr', 7, 'Heavy armour. Magic damage works best.', '<b>Hammer slam:</b> raises the hammer and a circle marks where it lands. Leave the circle.'],
 ];
 const BEST_AFF = [['frozen', 'Frozen', 'Leaves a trail of ice that slows you.'], ['burning', 'Burning', 'Explodes a moment after it dies. Leave the ring.'], ['warded', 'Warded', 'A rune shield soaks up damage first. Hits on it show in purple.'], ['swift', 'Swift', 'Moves about 45% faster and leaves an afterimage.']];
@@ -3242,11 +3269,54 @@ function drawBestiary(ts){
   }
   bestRaf = $('#bestiary').hidden ? 0 : requestAnimationFrame(drawBestiary);
 }
-function showBestiary(on){
-  $('#bestiary').hidden = !on; $('#pause .box:not(.best)').hidden = on;
-  if (on){ buildBestiary(); if (!bestRaf) bestRaf = requestAnimationFrame(drawBestiary); $('#btnBestBack').focus(); } else $('#btnBest').focus();
+const RELIC_HINT = {
+  iron_oath: 'An oath sworn on cold metal.', ember_boots: 'Footprints that keep on burning.', odins_eye: 'The All-Father gave an eye for wisdom.',
+  draugr_pact: 'Power, paid for with your own life.', huginn_feather: 'Thought flies ahead of you.', twin_souls: 'Two souls in one body.',
+  gleipnir_link: 'A link from the chain that bound Fenrir.', usurer_coin: 'Gold that breeds more gold.', mead_hall: 'A horn that never runs dry.',
+  berserk_mark: 'Rage grows as the blood runs.', raven_banner: 'A banner that calls one more to war.', naglfar_chest: 'A chest from a ship of the dead.',
+};
+const relicSeen = k => Array.isArray(meta.relicsSeen) && meta.relicsSeen.includes(k);
+function discoverRelic(k){
+  if (!RELICS[k] || relicSeen(k) || (S && S.tutorial)) return;
+  if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = [];
+  meta.relicsSeen.push(k); saveMeta();
+  setTimeout(() => toast(`New relic found: ${RELICS[k].name}. It's in the Field Guide now`), 600);
 }
-$('#btnBest').onclick = () => showBestiary(true);
+function renderBestRelics(){
+  const keys = Object.keys(RELICS), n = keys.filter(relicSeen).length;
+  $('#bestRelicN').textContent = `${n}/${keys.length}`;
+  $('#bestRelics').innerHTML = keys.map(k => relicSeen(k)
+    ? `<div class="brl"><img src="${RELIC_ICON[k]}" alt=""><div><h4>${RELICS[k].name}</h4><p>${RELICS[k].desc}</p></div></div>`
+    : `<div class="brl locked"><img src="${RELIC_ICON[k]}" alt=""><div><h4>Undiscovered relic</h4><p>${RELIC_HINT[k]}</p></div></div>`).join('');
+}
+let guideFromTitle = false;
+function openGuideFromTitle(){ guideFromTitle = true; $('#pause').hidden = false; $('#pause').classList.add('over-shop'); showBestiary(true); fgShow(fgTab); }
+function showBestiary(on){
+  if (!on && guideFromTitle){ guideFromTitle = false; $('#bestiary').hidden = true; $('#pause .box:not(.best)').hidden = false; $('#pause').hidden = true; $('#btnGuide').focus(); return; }
+  $('#bestiary').hidden = !on; $('#pause .box:not(.best)').hidden = on;
+  if (on){ buildBestiary(); renderBestRelics(); if (!bestRaf) bestRaf = requestAnimationFrame(drawBestiary); $('#btnBestBack').focus(); } else $('#btnBest').focus();
+}
+// Field Guide tabs; add a button with data-tab and a panel to add a new section
+let fgTab = 'beasts';
+function fgFit(){
+  const box = $('#bestiary'); if (box.hidden) return;
+  const ui = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ui')) || 1, avail = $('#pause').getBoundingClientRect().height / ui;
+  box.style.height = Math.round(Math.min(860, avail - 24)) + 'px';
+}
+addEventListener('resize', fgFit);
+function fgShow(tab){
+  fgFit();
+  fgTab = tab;
+  document.querySelectorAll('.fg-tab').forEach(b => { const on = b.dataset.tab === tab; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; const p = document.getElementById(b.getAttribute('aria-controls')); if (p) p.hidden = !on; });
+}
+document.querySelector('.fg-tabs').addEventListener('click', e => { const b = e.target.closest('.fg-tab'); if (b){ fgShow(b.dataset.tab); b.focus(); } });
+document.querySelector('.fg-tabs').addEventListener('keydown', e => {
+  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+  const tabs = [...document.querySelectorAll('.fg-tab')], i = tabs.findIndex(b => b.dataset.tab === fgTab), n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+  e.preventDefault(); e.stopPropagation(); fgShow(n.dataset.tab); n.focus();
+});
+$('#btnBest').onclick = () => { showBestiary(true); fgShow(fgTab); };
+$('#btnGuide').onclick = openGuideFromTitle;
 $('#btnBestBack').onclick = () => showBestiary(false);
 $('#event').addEventListener('click', e => { const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
 $('#event').addEventListener('mouseover', e => { const r = e.target.closest('.relic-card'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, false); });
@@ -3263,7 +3333,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.13.0'; // major.minor.patch
+const VERSION = '0.14.0'; // major.minor.patch
 const BUILD = ''; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3341,7 +3411,7 @@ const ABILITIES = {
   bash: { name: 'Shield Bash', col: '#c89a3a', cd: [9, 8, 7],
     icon: ['..XXXXX..', '.XXwXXXX.', 'XXwXXXXXX', 'XXXXYXXXX', 'XXXYYYXXX', 'XXXXYXXXX', '.XXXXXXX.', '..XXXXX..', '.........'], ic: { X: '#8a5a34', Y: '#e2b24c', w: '#c89a6a' },
     desc: l => `Charge ${[70, 85, 100][l - 1]} paces toward the cursor, knocking back and stunning everything in the way.${l >= 3 ? ' Ends with a shockwave.' : ''}` },
-  spear: { name: 'Gungnir Throw', col: '#e6ebf5', cd: [10, 9, 8],
+  spear: { name: "Odin's Spear", col: '#e6ebf5', cd: [10, 9, 8],
     icon: ['......YYY', '.......YY', '......X.Y', '.....X...', '....X....', '...X.....', '..X......', '.X.......', 'X........'], ic: { X: '#8a5a34', Y: '#e6ebf5' },
     desc: l => `Hurl Odin's spear at the cursor. It pierces every enemy in a line.${l >= 3 ? ' Then it flies back to you.' : ''}` },
   quake: { name: 'Earthshaker', col: '#a07850', cd: [10, 9, 8],
@@ -3353,13 +3423,13 @@ const ABILITIES = {
   wall: { name: 'Shield Wall', col: '#86d4ff', cd: [18, 16, 14],
     icon: ['XXXXXXXXX', 'XwwwwwwwX', 'XwYYYYYwX', 'XwYwwwYwX', 'XwYwwwYwX', 'XwYYYYYwX', 'XwwwwwwwX', '.XwwwwwX.', '..XXXXX..'], ic: { X: '#3a5a76', w: '#86d4ff', Y: '#e6ebf5' },
     desc: l => `Block all damage for ${[2.5, 3, 3.5][l - 1]} seconds.${l >= 3 ? ' Enemy projectiles bounce back at them.' : ''}` },
-  ravens: { name: 'Huginn & Muninn', col: '#b98cff', cd: [16, 14, 12],
+  ravens: { name: "Odin's Ravens", col: '#b98cff', cd: [16, 14, 12],
     icon: ['X.....X..', 'XX...XX..', '.XXXXX...', '..XXXYw..', '...XX....', '.....X..X', '....XX.XX', '.....XXX.', '......XYw'], ic: { X: '#43435a', Y: '#d84a3a', w: '#ffffff' },
     desc: l => `${l >= 2 ? 'Three' : 'Two'} ravens circle you for 8 seconds, hitting enemies they touch.${l >= 3 ? ' They also gather souls.' : ''}` },
   horn: { name: 'Horn of Valhalla', col: '#7dc46a', cd: [30, 26, 22],
     icon: ['.......XX', '......XXw', '.....XXX.', '....XXX..', '..YXXX...', '.YYXX....', 'YYYX.....', 'YYY......', '.Y.......'], ic: { X: '#c89a6a', w: '#ecd2a8', Y: '#7dc46a' },
     desc: l => `Heal ${[30, 40, 50][l - 1]}% of your health over 4 seconds.${l >= 3 ? ' Also frees you from chill and binding chains.' : ''}` },
-  rage: { name: 'Berserkergang', col: '#d42a4a', cd: [20, 18, 16],
+  rage: { name: 'Berserker Rage', col: '#d42a4a', cd: [20, 18, 16],
     icon: ['XXXXXXXXX', 'X.......X', 'X.YY.YY.X', 'X.......X', 'X..XXX..X', 'X.XwwwX.X', 'X.......X', '.X.....X.', '..XXXXX..'], ic: { X: '#8e1232', Y: '#ff3a5a', w: '#e8e3d6' },
     desc: l => `For 6 seconds you move 30% faster and enemies you touch take damage.${l >= 3 ? ' Every kill during the rage refills a dash.' : ''}` },
 };
@@ -3697,17 +3767,18 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.14.0', 'The Field Guide', ['The Bestiary is now the Field Guide, with tabs for Beasts and Relics. Open it from the main menu or the pause menu', 'Each relic unlocks in the guide the first time the Merchant offers it or the Altar grants it. Until then you only get a hint', 'Relics cost more: 18 to 35 gold, so buying one is a real decision', 'The tutorial now shows the Wandering Merchant and the other campfire visitors', 'Simpler names: the Seiðkona is now the Witch, the Draugr Jarl is the Draugr King, and other Old Norse names became plain English, such as Odin\'s Spear, Great Fireball, Swift Stride and Ghost Ship Chest']],
   ['0.13.0', 'Smoother and fairer', ['Interface size setting, picked automatically from your screen height', 'Graphics quality (High, Medium, Low), Reduce flashing and Show FPS in Settings. If the game runs slowly it offers to switch to Low', 'The shop fits short screens: the Start wave row stays visible, and the shop no longer stretches on ultrawide screens', 'Faster drawing of the ground and faster hit checks in crowded waves', 'Raven Banner now opens a 9th slot behind the hero at any level', 'Give up asks for confirmation', 'Fixed: the shop no longer jumps up and down when you hover cards and units. Long descriptions scroll inside the info box', 'The game fills the whole screen. Everyone sees exactly the same 16:9 battlefield, and on wider screens the sides fill with mist that hides anything in it', 'On wide screens the ability and health bar moves into the mist at the side, and the shop uses the extra width']],
-  ['0.12.0', 'The Wandering Merchant', ['Shop events from wave 3: now and then a visitor waits at the campfire', 'The Wandering Merchant sells relics, items that twist a rule for the rest of the raid. Carry up to 3 and sell them back for half', '12 relics, such as Iron Oath, Ember Boots, Twin Souls and Raven Banner', 'A Blood Shrine trades health for gold. A Cursed Altar makes the next wave harder and pays with a free relic', "Sleipnir's Stride no longer appears once every dash slot is unlocked", 'A mute button in Settings, and M mutes or unmutes anywhere']],
+  ['0.12.0', 'The Wandering Merchant', ['Shop events from wave 3: now and then a visitor waits at the campfire', 'The Wandering Merchant sells relics, items that twist a rule for the rest of the raid. Carry up to 3 and sell them back for half', '12 relics, such as Iron Oath, Ember Boots, Twin Souls and Raven Banner', 'A Blood Shrine trades health for gold. A Cursed Altar makes the next wave harder and pays with a free relic', "Swift Stride no longer appears once every dash slot is unlocked", 'A mute button in Settings, and M mutes or unmutes anywhere']],
   ['0.11.0', 'Sound and feel', ['Music and sound effects, all made in the game: war drums in battle, a campfire tune in the shop, a roar for every boss', 'Settings menu on the title screen and in the pause menu: volume, screen shake, damage numbers and tooltips', 'Big hits freeze the action for a moment, boss attacks flash the screen, and a boss dies in slow motion', 'Merging units bursts with light', 'The pause menu also opens in the shop: press Esc or P, or click Menu. It has Save and quit there too']],
   ['0.10.0', 'How to play', ['A short guided tutorial on the main menu: How to play', 'The synergies panel shows progress pips. Hover or click a synergy to see each step, which one is active and which units count', 'Unit descriptions say which synergies the unit counts toward']],
-  ['0.9.0', 'The horde gets teeth', ['The game has its own tab icon', 'A Bestiary in the pause screen shows every enemy and elite trait', 'New looks for the draugr, wolves, ravens, Iron Draugr, Seiðkonur, Barrow Wights and Soul Wisps, with walk animations and their own deaths', 'Some draugr claw up out of the ground nearby', 'Wolves circle and pounce (from wave 2). Ravens mark a line and dive (wave 3)', 'Seiðkonur curse the ground under you (wave 4). Iron Draugr slam their hammers (wave 7)', 'Elites have a trait: Frozen leaves an icy trail, Burning explodes on death, Warded has a shield, Swift is fast']],
+  ['0.9.0', 'The horde gets teeth', ['The game has its own tab icon', 'A Bestiary in the pause screen shows every enemy and elite trait', 'New looks for the draugr, wolves, ravens, Iron Draugr, Witches, Barrow Wights and Soul Wisps, with walk animations and their own deaths', 'Some draugr claw up out of the ground nearby', 'Wolves circle and pounce (from wave 2). Ravens mark a line and dive (wave 3)', 'Witches curse the ground under you (wave 4). Iron Draugr slam their hammers (wave 7)', 'Elites have a trait: Frozen leaves an icy trail, Burning explodes on death, Warded has a shield, Swift is fast']],
   ['0.8.1', 'Small fixes', ['The Sort button explains how it sorts the bench']],
   ['0.8.0', 'Hero abilities and a new look', ['Hero abilities on 1, 2 and 3, aimed with the mouse. Pick 1 of 2 at the start of a raid and 1 of 3 after every boss', '8 Viking abilities with three levels each', 'Every card has its own look: 24 class and element sprites. Priests carry a gold sceptre', 'Rearrange your abilities in the shop', 'Health and dashes sit under the hero and the ability bar', 'The shop shows your warband resting around a campfire']],
-  ['0.7.0', 'Leaderboard, saves and mini-bosses', ['Online leaderboard for Endless runs', 'Save and quit from the shop, and cloud save with a save code', 'The Draugr Jarl, Frost Giant and Herald of Hel have new looks and two new abilities each']],
+  ['0.7.0', 'Leaderboard, saves and mini-bosses', ['Online leaderboard for Endless runs', 'Save and quit from the shop, and cloud save with a save code', 'The Draugr King, Frost Giant and Herald of Hel have new looks and two new abilities each']],
   ['0.6.1', 'Clearer battles', ['Element icons on cards and units. Blood is now crimson', 'A countdown at the end of waves 1 to 20', 'The Endless shop opens every 2 minutes, with a countdown']],
-  ['0.6.0', 'Fenrir and dashes', ['Fenrir is the World-Eater on wave 20 and comes back Gleipnir-Bound in Endless', "Dash charges, the Sleipnir's Stride power-up and the Sleipnir's Hooves rune"]],
-  ['0.5.0', 'Endless mode', ['Endless mode after Fenrir, with returning bosses', "Fenrir's new abilities: Gleipnir's Snap and Devour the Sun", 'Warriors throw axes and use Berserker Leap']],
+  ['0.6.0', 'Fenrir and dashes', ['Fenrir is the World-Eater on wave 20 and comes back as the Chained in Endless', "Dash charges, the Swift Stride power-up and the Extra Dash Slots rune"]],
+  ['0.5.0', 'Endless mode', ['Endless mode after Fenrir, with returning bosses', "Fenrir's new abilities: Chain Snap and Devour the Sun", 'Warriors throw axes and use Berserker Leap']],
   ['0.4.0', 'Healing and feedback', ['Healing is bought in the shop', 'Send feedback from the game']],
   ['0.3.0', 'A tougher economy', ['The formation starts with 1 slot', 'Card locks, and rising prices for reroll, XP and healing', 'Power-up tooltips with a timer']],
   ['0.2.0', 'English, minimap and power-ups', ['The game is in English', 'Minimap with power-ups, elites and bosses', 'Six power-ups', 'Sort the bench, drag units, Space starts the wave']],
@@ -3774,6 +3845,7 @@ function togglePause(v){ if (mode !== 'combat' && mode !== 'shop') return; pause
 
 addEventListener('keydown', e => {
   if (!$('#settings').hidden){ if (e.code === 'Escape'){ e.preventDefault(); closeSettings(); } return; }
+  if (guideFromTitle){ if (e.code === 'Escape'){ e.preventDefault(); showBestiary(false); } return; }
   if (dbg.bot && e.isTrusted && !e.ctrlKey && !e.metaKey && !e.altKey && MOVE_KEYS.includes(e.code) && !(e.target && e.target.closest && e.target.closest('input, textarea, select'))){ setBot(false); toast('Autoplay off. You have control.'); }
   if (e.ctrlKey && e.shiftKey && e.code === 'KeyD'){ e.preventDefault(); toggleDbg(); return; }
   const digit = { Digit1: 0, Digit2: 1, Digit3: 2, Numpad1: 0, Numpad2: 1, Numpad3: 2 }[e.code];
@@ -3839,7 +3911,7 @@ function updateHud(dt){
   $('#dashTxt').classList.toggle('ready', h.dashCh > 0);
   const buffs = [];
   if (S.fury > 0) buffs.push(`Fury ${Math.ceil(S.fury)} s`);
-  if (S.magnet > 0) buffs.push("Huginn's Call");
+  if (S.magnet > 0) buffs.push("Raven's Call");
   $('#buffTxt').hidden = !buffs.length; $('#buffTxt').textContent = buffs.join(' · ');
   $('#waveTxt').textContent = S.endless ? `Endless · wave ${S.wave} · ${W.name}` : `Wave ${S.wave}/20 · ${W.name}`;
   const sb = $('#btnShopOpen');
@@ -3865,18 +3937,18 @@ const STEP = 1 / 60;
 /* ================= RELICS: items that twist a rule for the rest of the raid ================= */
 const MAX_RELICS = 3;
 const RELICS = {
-  iron_oath:      { name: 'Iron Oath', price: 10, desc: 'Iron units count double for the Iron synergy.' },
-  ember_boots:    { name: 'Ember Boots', price: 12, desc: 'Dashing leaves a trail of fire that burns enemies.' },
-  odins_eye:      { name: "Odin's Eye", price: 9, desc: 'Every 4th reroll in a shop is free.' },
-  draugr_pact:    { name: "Draugr's Pact", price: 13, desc: 'All units deal 40% more damage, but the hero has 30% less maximum health.' },
-  huginn_feather: { name: "Huginn's Feather", price: 10, desc: 'A random power-up appears near you at the start of every wave.' },
-  twin_souls:     { name: 'Twin Souls', price: 14, desc: 'Units with two or more stars count as two for synergies.' },
-  gleipnir_link:  { name: 'Gleipnir Link', price: 11, desc: 'Your first dash each wave stuns nearby enemies for 1.5 seconds.' },
-  usurer_coin:    { name: "Usurer's Coin", price: 8, desc: 'Interest goes up to 8 gold instead of 5, but healing costs double.' },
-  mead_hall:      { name: 'Horn of the Mead Hall', price: 9, desc: 'The hero heals 1.5 health every second.' },
-  berserk_mark:   { name: "Berserker's Mark", price: 11, desc: 'While the hero is below 40% health, all units attack 50% faster.' },
-  raven_banner:   { name: 'Raven Banner', price: 15, desc: 'One extra formation slot.' },
-  naglfar_chest:  { name: "Naglfar's Chest", price: 10, desc: 'Gain 3 gold every time the shop opens.' },
+  iron_oath:      { name: 'Iron Oath', price: 24, desc: 'Iron units count double for the Iron synergy.' },
+  ember_boots:    { name: 'Ember Boots', price: 26, desc: 'Dashing leaves a trail of fire that burns enemies.' },
+  odins_eye:      { name: "Odin's Eye", price: 18, desc: 'Every 4th reroll in a shop is free.' },
+  draugr_pact:    { name: "Pact of the Dead", price: 28, desc: 'All units deal 40% more damage, but the hero has 30% less maximum health.' },
+  huginn_feather: { name: "Raven Feather", price: 24, desc: 'A random power-up appears near you at the start of every wave.' },
+  twin_souls:     { name: 'Twin Souls', price: 32, desc: 'Units with two or more stars count as two for synergies.' },
+  gleipnir_link:  { name: 'Binding Chain', price: 24, desc: 'Your first dash each wave stuns nearby enemies for 1.5 seconds.' },
+  usurer_coin:    { name: "Moneylender's Coin", price: 18, desc: 'Interest goes up to 8 gold instead of 5, but healing costs double.' },
+  mead_hall:      { name: 'Horn of the Mead Hall', price: 22, desc: 'The hero heals 1.5 health every second.' },
+  berserk_mark:   { name: "Berserker's Mark", price: 26, desc: 'While the hero is below 40% health, all units attack 50% faster.' },
+  raven_banner:   { name: 'Raven Banner', price: 35, desc: 'One extra formation slot.' },
+  naglfar_chest:  { name: "Ghost Ship Chest", price: 20, desc: 'Gain 3 gold every time the shop opens.' },
 };
 const RELIC_ART = {
   iron_oath:      [['..XXXXX..', '.X.....X.', 'X...Y...X', 'X..YYY..X', 'X...Y...X', 'X...Y...X', 'X.......X', '.X.....X.', '..XXXXX..'], { X: '#a9aeb8', Y: '#e8ecf2' }],
@@ -3900,7 +3972,7 @@ function relicsChanged(){
   if (!hasR('raven_banner') && S.board[8]){ const f = S.bench.indexOf(null); if (f >= 0){ S.bench[f] = S.board[8]; S.board[8] = null; } }
   const h = S.hero, ratio = h.hp / h.maxHp; computeTraits(); h.maxHp = heroMaxHp(); h.hp = Math.max(1, Math.min(h.maxHp, Math.round(h.maxHp * ratio)));
 }
-function gainRelic(k){ if (!S.relics) S.relics = []; if (S.relics.length >= MAX_RELICS || S.relics.includes(k)) return false; S.relics.push(k); relicsChanged(); return true; }
+function gainRelic(k){ discoverRelic(k); if (!S.relics) S.relics = []; if (S.relics.length >= MAX_RELICS || S.relics.includes(k)) return false; S.relics.push(k); relicsChanged(); return true; }
 function buyRelic(k){
   const R = RELICS[k]; if (!R || !S.event || S.event.type !== 'merchant' || S.event.bought.includes(k)) return;
   if (S.relics.length >= MAX_RELICS) return toast('Your relic slots are full. Sell a relic first.');
@@ -3930,7 +4002,7 @@ function makeEvent(type){
   if (type === 'merchant'){
     const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
     if (!pool.length) type = 'shrine';
-    else { const offers = []; while (offers.length < 3 && pool.length) offers.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]); return { type, offers, bought: [] }; }
+    else { const offers = []; while (offers.length < 3 && pool.length) offers.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]); offers.forEach(discoverRelic); return { type, offers, bought: [] }; }
   }
   if (type === 'shrine') return { type, cost: Math.round(S.hero.maxHp * .2), gold: 8 + S.wave, done: false };
   return { type: 'altar', done: false };
@@ -4171,13 +4243,14 @@ const TUT_STEPS = [
   { mode: 'shop', target: '#cards', anim: 'merge', h: 'Three of a kind', p: 'Three copies of the same unit merge into a stronger unit with two stars. Three two-star units make a three-star. Cards you already own glow. We put two more copies in the shop.', enter: tutMerge, wait: () => owned().some(u => u.star >= 2), hint: 'Buy the two glowing copies' },
   { mode: 'shop', target: ['#formation', '#bench'], anim: 'drag', h: 'Formation and bench', p: 'Only units in the formation around your hero fight. The bench holds the rest. Drag a unit to move it, or right-click it to send it between bench and formation. Levelling up with XP opens more formation slots.' },
   { mode: 'shop', target: '#traits', h: 'Synergies', p: () => `Units in the formation build synergies. Two of the same class or element switch a bonus on. Four of a class, or three of an element, make it stronger. We added ${tut.gift || 'a unit'} so ${tut.giftEl || 'an element'} is active. Hover or click a synergy row to read exactly what it does.`, enter: tutSynergy },
+  { mode: 'shop', target: '#event', wide: true, h: 'Visitors at the campfire', p: 'The Wandering Merchant sells relics that twist a rule for the rest of the raid. They are expensive, you can carry 3, and you can sell one back for half. Other visitors: a Blood Shrine trades health for gold, and a Cursed Altar gives a free relic for a harder wave. Here is enough gold for one relic, if you want to try.', enter: tutMerchant },
   { mode: 'shop', target: '#btnStart', h: 'Start the wave', p: 'When your warband is ready, start the wave. In a real raid you can also press Space.', unlock: true, wait: () => mode === 'combat', hint: 'Click Start wave' },
   { mode: 'combat', target: 'hero', r: 46, anim: 'keys', h: 'Move your hero', p: 'Walk with W A S D or the arrow keys. Your hero doesn\'t attack. Your job is to keep the warband close and stay out of reach of the enemies.', enter: () => { tut.x0 = S.hero.x; tut.y0 = S.hero.y; }, wait: () => Math.hypot(S.hero.x - tut.x0, S.hero.y - tut.y0) > 70, hint: 'Walk around a little' },
   { mode: 'combat', target: 'hero', r: 150, h: 'Your warband fights', p: 'Units attack the nearest enemies on their own. Here come some draugr. Some of them climb out of the ground. Keep moving while your warband deals with them.', enter: tutSpawn, wait: () => S.kills - tut.k0 >= 4, hint: 'Defeat 4 draugr' },
   { mode: 'combat', target: '#goldTxt', h: 'Souls and gold', p: 'Fallen enemies drop souls. Walk close to collect them. Every 10 souls become 1 gold. You also earn gold, and interest on saved gold, when a wave ends.' },
   { mode: 'combat', target: ['#abil', '#hpDock'], anim: 'cast', h: 'Abilities and dash', p: 'Press 1, 2 or 3 to use a hero ability. It aims at your mouse cursor. You start with one and earn more by beating bosses. Press Space to dash through danger. Your health and dashes sit right below.', enter: () => { tut.cast = false; }, wait: () => tut.cast, hint: 'Press 1 or Space' },
   { mode: 'combat', target: '#mini', h: 'Power-ups and the minimap', p: 'Power-ups appear around the battlefield. The minimap shows them, along with elites and bosses. Walk over one to pick it up. Hover it first to see what it does.', enter: tutPowerup },
-  { mode: 'combat', center: true, last: true, h: 'You\'re ready', p: 'Waves 5, 10 and 15 end with a boss, and Fenrir waits on wave 20. Health only refills after a boss, so buy healing in the shop. After a raid, spend your runes in the Rune Forge for permanent upgrades. The pause menu (P) has a Bestiary of every enemy.' },
+  { mode: 'combat', center: true, last: true, h: 'You\'re ready', p: 'Waves 5, 10 and 15 end with a boss, and Fenrir waits on wave 20. Health only refills after a boss, so buy healing in the shop. After a raid, spend your runes in the Rune Forge for permanent upgrades. The pause menu (P) has a Field Guide of every enemy and relic.' },
 ];
 function tutMerge(){
   const u = owned()[0]; if (!u) return;
@@ -4196,6 +4269,12 @@ function tutSynergy(){
   S.board[0] = best; S.board[1] = g; units.slice(1).forEach((u, i) => { S.bench[i] = u; });
   S.curTr = 'm:' + g.mod;
   renderShop(); $('#info').innerHTML = describeTrait('m:' + g.mod);
+}
+function tutMerchant(){
+  if (tut.merchant) return; tut.merchant = true;
+  S.event = makeEvent('merchant');
+  S.gold = Math.max(S.gold, Math.min(...S.event.offers.map(k => RELICS[k].price)));
+  renderShop();
 }
 function tutSpawn(){
   tut.k0 = S.kills; if (tut.spawned) return; tut.spawned = true;
@@ -4251,6 +4330,7 @@ function tutGo(i){
   const st = TUT_STEPS[i];
   if (st.unlock) tut.unlocked = true;
   if (st.enter) st.enter();
+  $('#tutCard').classList.toggle('wide', !!st.wide);
   $('#tutK').textContent = `Step ${i + 1} of ${TUT_STEPS.length}`;
   $('#tutH').textContent = st.h;
   $('#tutP').textContent = typeof st.p === 'function' ? st.p() : st.p;
