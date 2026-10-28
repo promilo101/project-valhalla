@@ -57,6 +57,10 @@ Drag units between the bench and the formation, or right-click a unit to send it
 
 The game uses major.minor.patch numbers (for example 0.8.0). A new feature batch raises the minor number, a bug fix raises the patch number. The change notes live in the game under "What's new" on the title screen.
 
+## Run stats
+
+Players can choose to share anonymous run records (no name, no save code). They go to the `runs` table in Supabase. Each record has the version, build, hero, map, result, wave and a `data` field with the board, abilities, relics, events, gold flow, damage per unit and the Rune Forge levels. The page `stats.html` (served at `/dev/stats.html`) reads the table and shows balance numbers. When more heroes or maps arrive, set `HERO_ID` and `MAP_ID` in the game so the stats can be split by them.
+
 ## Ideas for later
 
 Saved for when the core game is solid:
