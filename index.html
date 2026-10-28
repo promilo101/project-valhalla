@@ -244,6 +244,8 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .pu-list dd{margin:0}
 
 #pause{position:absolute;inset:0;display:grid;place-items:center;background:rgba(7,8,12,.7)}
+#pause{z-index:6}
+#pause.over-shop{background:rgba(7,8,12,.96)}
 .tut-btn{position:relative}
 .tut-btn .dot{position:absolute;top:-4px;right:-4px;width:10px;height:10px;border-radius:50%;background:var(--ember);box-shadow:0 0 8px var(--ember)}
 #tut{position:absolute;inset:0;z-index:30;pointer-events:none}
@@ -453,6 +455,7 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="btn primary" id="btnStart" type="button">Start wave 1 <kbd>Space</kbd></button>
         <button class="btn" id="btnSell" type="button" disabled>Sell <kbd>E</kbd></button>
         <button class="btn" id="btnSaveQuit" type="button">Save and quit</button>
+        <button class="btn" id="btnShopMenu" type="button">Menu <kbd>Esc</kbd></button>
       </div>
       <p class="next" id="nextTxt"></p>
     </div>
@@ -593,7 +596,7 @@ a.btn{text-decoration:none;display:inline-block}
   <div id="pause" hidden>
     <div class="box">
       <h2>Paused</h2>
-      <p class="note">Press <kbd>P</kbd> to resume</p>
+      <p class="note">Press <kbd>P</kbd> or <kbd>Esc</kbd> to resume</p>
       <dl class="pu-list" id="puList"></dl>
       <div class="row"><button class="btn primary" id="btnResume" type="button">Resume</button><button class="btn" id="btnBest" type="button">Bestiary</button><button class="btn" id="btnSetPause" type="button">Settings</button><button class="btn" id="btnFbPause" type="button">Send feedback</button><button class="btn" id="btnQuit" type="button">Give up</button></div>
     </div>
@@ -1639,7 +1642,7 @@ function slotClick(where, i){
 
 /* ================= WAVES ================= */
 function startWave(){
-  if (picking) return;
+  if (picking || paused) return;
   if (tut && !tut.unlocked) return toast('Follow the tutorial steps first, or press Skip tutorial');
   if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
   // fill empty open slots from the bench so a new player is never stuck
@@ -2817,7 +2820,7 @@ function setMode(m){
   $('#bossbar').hidden = true;
   renderAbilBar();
   $('#dock').hidden = m !== 'combat';
-  if (m !== 'combat'){ paused = false; $('#pause').hidden = true; }
+  paused = false; $('#pause').hidden = true; // any screen change closes the pause menu
   if (m === 'title') renderTitle();
   if (m === 'meta') renderMeta();
 }
@@ -3065,6 +3068,7 @@ function showBestiary(on){
 }
 $('#btnBest').onclick = () => showBestiary(true);
 $('#btnBestBack').onclick = () => showBestiary(false);
+$('#btnShopMenu').onclick = e => { e.currentTarget.blur(); togglePause(true); };
 $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = () => { togglePause(false); gameOver(false, true); };
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
@@ -3502,7 +3506,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.11.0', 'Sound and feel', ['Music and sound effects, all made in the game: war drums in battle, a campfire tune in the shop, a roar for every boss', 'Settings menu on the title screen and in the pause menu: volume, screen shake, damage numbers and tooltips', 'Big hits freeze the action for a moment, boss attacks flash the screen, and a boss dies in slow motion', 'Merging units bursts with light']],
+  ['0.11.0', 'Sound and feel', ['Music and sound effects, all made in the game: war drums in battle, a campfire tune in the shop, a roar for every boss', 'Settings menu on the title screen and in the pause menu: volume, screen shake, damage numbers and tooltips', 'Big hits freeze the action for a moment, boss attacks flash the screen, and a boss dies in slow motion', 'Merging units bursts with light', 'The pause menu also opens in the shop: press Esc or P, or click Menu']],
   ['0.10.0', 'How to play', ['A short guided tutorial on the main menu: How to play', 'The synergies panel shows progress pips. Hover or click a synergy to see each step, which one is active and which units count', 'Unit descriptions say which synergies the unit counts toward']],
   ['0.9.0', 'The horde gets teeth', ['The game has its own tab icon', 'A Bestiary in the pause screen shows every enemy and elite trait', 'New looks for the draugr, wolves, ravens, Iron Draugr, Seiðkonur, Barrow Wights and Soul Wisps, with walk animations and their own deaths', 'Some draugr claw up out of the ground nearby', 'Wolves circle and pounce (from wave 2). Ravens mark a line and dive (wave 3)', 'Seiðkonur curse the ground under you (wave 4). Iron Draugr slam their hammers (wave 7)', 'Elites have a trait: Frozen leaves an icy trail, Burning explodes on death, Warded has a shield, Swift is fast']],
   ['0.8.1', 'Small fixes', ['The Sort button explains how it sorts the bench']],
@@ -3573,7 +3577,7 @@ function gameOver(win, quit){
   try { $('#lbName').value = localStorage.getItem('valhalla.name') || ''; } catch (e) {}
   setMode('over');
 }
-function togglePause(v){ if (mode !== 'combat') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; if (!paused || !$('#bestiary').hidden) showBestiary(false); }
+function togglePause(v){ if (mode !== 'combat' && mode !== 'shop') return; paused = v == null ? !paused : v; $('#pause').hidden = !paused; $('#pause').classList.toggle('over-shop', mode === 'shop'); if (!paused || !$('#bestiary').hidden) showBestiary(false); }
 
 addEventListener('keydown', e => {
   if (!$('#settings').hidden){ if (e.code === 'Escape'){ e.preventDefault(); closeSettings(); } return; }
@@ -3592,7 +3596,9 @@ addEventListener('keydown', e => {
     if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
     if (e.code === 'KeyT' && !e.repeat) toggleTips();
     if (e.code === 'KeyB' && !e.repeat) openEndlessShop();
-  } else if (mode === 'shop' && !e.repeat && performance.now() >= shopReadyAt){
+  } else if (mode === 'shop' && !e.repeat && (e.code === 'KeyP' || e.code === 'Escape')){
+    togglePause();
+  } else if (mode === 'shop' && !e.repeat && !paused && performance.now() >= shopReadyAt){
     if (e.code === 'Space') startWave();
     else if (e.code === 'KeyR') reroll();
     else if (e.code === 'KeyF') buyXp();
