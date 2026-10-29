@@ -1606,7 +1606,9 @@ for (let v = 0; v < 4; v++){
 let S = null, uid = 0, mode = 'title', paused = false;
 const keys = {};
 const SLOT_OFF = Array.from({ length: 8 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 4; return { x: Math.cos(a) * 24, y: Math.sin(a) * 20 }; });
-SLOT_OFF.push({ x: 0, y: 34 }); // the 9th slot, opened by the Raven Banner: a rear guard behind the hero
+// with the Raven Banner's 9th slot the whole ring widens and spreads nine places evenly, clear of the campfire below
+const SLOT_OFF9 = Array.from({ length: 9 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI * 2 / 9; return { x: Math.cos(a) * 29, y: Math.sin(a) * 23 }; });
+const slotPos = i => (S && (hasR('raven_banner') || S.board[8]) ? SLOT_OFF9 : SLOT_OFF)[i] || SLOT_OFF9[i];
 
 function newRun(R){
   if (R && R.v !== 1) R = null; // called from a click handler: no save to restore
@@ -2304,7 +2306,7 @@ function update(dt){
   const furyM = (S.fury > 0 ? 1.6 : 1) * (S.cry > 0 ? S.cryM : 1) * (hasR('berserk_mark') && h.hp < h.maxHp * .4 ? 1.5 : 1);
   S.board.forEach((u, i) => {
     if (!u || i >= slotCount()) return;
-    const o = SLOT_OFF[i], tx = h.x + o.x, ty = h.y + o.y, k = Math.min(1, dt * 9);
+    const o = slotPos(i), tx = h.x + o.x, ty = h.y + o.y, k = Math.min(1, dt * 9);
     if (u.leap){
       const L = u.leap; L.t += dt; const q = Math.min(1, L.t / L.dur);
       u.x = L.sx + (L.tx - L.sx) * q; u.y = L.sy + (L.ty - L.sy) * q; u.hz = Math.sin(q * Math.PI) * 28;
@@ -2824,7 +2826,7 @@ function render(dt){
       ctx.drawImage(sp, Math.round(nx - sp.width / 2), Math.round(ny - sp.height / 2 + (k === 'merchant' ? Math.sin(ct * 2) * .6 : 0)));
       if (k === 'altar' && Math.random() < .3) S.parts.push({ x: nx + rand(-6, 6), y: ny - 4, vx: rand(-3, 3), vy: rand(-22, -10), life: .6, max: .6, col: pick(['#b98cff', '#d6b8ff']), s: 1, add: true });
     }
-    st.board.forEach((u, i) => { if (!u || i >= slotCount()) return; u.x = h.x + SLOT_OFF[i].x; u.y = h.y + SLOT_OFF[i].y; u.face = u.x < fireX ? 1 : u.x > fireX ? -1 : u.face; u.hz = 0; u.leap = null; });
+    st.board.forEach((u, i) => { if (!u || i >= slotCount()) return; u.x = h.x + slotPos(i).x; u.y = h.y + slotPos(i).y; u.face = u.x < fireX ? 1 : u.x > fireX ? -1 : u.face; u.hz = 0; u.leap = null; });
   }
   // entities, y-sorted
   const ents = [];
@@ -2887,22 +2889,22 @@ function render(dt){
       if (camp && ((ct + u.id * 1.7) % 4) < .3){ const tip = u.cls === 'archer' ? '#ffffff' : UNIT_EL[u.mod].X; ctx.fillStyle = tip; ctx.globalAlpha = .9; ctx.fillRect(Math.round(u.x + u.face * 4), Math.round(u.y - 8 - hz), 1, 1); ctx.fillRect(Math.round(u.x + u.face * 4) - 1, Math.round(u.y - 7 - hz), 3, 1); ctx.globalAlpha = 1; }
       const usc = u.star === 3 ? 1.2 : u.star === 2 ? 1.1 : 1;
       drawSprite(u.cls + '_' + u.mod, u.x + lunge, u.y + Math.sin(st.time * 5 + u.id) * .6 - hz - (usc - 1) * 5, usc, u.face);
-      drawStars(Math.round(u.x), Math.round(u.y - hz) - 10 - (u.star - 1), u.star);
+      if (S && u.y - h.y > 12 && !camp) drawStars(Math.round(u.x), Math.round(u.y) + 11, u.star); else drawStars(Math.round(u.x), Math.round(u.y - hz) - 10 - (u.star - 1), u.star);
       if (u.st && mode === 'combat'){ ctx.fillStyle = '#10131b'; ctx.fillRect(Math.round(u.x) - 5, Math.round(u.y) + 8, 10, 1); ctx.fillStyle = '#86d4ff'; ctx.fillRect(Math.round(u.x) - 5, Math.round(u.y) + 8, Math.round(10 * u.mana / 100), 1); }
     } else {
       shadow(h.x, h.y + 6, 5);
       ctx.globalAlpha = S && S.fury > 0 ? .35 : .18; ctx.fillStyle = '#ff5b2e'; ctx.beginPath(); ctx.arc(h.x, h.y + 2, S && S.fury > 0 ? 12 : 9, 0, 6.283); ctx.fill(); ctx.globalAlpha = 1;
       const blink = h.inv > 0 && Math.floor(st.time * 20) % 2 === 0;
       if (!blink) drawSprite('hero', h.x, h.y + (Math.sin(h.walk * 14) > 0 ? -1 : 0), 1, h.face);
-      if (S && mode === 'combat'){
-        const bx = Math.round(h.x) - 8, by = Math.round(h.y) + 9, f = clamp(h.hp / h.maxHp, 0, 1), low = f < .3 && Math.floor(st.time * 4) % 2 === 0;
-        ctx.fillStyle = '#05060a'; ctx.fillRect(bx - 1, by - 1, 18, 4);
-        ctx.fillStyle = '#2a1118'; ctx.fillRect(bx, by, 16, 2);
-        ctx.fillStyle = low ? '#ff6b6b' : '#c4213f'; ctx.fillRect(bx, by, Math.round(16 * f), 2);
-        const cap = dashCap(), pw = 3, gap = 1, tw = cap * pw + (cap - 1) * gap, px0 = Math.round(h.x - tw / 2);
-        for (let i = 0; i < cap; i++){ ctx.fillStyle = i < h.dashCh ? '#86d4ff' : i < h.dashSlots ? '#1d2a42' : 'rgba(58,66,86,.6)'; ctx.fillRect(px0 + i * (pw + gap), by + 4, pw, 1); }
-      }
     }
+  }
+  if (S && mode === 'combat'){ // the hero's health bar and dash pips go on top of everything, so no unit can hide them
+    const bx = Math.round(h.x) - 8, by = Math.round(h.y) + 9, f = clamp(h.hp / h.maxHp, 0, 1), low = f < .3 && Math.floor(st.time * 4) % 2 === 0;
+    ctx.fillStyle = '#05060a'; ctx.fillRect(bx - 1, by - 1, 18, 3);
+    ctx.fillStyle = '#2a1118'; ctx.fillRect(bx, by, 16, 1);
+    ctx.fillStyle = low ? '#ff6b6b' : '#c4213f'; ctx.fillRect(bx, by, Math.round(16 * f), 1);
+    const cap = dashCap(), pw = 3, gap = 1, tw = cap * pw + (cap - 1) * gap, px0 = Math.round(h.x - tw / 2);
+    for (let i = 0; i < cap; i++){ ctx.fillStyle = i < h.dashCh ? '#86d4ff' : i < h.dashSlots ? '#1d2a42' : 'rgba(58,66,86,.6)'; ctx.fillRect(px0 + i * (pw + gap), by + 3, pw, 1); }
   }
 
   // the chain binding the hero to Fenrir
@@ -3433,7 +3435,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.17.5'; // major.minor.patch
+const VERSION = '0.17.6'; // major.minor.patch
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
 const FEEDBACK_REPO = (() => {
@@ -3873,6 +3875,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.17.6', 'Room for the warband', ['With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
   ['0.17.5', 'Quieter music', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat']],
   ['0.17.4', 'Small fixes', ['Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow. Shots fly through him to the wights']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
