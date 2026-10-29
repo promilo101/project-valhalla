@@ -2140,14 +2140,14 @@ function updateAxe(p, dt){
 function startChains(e, p2){
   const h = S.hero, n = p2 ? 7 : 5, a0 = Math.atan2(h.y - e.y, h.x - e.x);
   for (let k = 0; k < n; k++) S.chains.push({ e, x: e.x, y: e.y, a: a0 + k * Math.PI * 2 / n, len: 260, t: 0, wind: 1, hold: .45, snapped: false, dmg: e.dmg * 1.1 });
-  e.state = 'cast'; e.st = 1.6;
+  e.state = 'cast'; e.st = 1.6; sfx('b_chains');
   addText(e.x, e.y - e.h / 2 - 8, "Chain Snap", '#b4bccb', true);
 }
 // Devour the Sun: darkness falls, and shadow wolves lunge at the hero from the dark. Their eyes show where they come from.
 function startDevour(e){
   if (S.eclipse > 0) return startChains(e, true);
   S.eclipse = S.eclipseMax = 5.4;
-  e.state = 'cast'; e.st = 1;
+  e.state = 'cast'; e.st = 1; sfx('b_howl');
   addText(e.x, e.y - e.h / 2 - 8, 'Devour the Sun', '#ffb347', true);
   for (let k = 0; k < 4; k++) S.lunges.push({ delay: .9 + k * 1.05, wind: .8, state: 'wait', t: 0, dmg: e.dmg * 1.3 });
 }
@@ -2166,6 +2166,7 @@ function updateBossFx(dt){
   for (const B of S.boulders){
     B.t += dt;
     if (B.t >= B.dur && !B.done){
+      sfx('b_shatter');
       B.done = true;
       if (dist2(h.x, h.y, B.tx, B.ty) < B.r * B.r) heroDamage(B.dmg, 'Frost Giant: Glacier Hurl');
       for (let k = 0; k < 8; k++){ const a = k * Math.PI / 4 + .3; S.eprojs.push({ x: B.tx + Math.cos(a) * B.r * .8, y: B.ty + Math.sin(a) * B.r * .8, vx: Math.cos(a) * 115, vy: Math.sin(a) * 115, dmg: B.dmg * .45, r: 2.5, life: 1.3, col: '#bfe9ff' }); }
@@ -2194,7 +2195,7 @@ function updateBossFx(dt){
   for (const c of S.chains){
     c.t += dt;
     if (!c.snapped && c.t >= c.wind){
-      c.snapped = true; S.shake = Math.min(8, S.shake + 2);
+      c.snapped = true; sfx('b_snap'); S.shake = Math.min(8, S.shake + 2);
       const ex = Math.cos(c.a), ey = Math.sin(c.a), rx = h.x - c.x, ry = h.y - c.y;
       const along = rx * ex + ry * ey, perp = Math.abs(rx * ey - ry * ex);
       if (along > 0 && along < c.len && perp < 8 && h.dashT <= 0 && h.inv <= 0 && S.wall <= 0){
@@ -2207,7 +2208,7 @@ function updateBossFx(dt){
   for (const L of S.lunges){
     L.t += dt;
     if (L.state === 'wait' && L.t >= L.delay){
-      L.state = 'wind'; L.t = 0;
+      L.state = 'wind'; L.t = 0; sfx('b_snarl');
       const a = rand(0, Math.PI * 2); L.sx = h.x + Math.cos(a) * 150; L.sy = h.y + Math.sin(a) * 110;
       const dx = h.x - L.sx, dy = h.y - L.sy, dd = Math.hypot(dx, dy) || 1;
       L.ux = dx / dd; L.uy = dy / dd; L.len = dd + 140;
@@ -2412,7 +2413,7 @@ function update(dt){
       t.done = true;
       if (t.cancel) continue;
       const L = TELE_LOOK[t.kind] || TELE_LOOK.frost;
-      sfx(t.kind === 'fire' ? 'bigfire' : 'slam');
+      sfx(t.kind === 'fire' ? 'bigfire' : t.kind ? 'slam' : 'b_stomp');
       if (dist2(h.x, h.y, t.x, t.y) < (t.r + 40) ** 2) kick(h.x - t.x, h.y - t.y, t.kind ? 2 : 4);
       if (dist2(h.x, h.y, t.x, t.y) < t.r * t.r){ heroDamage(t.dmg, t.kind === 'slam' ? 'Iron Draugr: Hammer Slam' : t.kind === 'fire' ? 'Burning elite explosion' : S.boss ? S.boss.d.name + ': Stomp' : 'Ground attack'); if (!t.kind) flash('255,255,255', .3); }
       burst(t.x, t.y, t.kind ? 18 : 30, L.burst, t.kind ? 80 : 110);
@@ -2533,33 +2534,33 @@ function bossAI(e, dt, dx, dy, d, sp){
   if (e.d.boss !== 'fenrir' && e.state === 'cast'){ e.st -= dt; if (e.st <= 0) e.state = 'walk'; return; }
   if (e.d.boss === 'jarl'){
     if (e.immune){ // Barrow Rise: buried until both wights fall
-      if (e.wights.every(w => w.dead)){ e.immune = false; e.state = 'walk'; e.atkT = 1.5; burst(e.x, e.y, 40, ['#6a4428', '#3d2818', '#6fc7a0'], 90, false); addText(e.x, e.y - e.h / 2 - 8, 'He rises!', '#6fc7a0', true); S.shake = Math.min(8, S.shake + 5); }
+      if (e.wights.every(w => w.dead)){ e.immune = false; e.state = 'walk'; e.atkT = 1.5; burst(e.x, e.y, 40, ['#6a4428', '#3d2818', '#6fc7a0'], 90, false); sfx('b_burst'); addText(e.x, e.y - e.h / 2 - 8, 'He rises!', '#6fc7a0', true); S.shake = Math.min(8, S.shake + 5); }
       return;
     }
     if (phase2 && !e.rose){ e.rose = true; e.immune = true; e.wights = [];
       for (const s2 of [-1, 1]){ const w = spawnEnemy('wight', e.x + s2 * 50, e.y - 20); w.prio = true; e.wights.push(w); }
-      burst(e.x, e.y, 30, ['#6a4428', '#3d2818'], 70, false); addText(e.x, e.y - e.h / 2 - 8, 'Barrow Rise', '#6fc7a0', true); return; }
+      burst(e.x, e.y, 30, ['#6a4428', '#3d2818'], 70, false); sfx('b_sink'); addText(e.x, e.y - e.h / 2 - 8, 'Barrow Rise', '#6fc7a0', true); return; }
     e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
     if (e.atkT <= 0){
       const m = next(phase2 ? ['raise', 'axe', 'axe'] : ['axe', 'raise', 'axe']);
-      if (m === 'raise'){ e.atkT = phase2 ? 3 : 4; if (S.enemies.length < 30) for (let k = 0; k < 3; k++){ const a2 = rand(0, 6.28); { const z = spawnEnemy('draugr', e.x + Math.cos(a2) * 22, e.y + Math.sin(a2) * 22); z.rise = z.riseM = .6; } } burst(e.x, e.y, 20, ['#6f9479', '#bfe9ff'], 60); addText(e.x, e.y - e.h / 2 - 6, 'Rise!', '#bfe9ff', true); }
+      if (m === 'raise'){ sfx('b_raise'); e.atkT = phase2 ? 3 : 4; if (S.enemies.length < 30) for (let k = 0; k < 3; k++){ const a2 = rand(0, 6.28); { const z = spawnEnemy('draugr', e.x + Math.cos(a2) * 22, e.y + Math.sin(a2) * 22); z.rise = z.riseM = .6; } } burst(e.x, e.y, 20, ['#6f9479', '#bfe9ff'], 60); addText(e.x, e.y - e.h / 2 - 6, 'Rise!', '#bfe9ff', true); }
       else { // Axe Hurl: out along a marked line, then back the same way
         const base = Math.atan2(dy, dx), angs = phase2 ? [base - .28, base + .28] : [base];
         for (const ang of angs) S.bossAxes.push({ x0: e.x, y0: e.y - 4, ang, t: 0, wind: .8, out: .7, back: .7, len: 175, dmg: e.dmg * 1.1, hitOut: false, hitBack: false });
-        e.state = 'cast'; e.st = .8; e.atkT = 2.6; addText(e.x, e.y - e.h / 2 - 6, 'Axe Hurl', '#ffb7a3', true);
+        e.state = 'cast'; e.st = .8; e.atkT = 2.6; sfx('b_axe'); addText(e.x, e.y - e.h / 2 - 6, 'Axe Hurl', '#ffb7a3', true);
       }
     }
   } else if (e.d.boss === 'giant'){
     e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
     if (e.atkT <= 0){
       const m = next(phase2 ? ['stomp', 'breath', 'hurl'] : ['stomp', 'hurl', 'stomp']);
-      if (m === 'stomp'){ e.atkT = phase2 ? 2.4 : 3; const n = phase2 ? 3 : 1; for (let k = 0; k < n; k++) S.tele.push({ x: h.x + (k ? rand(-50, 50) : 0), y: h.y + (k ? rand(-40, 40) : 0), r: 40, t: 0, dur: 1.1, dmg: e.dmg * 1.4 }); }
+      if (m === 'stomp'){ sfx('b_grunt'); e.atkT = phase2 ? 2.4 : 3; const n = phase2 ? 3 : 1; for (let k = 0; k < n; k++) S.tele.push({ x: h.x + (k ? rand(-50, 50) : 0), y: h.y + (k ? rand(-40, 40) : 0), r: 40, t: 0, dur: 1.1, dmg: e.dmg * 1.4 }); }
       else if (m === 'hurl'){ // Glacier Hurl: a boulder lands on a marked spot and shatters
         S.boulders.push({ sx: e.x + 12 * e.face, sy: e.y - e.h / 2, tx: h.x, ty: h.y, t: 0, dur: 1.3, r: 26, dmg: e.dmg * 1.3 });
-        e.state = 'cast'; e.st = .6; e.atkT = 2.6; addText(e.x, e.y - e.h / 2 - 6, 'Glacier Hurl', '#bfe9ff', true);
+        e.state = 'cast'; e.st = .6; e.atkT = 2.6; sfx('b_whoosh'); addText(e.x, e.y - e.h / 2 - 6, 'Glacier Hurl', '#bfe9ff', true);
       } else { // Frost Breath: a marked cone, then frost that slows and leaves ice behind
         S.breath = { e, ang: Math.atan2(dy, dx), half: .45, len: 160, t: 0, wind: 1.1, dur: .9, dmg: e.dmg * .8, hit: false };
-        e.state = 'cast'; e.st = 2.1; e.atkT = 3.2; addText(e.x, e.y - e.h / 2 - 6, 'Frost Breath', '#bfe9ff', true);
+        e.state = 'cast'; e.st = 2.1; e.atkT = 3.2; sfx('b_breath'); addText(e.x, e.y - e.h / 2 - 6, 'Frost Breath', '#bfe9ff', true);
       }
     }
   } else if (e.d.boss === 'herald'){
@@ -2567,15 +2568,15 @@ function bossAI(e, dt, dx, dy, d, sp){
     e.x += dx / d * sp * dir * dt + Math.cos(e.t) * 10 * dt; e.y += dy / d * sp * dir * dt;
     if (e.atkT <= 0){
       const m = next(phase2 ? ['rings', 'half', 'wisps', 'rings'] : ['rings', 'rings', 'half']);
-      if (m === 'rings'){ e.atkT = phase2 ? 1.6 : 2.3; const n = phase2 ? 14 : 10, off = rand(0, 1); for (let k = 0; k < n; k++){ const a2 = (k + off) / n * Math.PI * 2; S.eprojs.push({ x: e.x, y: e.y, vx: Math.cos(a2) * 70, vy: Math.sin(a2) * 70, dmg: e.dmg, r: 3.5, life: 4, col: '#ff5b2e' }); } }
+      if (m === 'rings'){ sfx('b_rings'); e.atkT = phase2 ? 1.6 : 2.3; const n = phase2 ? 14 : 10, off = rand(0, 1); for (let k = 0; k < n; k++){ const a2 = (k + off) / n * Math.PI * 2; S.eprojs.push({ x: e.x, y: e.y, vx: Math.cos(a2) * 70, vy: Math.sin(a2) * 70, dmg: e.dmg, r: 3.5, life: 4, col: '#ff5b2e' }); } }
       else if (m === 'half'){ // Half-Death: one side of the arena fills with deadly fog
         const hdx = h.x - e.x, side = Math.abs(hdx) < 90 ? Math.sign(hdx || 1) : -Math.sign(hdx);
         S.halfDeath = { x0: e.x, side, t: 0, warn: 1.6, fog: .6, dmg: e.dmg * 1.6, hit: false };
-        e.state = 'cast'; e.st = .9; e.atkT = 2.8; addText(e.x, e.y - e.h / 2 - 6, 'Half-Death', '#d6b8ff', true);
+        e.state = 'cast'; e.st = .9; e.atkT = 2.8; sfx('b_half'); addText(e.x, e.y - e.h / 2 - 6, 'Half-Death', '#d6b8ff', true);
       } else { // Soul Wisps: slow souls that drain the hero and heal her
         const alive = S.enemies.filter(o => o.d.wisp && !o.dead).length;
         for (let k = alive; k < 3; k++){ const a2 = k * 2.1 + rand(0, .5); spawnEnemy('wisp', e.x + Math.cos(a2) * 18, e.y + Math.sin(a2) * 18).prio = true; }
-        e.state = 'cast'; e.st = .7; e.atkT = 2.4; addText(e.x, e.y - e.h / 2 - 6, 'Soul Wisps', '#bfffe6', true);
+        e.state = 'cast'; e.st = .7; e.atkT = 2.4; sfx('b_whisper'); addText(e.x, e.y - e.h / 2 - 6, 'Soul Wisps', '#bfffe6', true);
       }
     }
   } else if (e.d.boss === 'fenrir'){
@@ -2586,12 +2587,12 @@ function bossAI(e, dt, dx, dy, d, sp){
         const next = seq[e.combo++ % seq.length];
         if (next === 'chains') startChains(e, phase2);
         else if (next === 'devour') startDevour(e);
-        else { e.state = 'wind'; e.st = phase2 ? .6 : .85; e.cx = dx / d; e.cy = dy / d; }
+        else { e.state = 'wind'; e.st = phase2 ? .6 : .85; e.cx = dx / d; e.cy = dy / d; sfx('b_growl'); }
       }
     } else if (e.state === 'cast'){
       e.st -= dt; if (e.st <= 0){ e.state = 'walk'; e.atkT = phase2 ? 2.2 : 3.2; }
     } else if (e.state === 'wind'){
-      e.st -= dt; if (e.st <= 0){ e.state = 'charge'; e.st = .55; }
+      e.st -= dt; if (e.st <= 0){ e.state = 'charge'; e.st = .55; sfx('b_paws'); }
     } else if (e.state === 'charge'){
       e.st -= dt; e.x += e.cx * 290 * dt; e.y += e.cy * 290 * dt;
       if (Math.random() < .9) S.parts.push({ x: e.x + rand(-10, 10), y: e.y + rand(-6, 6), vx: 0, vy: 0, life: .3, max: .3, col: '#ff3b2b', s: 2, add: true });
@@ -3875,7 +3876,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.17.6', 'Room for the warband', ['Fixed: a fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
+  ['0.17.6', 'Room for the warband', ['Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'Fixed: a fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
   ['0.17.5', 'Quieter music', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat']],
   ['0.17.4', 'Small fixes', ['Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow. Shots fly through him to the wights']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
@@ -4309,8 +4310,8 @@ function noise(dur, o = {}){
   src.connect(fl); fl.connect(g); g.connect(o.bus || AU.sfx); src.start(t, Math.random() * .5); src.stop(t + dur + .05);
   AU.voices++; src.onended = () => { AU.voices--; g.disconnect(); };
 }
-const SFX_GAP = { hit: .05, crit: .09, axe: .07, arrow: .06, fire: .08, holy: .1, soul: .035, coin: .06, zap: .08, bones: .06, yelp: .08, caw: .08, clang: .1, shriek: .12, spirit: .08, warn: .15, slam: .08, hurt: .15, click: .03, burn: .3 };
-const SFX_KEY = { horn: 1, roar: 1, bossdie: 1, victory: 1, death: 1, merge: 1, level: 1, cast: 1, power: 1, dash: 1, hurt: 1, warn: 1, slam: 1 };
+const SFX_GAP = { b_rings: .5, b_snap: .12, b_snarl: .2, b_whisper: .5, b_stomp: .1, b_shatter: .1, hit: .05, crit: .09, axe: .07, arrow: .06, fire: .08, holy: .1, soul: .035, coin: .06, zap: .08, bones: .06, yelp: .08, caw: .08, clang: .1, shriek: .12, spirit: .08, warn: .15, slam: .08, hurt: .15, click: .03, burn: .3 };
+const SFX_KEY = { b_axe: 1, b_raise: 1, b_sink: 1, b_burst: 1, b_grunt: 1, b_stomp: 1, b_whoosh: 1, b_shatter: 1, b_breath: 1, b_rings: 1, b_half: 1, b_whisper: 1, b_growl: 1, b_paws: 1, b_chains: 1, b_snap: 1, b_howl: 1, b_snarl: 1, horn: 1, roar: 1, bossdie: 1, victory: 1, death: 1, merge: 1, level: 1, cast: 1, power: 1, dash: 1, hurt: 1, warn: 1, slam: 1 };
 const RUN = ['jarl', 'giant', 'herald', 'fenrir'];
 function sfx(name, p){
   if (!auOn() || settings.muted || settings.master <= 0 || settings.sfx <= 0) return;
@@ -4343,7 +4344,27 @@ function sfx(name, p){
     case 'dash': noise(.18, { f: 500, to: 2500, q: 1.5, vol: .08 }); break;
     case 'horn': [[110, 0], [164.8, 6], [82.4, -4]].forEach(([f, d]) => tone(f, 1.4, { type: 'sawtooth', lp: 650, a: .14, vol: .06, det: d })); break;
     case 'clear': [392, 523, 659].forEach((f, i) => tone(f, .35, { type: 'triangle', vol: .06, delay: i * .1 })); break;
-    case 'warn': tone(r(300, 340), .1, { type: 'square', vol: .03, lp: 1500 }); tone(r(300, 340), .1, { type: 'square', vol: .03, lp: 1500, delay: .13 }); break;
+    case 'warn': { const k = p || 1; tone(r(300, 340), .1, { type: 'square', vol: .03 * k, lp: 1500 }); tone(r(300, 340), .1, { type: 'square', vol: .03 * k, lp: 1500, delay: .13 }); break; }
+    // boss attacks: each one has its own voice
+    case 'b_axe': for (let i = 0; i < 18; i++) noise(.05, { f: 1100 + (i % 2) * 300, q: 3, vol: .035, delay: .8 + i * .08 }); tone(150, .14, { to: 85, vol: .09, delay: 2.25 }); noise(.07, { f: 600, ft: 'lowpass', vol: .08, delay: 2.25 }); break;
+    case 'b_raise': noise(.9, { f: 220, to: 90, ft: 'lowpass', vol: .16, a: .2 }); for (let i = 0; i < 5; i++) tone(r(600, 900), .04, { type: 'triangle', vol: .022, delay: .3 + i * .1 }); break;
+    case 'b_sink': noise(1.2, { f: 300, to: 70, ft: 'lowpass', vol: .18, a: .1 }); tone(55, 1, { to: 35, vol: .12 }); break;
+    case 'b_burst': noise(.5, { f: 700, to: 150, ft: 'lowpass', vol: .2 }); tone(80, .4, { to: 40, vol: .15 }); break;
+    case 'b_grunt': tone(95, .35, { type: 'sawtooth', to: 68, lp: 500, vol: .08, a: .05 }); break;
+    case 'b_stomp': tone(50, .5, { to: 28, vol: .26 }); noise(.4, { f: 400, to: 60, ft: 'lowpass', vol: .2 }); noise(.15, { f: 2500, ft: 'highpass', vol: .05, delay: .05 }); break;
+    case 'b_whoosh': noise(.7, { f: 300, to: 1300, q: 1.5, vol: .1, a: .25 }); break;
+    case 'b_shatter': noise(.5, { f: 3000, ft: 'highpass', vol: .09 }); [2200, 2900, 3600, 1800].forEach((f, i) => tone(f, .22, { type: 'triangle', vol: .025, delay: i * .04 })); tone(70, .3, { to: 40, vol: .15 }); break;
+    case 'b_breath': noise(2, { f: 2200, to: 3600, q: .8, vol: .09, a: .9 }); break;
+    case 'b_rings': tone(880, .6, { type: 'triangle', vol: .028 }); tone(1320, .5, { vol: .018, delay: .03 }); tone(660, .7, { vol: .02 }); break;
+    case 'b_half': tone(196, 2.2, { vol: .09 }); tone(396, 1.6, { vol: .04 }); tone(523, 1.2, { type: 'triangle', vol: .02 }); tone(500, 1.2, { to: 260, type: 'sawtooth', lp: 1200, vol: .035, a: .3, delay: 1.6 }); noise(1.2, { f: 800, to: 300, q: 2, vol: .06, a: .3, delay: 1.6 }); break;
+    case 'b_whisper': for (let i = 0; i < 6; i++) noise(r(.12, .25), { f: r(3000, 5200), q: 6, vol: .03, delay: i * r(.12, .2) }); break;
+    case 'b_growl': tone(72, .8, { type: 'sawtooth', lp: 420, vol: .1, a: .1 }); noise(.8, { f: 260, q: 3, vol: .08, a: .1 }); break;
+    case 'b_paws': for (let i = 0; i < 6; i++){ tone(60, .12, { to: 40, vol: .14, delay: i * .09 }); noise(.08, { f: 300, ft: 'lowpass', vol: .08, delay: i * .09 }); } break;
+    case 'b_chains': for (let i = 0; i < 12; i++) tone(r(1800, 2600), .05, { type: 'square', lp: 4000, vol: .015, delay: i * .05 }); noise(.6, { f: 3500, q: 2, vol: .04 }); break;
+    case 'b_snap': tone(2600, .15, { type: 'square', lp: 5000, vol: .04, to: 1200 }); noise(.12, { f: 4000, ft: 'highpass', vol: .08 }); break;
+    case 'b_howl': tone(280, 1.3, { to: 560, type: 'sawtooth', lp: 1100, vol: .06, a: .4 }); tone(286, 1.3, { to: 570, type: 'sawtooth', lp: 900, vol: .04, a: .4 }); tone(560, 1.4, { to: 300, type: 'sawtooth', lp: 1000, vol: .05, delay: 1.2 }); noise(2.4, { f: 700, q: 1.5, vol: .04, a: .5 });
+      for (let k = 0; k < 6; k++){ tone(55, .15, { vol: .2, delay: 1.6 + k * .8 }); tone(48, .15, { vol: .15, delay: 1.8 + k * .8 }); } break;
+    case 'b_snarl': tone(140, .35, { type: 'sawtooth', to: 90, lp: 900, vol: .07 }); noise(.3, { f: 900, q: 2, vol: .07 }); break;
     case 'slam': tone(70, .3, { to: 40, vol: .16 }); noise(.25, { f: 300, to: 80, ft: 'lowpass', vol: .14 }); break;
     case 'hurt': tone(220, .15, { type: 'square', to: 110, vol: .05, lp: 1200 }); noise(.1, { f: 600, ft: 'lowpass', vol: .07 }); break;
     case 'cast': tone(300, .3, { to: 900, type: 'triangle', vol: .06 }); noise(.3, { f: 1500, to: 4000, vol: .035 }); break;
@@ -4431,9 +4452,8 @@ let watch = { tele: 0, chains: 0, lunges: 0, axes: 0, boulders: 0, bstate: '' };
 function watchFx(){
   if (!S) return;
   const n = { tele: S.tele.filter(t => t.kind !== 'fire').length, chains: S.chains.length, lunges: S.lunges.length, axes: S.bossAxes.length, boulders: S.boulders.length };
-  if (n.tele > watch.tele || n.chains > watch.chains || n.lunges > watch.lunges || n.axes > watch.axes || n.boulders > watch.boulders) sfx('warn');
+  if (n.tele > watch.tele || n.chains > watch.chains || n.lunges > watch.lunges || n.axes > watch.axes || n.boulders > watch.boulders) sfx('warn', S.boss ? .45 : 1);
   const bs = S.boss && !S.boss.dead ? S.boss.state : '';
-  if (bs === 'cast' && watch.bstate !== 'cast') sfx('bosscast', S.boss.d.boss);
   n.bstate = bs; watch = n;
 }
 
