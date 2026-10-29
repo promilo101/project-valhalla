@@ -242,7 +242,14 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .slot.sel{outline:2px solid var(--frost);outline-offset:1px;background:#1a2333}
 .slot.over{outline:2px dashed var(--frost);outline-offset:1px;background:#18202e}
 .slot.locked{opacity:.35;cursor:not-allowed}
-.slot .st{position:absolute;top:1px;left:0;right:0;text-align:center;font-size:13px;color:var(--gold);line-height:1;letter-spacing:-1px;pointer-events:none}
+.slot .st{position:absolute;top:-7px;left:50%;transform:translateX(-50%);z-index:1;font-size:14px;line-height:1;letter-spacing:-1px;padding:1px 3px 0;background:#0d1018;border:1px solid currentColor;border-radius:2px;white-space:nowrap;pointer-events:none}
+.formation .slot .st{font-size:12px;top:-6px;padding:0 2px}
+.slot .st.s1,.star1{color:#d08a4e}
+.slot .st.s2,.star2{color:#e4e9f0}
+.slot .st.s3,.star3{color:#ffd451}
+.slot.s2{box-shadow:inset 0 0 0 1px #c9d0da}
+.slot.s3{box-shadow:inset 0 0 0 1px #ffd451,0 0 8px rgba(255,212,81,.45)}
+.badge .star1,.badge .star2,.badge .star3{letter-spacing:-1px}
 .slot .cnt{position:absolute;right:1px;bottom:1px;font-size:13px;line-height:1;padding:1px 2px;background:#0d1018;color:var(--fg);border-radius:1px;pointer-events:none}
 .slot.ready{box-shadow:0 0 0 1px var(--gold),0 0 10px rgba(226,178,76,.6);animation:readyPulse 1.2s ease-in-out infinite}
 .slot.ready .cnt{background:var(--gold);color:#1a1205}
@@ -2631,6 +2638,13 @@ resize();
 const flakes = Array.from({ length: 60 }, () => ({ x: Math.random(), y: Math.random(), v: rand(4, 12), s: Math.random() < .2 ? 2 : 1 }));
 function hash(x, y){ let h = (x * 374761393 + y * 668265263) | 0; h = (h ^ (h >>> 13)) * 1274126177 | 0; return (h ^ (h >>> 16)) >>> 0; }
 
+const STAR_COL = ['#d08a4e', '#e4e9f0', '#ffd451'];
+function drawStars(cx, y, n){ // small pixel stars, bronze, silver or gold by level
+  const w = n * 4 - 1, x0 = cx - Math.floor(w / 2);
+  ctx.fillStyle = 'rgba(10,8,14,.85)'; ctx.fillRect(x0 - 1, y - 2, w + 2, 5);
+  ctx.fillStyle = STAR_COL[n - 1];
+  for (let s = 0; s < n; s++){ const x = x0 + s * 4 + 1; ctx.fillRect(x, y - 1, 1, 3); ctx.fillRect(x - 1, y, 3, 1); }
+}
 function drawSprite(name, x, y, sc, face, white){
   const key = name + (white ? '_w' : '') + (face < 0 ? (white ? 'f' : '_f') : '');
   const img = SPR[key] || SPR[name];
@@ -2860,9 +2874,9 @@ function render(dt){
       const lunge = u.anim > 0 ? u.face : 0;
       const hz = (u.hz || 0) + (camp ? Math.max(0, Math.sin(ct * 2.2 + u.id * 1.7)) * 1.2 : 0);
       if (camp && ((ct + u.id * 1.7) % 4) < .3){ const tip = u.cls === 'archer' ? '#ffffff' : UNIT_EL[u.mod].X; ctx.fillStyle = tip; ctx.globalAlpha = .9; ctx.fillRect(Math.round(u.x + u.face * 4), Math.round(u.y - 8 - hz), 1, 1); ctx.fillRect(Math.round(u.x + u.face * 4) - 1, Math.round(u.y - 7 - hz), 3, 1); ctx.globalAlpha = 1; }
-      drawSprite(u.cls + '_' + u.mod, u.x + lunge, u.y + Math.sin(st.time * 5 + u.id) * .6 - hz, 1, u.face);
-      ctx.fillStyle = '#e2b24c';
-      for (let s = 0; s < u.star; s++) ctx.fillRect(Math.round(u.x) - u.star + s * 2, Math.round(u.y - hz) - 9, 1, 1);
+      const usc = u.star === 3 ? 1.2 : u.star === 2 ? 1.1 : 1;
+      drawSprite(u.cls + '_' + u.mod, u.x + lunge, u.y + Math.sin(st.time * 5 + u.id) * .6 - hz - (usc - 1) * 5, usc, u.face);
+      drawStars(Math.round(u.x), Math.round(u.y - hz) - 10 - (u.star - 1), u.star);
       if (u.st && mode === 'combat'){ ctx.fillStyle = '#10131b'; ctx.fillRect(Math.round(u.x) - 5, Math.round(u.y) + 8, 10, 1); ctx.fillStyle = '#86d4ff'; ctx.fillRect(Math.round(u.x) - 5, Math.round(u.y) + 8, Math.round(10 * u.mana / 100), 1); }
     } else {
       shadow(h.x, h.y + 6, 5);
@@ -3184,8 +3198,10 @@ function renderShop(){
     const m = MODS[c.mod], cost = m.tier;
     const n = counts[`${c.cls}|${c.mod}|1`] || 0;
     const chain = n >= 2 && (counts[`${c.cls}|${c.mod}|2`] || 0) >= 2;
-    const badge = n >= 2 ? (chain ? '★★★ ready' : '★★ ready') : n === 1 ? 'owned 1/3' : '';
-    return `<div class="card-wrap${c.locked ? ' locked' : ''}"><button class="lock" type="button" data-lock="${i}" aria-pressed="${c.locked}" title="${c.locked ? 'Unlock card' : 'Lock card: it stays through rerolls and into the next shop'}">${c.locked ? '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 5V3.5a3 3 0 0 1 6 0V5" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="5" width="8" height="6" rx="1" fill="currentColor"/></svg>' : '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 5V3.5a3 3 0 0 1 5.8-1" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="5" width="8" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'}</button><button class="card t${m.tier}${n >= 2 ? ' merge' : n === 1 ? ' owned' : ''}" type="button" data-i="${i}" data-key="${c.cls}|${c.mod}|1" ${broke(cost) ? 'disabled' : ''}>
+    const own = allUnits().filter(u => u.cls === c.cls && u.mod === c.mod).map(u => u.star).sort((a, b) => b - a);
+    const ownTxt = own.slice(0, 4).map(st => `<span class="star${st}">${'★'.repeat(st)}</span>`).join(' ') + (own.length > 4 ? ' …' : '');
+    const badge = n >= 2 ? (chain ? '<span class="star3">★★★</span> ready' : '<span class="star2">★★</span> ready') : own.length ? 'own ' + ownTxt : '';
+    return `<div class="card-wrap${c.locked ? ' locked' : ''}"><button class="lock" type="button" data-lock="${i}" aria-pressed="${c.locked}" title="${c.locked ? 'Unlock card' : 'Lock card: it stays through rerolls and into the next shop'}">${c.locked ? '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 5V3.5a3 3 0 0 1 6 0V5" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="5" width="8" height="6" rx="1" fill="currentColor"/></svg>' : '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M3 5V3.5a3 3 0 0 1 5.8-1" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="5" width="8" height="6" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>'}</button><button class="card t${m.tier}${n >= 2 ? ' merge' : own.length ? ' owned' : ''}" type="button" data-i="${i}" data-key="${c.cls}|${c.mod}|1" ${broke(cost) ? 'disabled' : ''}>
       ${badge ? `<span class="badge">${badge}</span>` : ''}${unitImg(c.cls, c.mod)}<span class="cn">${CLASSES[c.cls].name}</span><span class="mn" style="color:${m.col}">${mi(c.mod)}${m.name}</span><span class="cost">${cost} gold</span></button></div>`;
   }).join('');
   const slotHTML = (u, where, i, locked, style) => {
@@ -3195,7 +3211,7 @@ function renderShop(){
     const n = counts[gkey(u)] || 0;
     const ready = u.star < 3 && ((u.star === 1 && n >= 2 && inShop.has(gkey(u))) || n >= 3);
     const show = u.star < 3 && (n >= 2 || (u.star === 1 && inShop.has(gkey(u))));
-    return `<div class="slot has${sel ? ' sel' : ''}${ready ? ' ready' : ''}"${st} role="button" tabindex="0" draggable="true" data-w="${where}" data-i="${i}" data-key="${gkey(u)}" aria-label="${cardName(u)}, ${u.star} star${u.star > 1 ? 's' : ''}${show ? `, ${n} of 3 for an upgrade` : ''}"><span class="st">${'★'.repeat(u.star)}</span>${unitImg(u.cls, u.mod)}<img class="smi" src="${MODS[u.mod].icon}" alt="">${show ? `<span class="cnt">${n}/3</span>` : ''}</div>`;
+    return `<div class="slot has s${u.star}${sel ? ' sel' : ''}${ready ? ' ready' : ''}"${st} role="button" tabindex="0" draggable="true" data-w="${where}" data-i="${i}" data-key="${gkey(u)}" aria-label="${cardName(u)}, ${u.star} star${u.star > 1 ? 's' : ''}${show ? `, ${n} of 3 for an upgrade` : ''}"><span class="st s${u.star}">${'★'.repeat(u.star)}</span>${unitImg(u.cls, u.mod)}<img class="smi" src="${MODS[u.mod].icon}" alt="">${show ? `<span class="cnt">${n}/3</span>` : ''}</div>`;
   };
   $('#bench').innerHTML = S.bench.map((u, i) => slotHTML(u, 'bench', i, false)).join('');
   const R = 66;
@@ -3229,12 +3245,12 @@ function renderShop(){
   $('#btnSell').innerHTML = su ? `Sell · +${su ? sellValue(su) : 0}g <kbd>E</kbd>` : 'Sell <kbd>E</kbd>';
   if (su) $('#info').innerHTML = describe(su);
 }
-function markMatches(key){
+function markMatches(key, anyStar){
   document.querySelectorAll('.slot.match').forEach(el => el.classList.remove('match'));
-  if (key) document.querySelectorAll(`.slot[data-key="${key}"]`).forEach(el => el.classList.add('match'));
+  if (key) document.querySelectorAll(anyStar ? `.slot[data-key^="${key.replace(/\|\d$/, '|')}"]` : `.slot[data-key="${key}"]`).forEach(el => el.classList.add('match'));
 }
 $('#cards').addEventListener('click', e => { const l = e.target.closest('.lock'); if (l){ toggleLock(+l.dataset.lock); return; } const b = e.target.closest('.card'); if (b && b.dataset.i != null) buy(+b.dataset.i); });
-$('#cards').addEventListener('mouseover', e => { const b = e.target.closest('.card'); if (b && b.dataset.i != null && S.shop[+b.dataset.i]){ $('#info').innerHTML = describe(S.shop[+b.dataset.i]); markMatches(b.dataset.key); } });
+$('#cards').addEventListener('mouseover', e => { const b = e.target.closest('.card'); if (b && b.dataset.i != null && S.shop[+b.dataset.i]){ $('#info').innerHTML = describe(S.shop[+b.dataset.i]); markMatches(b.dataset.key, true); } });
 $('#cards').addEventListener('mouseleave', () => markMatches(null));
 // hero abilities: click two slots or drag one onto another to swap them
 function swapAbil(a, b){ if (a === b || a == null || b == null) return; [S.abil[a], S.abil[b]] = [S.abil[b], S.abil[a]]; S.selAb = null; renderShop(); }
@@ -3401,7 +3417,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.17.0'; // major.minor.patch
+const VERSION = '0.17.1'; // major.minor.patch
 const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3842,6 +3858,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
   ['0.17.0', 'Balance pass', ['Blood heals the hero less: 1.5%, 2.25% and 3% of damage dealt (was 3%, 4.5% and 6%), and gives +10% attack speed (was +15%)', 'Twin Souls now only doubles class synergies, not elements, and costs 36 gold', 'Warriors deal a little less: +15% and +40% damage (was +20% and +50%)', 'Archers also give archers +15% and +30% damage', 'Mages are stronger: magic damage +30% and +75% (was +25% and +60%)', 'Priests hit harder', 'Elite wolves are half as common, crouch longer before they pounce and hit a little softer', 'Bosses that return in Endless hit less hard and have a bit less health', 'Iron is stronger: +40%, +60% and +80% damage', 'Pact of the Dead: +50% damage and only 20% less maximum health', 'Ghost Ship Chest gives 5 gold every shop', 'Press F in battle to make your units target bosses and elites first. Press it again to go back to the nearest enemy', 'You can skip the reward after a boss and take 10 gold instead', 'No more running away forever: enemies left far behind come back in ahead of you, more enemies appear in the direction you run, and bosses speed up to catch you', 'The damage meter can also show healing: click Healing to see who keeps the hero alive. The run summary shows it too']],
   ['0.16.0', 'Damage meter and run summary', ['A damage meter: press Tab to see how much each unit deals this wave, or for the whole raid. In the shop it shows the last wave', 'A run summary on the result screen: damage by unit, class and element, what hit you hardest, where your gold went, and your health after each wave', 'Anonymous run stats help us balance the game. They are on by default, you are told once, and you can turn them off in Settings', 'The campfire music in the shop is softer and no longer buzzes']],
   ['0.15.0', 'Physical and magic damage', ['The Rune Forge upgrade Raw Damage is split into Physical Damage (warriors and archers) and Magic Damage (mages and priests), +8% per level each', 'Runes spent on Raw Damage are refunded, so you can choose again', 'Fixed: cloud saves now keep the relics you have found']],
