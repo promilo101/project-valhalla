@@ -3433,7 +3433,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.17.4'; // major.minor.patch
+const VERSION = '0.17.5'; // major.minor.patch
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
 const FEEDBACK_REPO = (() => {
@@ -3873,6 +3873,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.17.5', 'Quieter music', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat']],
   ['0.17.4', 'Small fixes', ['Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow. Shots fly through him to the wights']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
   ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
@@ -4379,12 +4380,12 @@ function setMusic(name){
   const g = c.createGain(); g.gain.value = 0; g.connect(AU.music); const nodes = [];
   const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.connect(g);
   const osc = (f, type, det) => { const o = c.createOscillator(); o.type = type; o.frequency.value = f; o.detune.value = det || 0; o.connect(lp); o.start(); nodes.push(o); };
-  if (name === 'battle'){ lp.frequency.value = 260; osc(NOTE.D2, 'sawtooth', -6); osc(NOTE.D2 * 1.5, 'sawtooth', 5); g.gain.setTargetAtTime(.09, t, 1); }
+  if (name === 'battle'){ /* no constant drone in battle: the bass note on each bar carries the low end */ }
   else if (name === 'camp'){ /* no constant drone at the campfire: it hums on small speakers */ }
   else { // the title wind: filtered noise that slowly sweeps
     lp.frequency.value = 900; const src = c.createBufferSource(); src.buffer = AU.noise; src.loop = true; const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = 2; bp.frequency.value = 500;
     const lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = .07; lg.gain.value = 300; lfo.connect(lg); lg.connect(bp.frequency); lfo.start(); nodes.push(lfo);
-    src.connect(bp); bp.connect(lp); src.start(); nodes.push(src); osc(NOTE.D2, 'sine'); g.gain.setTargetAtTime(.1, t, 1.5);
+    src.connect(bp); bp.connect(lp); src.start(); nodes.push(src); g.gain.setTargetAtTime(.1, t, 1.5);
   }
   AU.drone = { g, nodes };
 }
@@ -4403,7 +4404,7 @@ function musicStep(t, b, intense, step){
     if (s8 === 0 || s8 === 4 || (intense && (s8 === 3 || s8 === 6))) tone(100, .25, Object.assign({ to: 40, vol: .28 }, m));
     if (s8 === 2 || s8 === 6){ noise(.18, Object.assign({ f: 250, ft: 'lowpass', vol: .12 }, m)); tone(140, .15, Object.assign({ to: 90, vol: .06 }, m)); }
     if (intense) noise(.03, Object.assign({ f: 6000, ft: 'highpass', vol: .018 }, m));
-    if (s8 === 0){ const root = [NOTE.D2, NOTE.D2, NOTE.C2, NOTE.A1][bar % 4]; tone(root, step * 7, Object.assign({ type: 'sawtooth', lp: 320, vol: .07, a: .03 }, m)); }
+    if (s8 === 0){ const root = [NOTE.D2, NOTE.D2, NOTE.C2, NOTE.A1][bar % 4]; tone(root, step * 3.5, Object.assign({ type: 'sawtooth', lp: 320, vol: .075, a: .02 }, m)); }
     if (bar % 2 === 1 && (s8 === 0 || s8 === 3 || s8 === 6) && Math.random() < .85) mel(step * 2.6, .045, 'triangle', 1300);
   } else if (AU.track === 'camp'){
     const chord = [[NOTE.D3, NOTE.F3, NOTE.A3, NOTE.D4], [NOTE.C4 / 2, NOTE.G3, NOTE.C4, NOTE.G4 / 2 * 2], [NOTE.F3, NOTE.A3, NOTE.C4, NOTE.F4], [NOTE.A3 / 2 * 2, NOTE.D4, NOTE.F4, NOTE.A4]][bar % 4];
