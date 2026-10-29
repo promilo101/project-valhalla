@@ -78,6 +78,7 @@ section.card{background:var(--panel);border:1px solid var(--line);border-radius:
     <section class="card"><h2>Relics</h2><div class="scroll"><table class="tbl" id="tRel"></table></div></section>
     <section class="card"><h2>Hero abilities</h2><div class="scroll"><table class="tbl" id="tAb"></table></div></section>
     <section class="card"><h2>Damage share by unit</h2><div class="scroll"><table class="tbl" id="tUnit"></table></div></section>
+    <section class="card"><h2>Healing by source</h2><p class="note" style="margin-bottom:6px">From version 0.17.0. Only health actually restored counts.</p><div class="scroll"><table class="tbl" id="tHeal"></table></div></section>
     <section class="card"><h2>Rune Forge levels</h2><div class="scroll"><table class="tbl" id="tForge"></table></div></section>
   </div>
 </div>
@@ -96,7 +97,7 @@ const pct = x => Math.round(x * 100) + '%';
 const avg = a => a.length ? a.reduce((x, y) => x + y, 0) / a.length : 0;
 const median = a => { if (!a.length) return 0; const b = [...a].sort((x, y) => x - y), m = b.length >> 1; return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
 const beat = r => r.result === 'won' || r.wave > 20;
-const unitName = k => { const [c, m] = k.split('_'); return CL[c] && EL[m] ? `${EL[m]} ${CL[c]}` : k === 'hero' ? 'Hero and power-ups' : k === 'ember' ? 'Ember Boots' : k; };
+const unitName = k => { if (k === 'syn_priest') return 'Priests synergy'; if (k === 'pu_mead') return 'Mead Horn power-up'; if (k.startsWith('relic_')) return RL[k.slice(6)] || k; if (k.startsWith('abil_')) return AB[k.slice(5)] || k; const [c, m] = k.split('_'); return CL[c] && EL[m] ? `${EL[m]} ${CL[c]}` : k === 'hero' ? 'Hero and power-ups' : k === 'ember' ? 'Ember Boots' : k; };
 const bar = (v, max, col) => `<div class="b"><i style="width:${max ? Math.max(1, 100 * v / max) : 0}%;${col ? 'background:' + col : ''}"></i></div>`;
 function table(el, head, rows){ el.innerHTML = `<thead><tr>${head.map(h => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows.length ? rows.join('') : `<tr><td colspan="${head.length}" class="note">No data yet</td></tr>`}</tbody>`; }
 // for a set of things, compare runs that had the thing with all runs
@@ -138,6 +139,10 @@ function render(){
   const dm = {}; let dt = 0; for (const r of runs) for (const [k, n] of Object.entries((r.data && r.data.dmg) || {})){ dm[k] = (dm[k] || 0) + n; dt += n; }
   const dl = Object.entries(dm).sort((a, b) => b[1] - a[1]).slice(0, 20), dmax = Math.max(1, ...dl.map(x => x[1]));
   table($('#tUnit'), ['Unit', 'Share of all damage', ''], dl.map(([k, n]) => `<tr><td>${esc(unitName(k))}</td><td>${pct(n / (dt || 1))}</td><td class="bar">${bar(n, dmax)}</td></tr>`));
+  // healing by source
+  const hm = {}, hr = {}; let ht = 0; const hRuns = runs.filter(r => r.data && r.data.heal); for (const r of hRuns) for (const [k, n] of Object.entries(r.data.heal)){ hm[k] = (hm[k] || 0) + n; hr[k] = (hr[k] || 0) + 1; ht += n; }
+  const hl = Object.entries(hm).sort((a, b) => b[1] - a[1]).slice(0, 20), hmax = Math.max(1, ...hl.map(x => x[1]));
+  table($('#tHeal'), ['Source', 'Share of all healing', 'Average per raid that has it', ''], hl.map(([k, n]) => `<tr><td>${esc(unitName(k))}</td><td>${pct(n / (ht || 1))}</td><td>${Math.round(n / hr[k])}</td><td class="bar">${bar(n, hmax)}</td></tr>`));
   // forge
   const fl = Object.keys(FG).map(k => { const lv = runs.map(r => (r.data && r.data.forge && r.data.forge[k]) || 0); return [k, avg(lv), lv.filter(x => x > 0).length / Math.max(1, runs.length)]; }), fm = Math.max(1, ...fl.map(x => x[1]));
   table($('#tForge'), ['Upgrade', 'Average level', 'Runs with it', ''], fl.map(([k, a, p]) => `<tr><td>${FG[k]}</td><td>${a.toFixed(2)}</td><td>${pct(p)}</td><td class="bar">${bar(a, fm)}</td></tr>`));
