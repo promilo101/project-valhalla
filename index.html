@@ -468,6 +468,14 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .cp-foot .abt{width:60px;height:60px}
 .cp-foot .abt img{width:40px;height:40px}
 .item-card{border-color:color-mix(in srgb,var(--rc) 55%,var(--line))}
+.rare-tag{font-size:13px;color:#1a1205;background:var(--gold);border-radius:2px;padding:0 4px;vertical-align:2px;white-space:nowrap}
+.brl .rar{font-size:15px;margin-top:2px}
+.bst.locked h4{color:var(--muted)}
+.bst.locked p{font-style:italic;color:var(--muted)}
+.bookbtn{display:flex;gap:10px;align-items:center;width:100%;margin-top:8px;text-align:left;background:var(--panel-2);border:1px solid var(--line);border-radius:2px;padding:8px 10px;color:var(--fg);font:inherit}
+.bookbtn:hover{background:#232a3d;border-color:#4a5470}
+.bookbtn img{width:30px;height:30px;image-rendering:pixelated;image-rendering:crisp-edges}
+.bookbtn .cb-t{font-size:18px}
 .item-card{position:relative}
 .item-card.sel{outline:2px solid var(--frost);outline-offset:1px}
 .verdict{position:absolute;bottom:4px;right:4px;font-size:13px;line-height:1;padding:1px 4px;background:#0d1018;border:1px solid;border-radius:2px}
@@ -655,6 +663,7 @@ a.btn{text-decoration:none;display:inline-block}
   <section id="shop" hidden aria-label="Shop and formation">
     <div class="s-form">
       <button class="charbtn" id="btnChar" type="button"><span class="cb-top"><img class="px" id="charBtnImg" alt=""><span class="cb-tt"><span class="cb-t">Character <kbd>C</kbd></span><span class="cb-s">Gear, abilities, relics</span></span></span><span class="cb-row" id="charSum"></span></button>
+      <button class="bookbtn" id="btnBook" type="button"><img id="bookImg" alt=""><span class="cb-tt"><span class="cb-t">Field Guide <kbd>J</kbd></span><span class="cb-s">Beasts, relics and gear you have found</span></span></button>
       <div class="head" style="margin-top:12px"><h3>Formation</h3></div>
       <p class="note" id="slotNote">2 of 8 slots</p>
       <p class="note form-help">Drag units from the bench onto the glowing marks around your hero at the fire. Right-click a unit to swap it between bench and formation.</p>
@@ -723,6 +732,7 @@ a.btn{text-decoration:none;display:inline-block}
         <dt><kbd>Tab</kbd></dt><dd>Show or hide the damage meter</dd>
         <dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Hero abilities, aimed at the mouse cursor</dd>
         <dt><kbd>C</kbd></dt><dd>In the shop: open your Character panel with gear, relics and abilities</dd>
+        <dt><kbd>J</kbd></dt><dd>In the shop: open the Field Guide</dd>
         <dt><kbd>F</kbd></dt><dd>In battle: switch between targeting the nearest enemy and bosses and elites first</dd>
         <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 2 minutes)</dd>
         <dt>Shop</dt><dd><kbd>R</kbd> reroll · <kbd>F</kbd> buy XP · <kbd>E</kbd> sell · <kbd>Q</kbd> sort bench · <kbd>G</kbd> heal</dd>
@@ -851,18 +861,23 @@ a.btn{text-decoration:none;display:inline-block}
     <div class="box best" id="bestiary" hidden aria-labelledby="bestTitle">
       <div class="best-head"><h2 id="bestTitle">Field Guide</h2><button class="btn sm" id="btnBestBack" type="button">Back</button></div>
       <div class="fg-tabs" role="tablist" aria-label="Field Guide sections">
-        <button class="fg-tab" role="tab" type="button" id="fgTabBeasts" data-tab="beasts" aria-controls="fgBeasts" aria-selected="true">Beasts</button>
+        <button class="fg-tab" role="tab" type="button" id="fgTabBeasts" data-tab="beasts" aria-controls="fgBeasts" aria-selected="true">Beasts <small id="bestBeastN"></small></button>
         <button class="fg-tab" role="tab" type="button" id="fgTabRelics" data-tab="relics" aria-controls="fgRelics" aria-selected="false" tabindex="-1">Relics <small id="bestRelicN"></small></button>
+        <button class="fg-tab" role="tab" type="button" id="fgTabGear" data-tab="gear" aria-controls="fgGear" aria-selected="false" tabindex="-1">Gear <small id="bestGearN"></small></button>
       </div>
       <div class="best-scroll" id="fgBeasts" role="tabpanel" aria-labelledby="fgTabBeasts" tabindex="0">
         <div class="best-grid" id="bestList"></div>
         <h3 class="best-sub">Elite traits</h3>
-        <p class="note best-intro">Elites have a coloured aura and a health bar. They are tougher and drop more souls and 1 gold. Each one has one trait:</p>
+        <p class="note best-intro">Elites have a coloured aura and a health bar. They are tougher and drop more souls and 1 gold. Each one has one trait. Beasts and traits appear here the first time you meet them.</p>
         <div class="best-grid" id="bestElite"></div>
       </div>
       <div class="best-scroll" id="fgRelics" role="tabpanel" aria-labelledby="fgTabRelics" tabindex="0" hidden>
         <p class="note best-intro">Relics are sold by the Wandering Merchant and granted by the Cursed Altar. Each one appears here the first time you find it. Until then you only get a hint.</p>
         <div class="best-grid best-relics" id="bestRelics"></div>
+      </div>
+      <div class="best-scroll" id="fgGear" role="tabpanel" aria-labelledby="fgTabGear" tabindex="0" hidden>
+        <p class="note best-intro">Gear for your hero, sold by the Wandering Merchant and dropped by bosses. Each type appears here the first time you find it, and the rarities you have found light up: Common, Rare and Epic.</p>
+        <div class="best-grid best-relics" id="bestGear"></div>
       </div>
     </div>
   </div>
@@ -957,6 +972,14 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="r"><select id="dbgCls" aria-label="Class"></select><select id="dbgMod" aria-label="Modifier"></select><select id="dbgStar" aria-label="Stars"><option value="1">★</option><option value="2">★★</option><option value="3">★★★</option></select><button type="button" id="dbgGive">Give unit</button></div>
       <div class="r"><button type="button" id="dbgMana">Fill mana</button></div>
     </fieldset>
+    <fieldset><legend>Gear</legend>
+      <div class="r"><button type="button" id="dbgDropRare">Boss drop: Rare</button><button type="button" id="dbgDropEpic">Boss drop: Epic</button></div>
+      <div class="r"><label for="dbgEpicBoss"><input type="checkbox" id="dbgEpicBoss"> Bosses always drop Epic gear</label></div>
+      <div class="r"><select id="dbgGearBase" aria-label="Gear type"></select><select id="dbgGearR" aria-label="Rarity"><option value="0">Common</option><option value="1">Rare</option><option value="2" selected>Epic</option></select><button type="button" id="dbgGiveGear">Give gear</button></div>
+    </fieldset>
+    <fieldset><legend>Field Guide</legend>
+      <div class="r"><button type="button" id="dbgUnlockFg">Unlock all entries</button><button type="button" id="dbgLockFg" class="warn">Lock all entries</button></div>
+    </fieldset>
     <fieldset><legend>Autoplay</legend>
       <div class="r"><label for="dbgBot"><input type="checkbox" id="dbgBot"> Bot plays the game</label><label for="dbgBotLoop"><input type="checkbox" id="dbgBotLoop" checked> New raid after death</label></div>
       <div class="r" style="color:var(--muted);font-size:15px">Moves, dodges, dashes, casts and shops. Press a movement key to take over. Combine with Speed below.</div>
@@ -1021,6 +1044,12 @@ function migrateMeta(){
   if (old > 0){ let back = 0; for (let l = 0; l < old; l++) back += upCost(l); meta.runes += back; metaRefund += back; }
   meta.dmg = 0;
   if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = [];
+  if (!meta.seen || typeof meta.seen !== 'object'){ // Field Guide discoveries; existing players keep what they have already met
+    const first = { draugr: 1, wolf: 2, raven: 3, witch: 4, armored: 7 };
+    meta.seen = { e: Object.keys(first).filter(k => (meta.best || 0) >= first[k]), a: (meta.runs || 0) > 0 ? ['frozen', 'burning', 'warded', 'swift'] : [], g: {} };
+    saveMeta();
+  }
+  if (!Array.isArray(meta.seen.e)) meta.seen.e = []; if (!Array.isArray(meta.seen.a)) meta.seen.a = []; if (!meta.seen.g || typeof meta.seen.g !== 'object') meta.seen.g = {};
   if (old > 0) saveMeta();
 }
 migrateMeta();
@@ -2047,7 +2076,7 @@ function spawnFromWave(){
   spawnEnemy(type, S.hero.x + Math.cos(a) * d, S.hero.y + Math.sin(a) * d, elite);
 }
 function spawnEnemy(type, x, y, elite){
-  const d = ENEMIES[type], W = waveDef(S.wave);
+  const d = ENEMIES[type], W = waveDef(S.wave); discover('e', type);
   const ek = Math.max(0, S.wave - WAVES.length); // endless waves past Fenrir
   const hs = d.boss ? (ek ? hpScale(S.wave) / hpScale(BOSS_HOME[type]) * .7 : 1) : hpScale(S.wave) * (W.hp || 1) * 1.06 ** ek * (S.cursed ? 1.4 : 1);
   const sc = d.scale || 1, spr = SPR[d.spr];
@@ -2061,7 +2090,7 @@ function spawnEnemy(type, x, y, elite){
   e.max = e.hp;
   // elite affixes: every elite gets one trait you can see at a glance
   if (elite && !d.boss){
-    e.aff = pick(['frozen', 'burning', 'warded', 'swift']); e.gx = x; e.gy = y; e.trT = 0;
+    e.aff = pick(['frozen', 'burning', 'warded', 'swift']); e.gx = x; e.gy = y; e.trT = 0; discover('a', e.aff);
     if (e.aff === 'swift') e.spd *= 1.45;
     if (e.aff === 'warded') e.shield = e.shieldMax = e.max * .35;
   }
@@ -2103,7 +2132,7 @@ function takePowerup(p){
 /* ================= COMBAT ================= */
 function nearest(x, y, range, eliteOnly){
   let best = null, bd = range * range;
-  for (const e of S.enemies){ if (e.dead || (eliteOnly && !e.elite && !e.d.boss)) continue; let d = dist2(x, y, e.x, e.y) - e.r * e.r; if (d > range * range) continue; if (e.d.boss) d *= .3; if (d < bd){ bd = d; best = e; } }
+  for (const e of S.enemies){ if (e.dead || e.immune || (eliteOnly && !e.elite && !e.d.boss && !e.prio)) continue; let d = dist2(x, y, e.x, e.y) - e.r * e.r; if (d > range * range) continue; if (e.d.boss) d *= .3; if (d < bd){ bd = d; best = e; } }
   return best;
 }
 function hit(e, raw, dtype, u, opt){
@@ -2464,7 +2493,7 @@ function update(dt){
     }
     if (p.kind === 'holy' && Math.random() < .5) S.parts.push({ x: p.x, y: p.y, vx: 0, vy: 0, life: .2, max: .2, col: '#ffe9a0', s: 1, add: true });
     for (const e of (S.enemies.length > 40 ? near(p.x, p.y, nb) : S.enemies)){
-      if (e.dead) continue;
+      if (e.dead || e.immune) continue; // shots fly through a boss hiding in his barrow
       if (dist2(p.x, p.y, e.x, e.y) > (p.r + e.r) ** 2) continue;
       if (p.hits && p.hits.has(e)) continue;
       if (p.aoe){ explode(p); p.life = 0; p.boom = true; break; }
@@ -2658,7 +2687,7 @@ function bossAI(e, dt, dx, dy, d, sp){
       return;
     }
     if (phase2 && !e.rose){ e.rose = true; e.immune = true; e.wights = [];
-      for (const s2 of [-1, 1]) e.wights.push(spawnEnemy('wight', e.x + s2 * 50, e.y - 20));
+      for (const s2 of [-1, 1]){ const w = spawnEnemy('wight', e.x + s2 * 50, e.y - 20); w.prio = true; e.wights.push(w); }
       burst(e.x, e.y, 30, ['#6a4428', '#3d2818'], 70, false); addText(e.x, e.y - e.h / 2 - 8, 'Barrow Rise', '#6fc7a0', true); return; }
     e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
     if (e.atkT <= 0){
@@ -2695,7 +2724,7 @@ function bossAI(e, dt, dx, dy, d, sp){
         e.state = 'cast'; e.st = .9; e.atkT = 2.8; addText(e.x, e.y - e.h / 2 - 6, 'Half-Death', '#d6b8ff', true);
       } else { // Soul Wisps: slow souls that drain the hero and heal her
         const alive = S.enemies.filter(o => o.d.wisp && !o.dead).length;
-        for (let k = alive; k < 3; k++){ const a2 = k * 2.1 + rand(0, .5); spawnEnemy('wisp', e.x + Math.cos(a2) * 18, e.y + Math.sin(a2) * 18); }
+        for (let k = alive; k < 3; k++){ const a2 = k * 2.1 + rand(0, .5); spawnEnemy('wisp', e.x + Math.cos(a2) * 18, e.y + Math.sin(a2) * 18).prio = true; }
         e.state = 'cast'; e.st = .7; e.atkT = 2.4; addText(e.x, e.y - e.h / 2 - 6, 'Soul Wisps', '#bfffe6', true);
       }
     }
@@ -3517,16 +3546,18 @@ const BESTIARY = [
 const BEST_AFF = [['frozen', 'Frozen', 'Leaves a trail of ice that slows you.'], ['burning', 'Burning', 'Explodes a moment after it dies. Leave the ring.'], ['warded', 'Warded', 'A rune shield soaks up damage first. Hits on it show in purple.'], ['swift', 'Swift', 'Moves about 45% faster and leaves an afterimage.']];
 const bestAnims = []; let bestRaf = 0;
 function buildBestiary(){
-  if (bestAnims.length) return;
-  const card = (k, html, aff) => {
-    const el = document.createElement('div'); el.className = 'bst'; if (aff) el.style.setProperty('--c', AFF_COL[aff]);
+  bestAnims.length = 0; $('#bestList').innerHTML = ''; $('#bestElite').innerHTML = '';
+  const nE = BESTIARY.filter(([k]) => seenE(k)).length + BEST_AFF.filter(([a]) => seenA(a)).length;
+  $('#bestBeastN').textContent = `${nE}/${BESTIARY.length + BEST_AFF.length}`;
+  const card = (k, html, aff, locked) => {
+    const el = document.createElement('div'); el.className = 'bst' + (locked ? ' locked' : ''); if (aff && !locked) el.style.setProperty('--c', AFF_COL[aff]);
     const c = document.createElement('canvas'); c.width = 22; c.height = 20; c.setAttribute('aria-hidden', 'true');
     el.append(c); el.insertAdjacentHTML('beforeend', `<div class="t">${html}</div>`);
-    bestAnims.push({ g: c.getContext('2d'), k, aff, off: Math.random() * 3 });
+    bestAnims.push({ g: c.getContext('2d'), k, aff: locked ? null : aff, off: Math.random() * 3, locked });
     return el;
   };
-  $('#bestList').append(...BESTIARY.map(([k, n, w, d, m]) => card(k, `<h4>${n}<small>move from wave ${w}</small></h4><p>${d}</p><p>${m}</p>`)));
-  $('#bestElite').append(...BEST_AFF.map(([a, n, d], i) => card(['draugr', 'wolf', 'armored', 'witch'][i], `<h4>${n}</h4><p>${d}</p>`, a)));
+  $('#bestList').append(...BESTIARY.map(([k, n, w, d, m]) => seenE(k) ? card(k, `<h4>${n}<small>move from wave ${w}</small></h4><p>${d}</p><p>${m}</p>`) : card(k, `<h4>Undiscovered beast</h4><p>${BEAST_HINT[k]}</p>`, null, true)));
+  $('#bestElite').append(...BEST_AFF.map(([a, n, d], i) => seenA(a) ? card(['draugr', 'wolf', 'armored', 'witch'][i], `<h4>${n}</h4><p>${d}</p>`, a) : card(['draugr', 'wolf', 'armored', 'witch'][i], `<h4>Undiscovered trait</h4><p>${AFF_HINT[a]}</p>`, a, true)));
 }
 function drawBestiary(ts){
   const t = Math.max(0, ts || 0) / 1000;
@@ -3541,6 +3572,7 @@ function drawBestiary(ts){
       if (A.aff === 'swift'){ g.globalAlpha = .28; g.drawImage(s, x - 3, y); g.globalAlpha = 1; }
     }
     g.drawImage(s, x, y);
+    if (A.locked){ g.globalCompositeOperation = 'source-atop'; g.fillStyle = '#2a3042'; g.fillRect(0, 0, 22, 20); g.globalCompositeOperation = 'source-over'; }
     if (A.aff === 'warded'){ g.strokeStyle = AFF_COL.warded; g.lineWidth = 1; g.setLineDash([1, 1]); g.beginPath(); g.arc(11, y + s.height / 2, 9.5, tt, tt + 6.283); g.stroke(); g.setLineDash([]); }
     if (A.aff === 'burning'){ g.fillStyle = (tt * 8 | 0) % 2 ? '#ff5b2e' : '#ffb347'; g.fillRect(6 + (tt * 7 | 0) % 9, y + 2 + (tt * 5 | 0) % 6, 1, 1); }
     if (A.aff){ g.fillStyle = '#000'; g.fillRect(4, Math.max(0, y - 3), 14, 2); g.fillStyle = AFF_COL[A.aff]; g.fillRect(4, Math.max(0, y - 3), 11, 2); }
@@ -3554,6 +3586,35 @@ const RELIC_HINT = {
   berserk_mark: 'Rage grows as the blood runs.', raven_banner: 'A banner that calls one more to war.', naglfar_chest: 'A chest from a ship of the dead.',
 };
 const relicSeen = k => Array.isArray(meta.relicsSeen) && meta.relicsSeen.includes(k);
+const BEAST_HINT = { draugr: 'Something stirs in the barrows.', wolf: 'Something howls in the dark.', raven: 'Wings beat above the mist.', witch: 'A voice chants in the fog.', armored: 'Iron scrapes on stone.' };
+const AFF_HINT = { frozen: 'An elite with a cold aura.', burning: 'An elite that smoulders.', warded: 'An elite hidden behind runes.', swift: 'An elite too fast to follow.' };
+const AFF_NAME = { frozen: 'Frozen', burning: 'Burning', warded: 'Warded', swift: 'Swift' };
+const seenE = k => meta.seen && meta.seen.e.includes(k), seenA = k => meta.seen && meta.seen.a.includes(k), seenG = k => (meta.seen && meta.seen.g[k]) || [];
+function discover(kind, k){
+  if (!meta.seen || (S && S.tutorial)) return;
+  if (kind === 'e' && !BEAST_HINT[k]) return;
+  const list = meta.seen[kind]; if (list.includes(k)) return;
+  list.push(k); saveMeta(); cloudQueue && cloudQueue();
+  const name = kind === 'e' ? ENEMIES[k].name : AFF_NAME[k] + ' elites';
+  setTimeout(() => toast(`New in the Field Guide: ${name}`), 400);
+}
+function discoverGear(it){
+  if (!it || !meta.seen || (S && S.tutorial)) return;
+  const have = meta.seen.g[it.b] || (meta.seen.g[it.b] = []); if (have.includes(it.r)) return;
+  const first = !have.length; have.push(it.r); saveMeta();
+  if (first) setTimeout(() => toast(`New gear in the Field Guide: ${GEAR_BASES[it.slot][it.b].name}`), 700);
+}
+const GEAR_DESC = { plate: 'Plate: heavy physical armor, some magic armor and health.', mail: 'Mail: physical and magic armor in equal parts, and the most health.', rune: 'Rune-woven: heavy magic armor against curses, fire and frost.', axe: 'Slow, heavy blows at short reach.', sword: 'Quick strikes at short reach.', spear: 'Steady blows with long reach.', shield: 'Physical and magic armor for the off hand.', handaxe: 'Adds damage to every blow of your main weapon, and ability damage.', talisman: 'Magic armor and ability damage.' };
+function renderBestGear(){
+  const all = []; for (const sl of GEAR_SLOTS) for (const b of Object.keys(GEAR_BASES[sl])) all.push([sl, b]);
+  const n = all.filter(([, b]) => seenG(b).length).length;
+  $('#bestGearN').textContent = `${n}/${all.length}`;
+  $('#bestGear').innerHTML = all.map(([sl, b]) => {
+    const got = seenG(b), B = GEAR_BASES[sl][b], top = got.length ? Math.max(...got) : 0, it = { slot: sl, b, r: top };
+    if (!got.length) return `<div class="brl locked"><img src="${itemIcon(it)}" alt=""><div><h4>Undiscovered ${SLOT_NAME[sl].toLowerCase()}</h4><p>Not found yet. The Merchant and the bosses carry gear.</p></div></div>`;
+    return `<div class="brl"><img src="${itemIcon(it)}" alt=""><div><h4 style="color:${RARITY[top].col}">${B.name} <small style="color:var(--muted)">${SLOT_NAME[sl]}</small></h4><p>${GEAR_DESC[B.fl || b] || ''}</p><p class="rar">${RARITY.map((R, r) => `<span style="color:${got.includes(r) ? R.col : '#3a4256'}">${got.includes(r) ? '◆' : '◇'} ${R.name}</span>`).join(' ')}</p></div></div>`;
+  }).join('');
+}
 function discoverRelic(k){
   if (!RELICS[k] || relicSeen(k) || (S && S.tutorial)) return;
   if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = [];
@@ -3564,15 +3625,15 @@ function renderBestRelics(){
   const keys = Object.keys(RELICS), n = keys.filter(relicSeen).length;
   $('#bestRelicN').textContent = `${n}/${keys.length}`;
   $('#bestRelics').innerHTML = keys.map(k => relicSeen(k)
-    ? `<div class="brl"><img src="${RELIC_ICON[k]}" alt=""><div><h4>${RELICS[k].name}</h4><p>${RELICS[k].desc}</p></div></div>`
+    ? `<div class="brl"><img src="${RELIC_ICON[k]}" alt=""><div><h4>${RELICS[k].name}${rareTag(k)}</h4><p>${RELICS[k].desc}</p></div></div>`
     : `<div class="brl locked"><img src="${RELIC_ICON[k]}" alt=""><div><h4>Undiscovered relic</h4><p>${RELIC_HINT[k]}</p></div></div>`).join('');
 }
 let guideFromTitle = false;
 function openGuideFromTitle(){ guideFromTitle = true; $('#pause').hidden = false; $('#pause').classList.add('over-shop'); showBestiary(true); fgShow(fgTab); }
 function showBestiary(on){
-  if (!on && guideFromTitle){ guideFromTitle = false; $('#bestiary').hidden = true; $('#pause .box:not(.best)').hidden = false; $('#pause').hidden = true; $('#btnGuide').focus(); return; }
+  if (!on && guideFromTitle){ guideFromTitle = false; $('#bestiary').hidden = true; $('#pause .box:not(.best)').hidden = false; $('#pause').hidden = true; (mode === 'shop' ? $('#btnBook') : $('#btnGuide')).focus(); return; }
   $('#bestiary').hidden = !on; $('#pause .box:not(.best)').hidden = on;
-  if (on){ buildBestiary(); renderBestRelics(); if (!bestRaf) bestRaf = requestAnimationFrame(drawBestiary); $('#btnBestBack').focus(); } else $('#btnBest').focus();
+  if (on){ buildBestiary(); renderBestRelics(); renderBestGear(); if (!bestRaf) bestRaf = requestAnimationFrame(drawBestiary); $('#btnBestBack').focus(); } else $('#btnBest').focus();
 }
 // Field Guide tabs; add a button with data-tab and a panel to add a new section
 let fgTab = 'beasts';
@@ -3595,6 +3656,9 @@ document.querySelector('.fg-tabs').addEventListener('keydown', e => {
 });
 $('#btnBest').onclick = () => { showBestiary(true); fgShow(fgTab); };
 $('#btnGuide').onclick = openGuideFromTitle;
+const BOOK_ICON = makeSprite(['.XXXXXXX.', 'XYYYYYYKX', 'XYGGGYYKX', 'XYGYGYYKX', 'XYGGGYYKX', 'XYYYYYYKX', 'XYYYYYYKX', 'XXXXXXXKX', '.WWWWWWW.'], { X: '#5a3a2a', Y: '#8e1232', G: '#e2b24c', K: '#3a2418', W: '#e8e3d6' }).toDataURL();
+$('#bookImg').src = BOOK_ICON;
+$('#btnBook').onclick = e => { e.currentTarget.blur(); openGuideFromTitle(); if (tut && tut.wantGuide) tut.guideOpened = true; };
 $('#btnBestBack').onclick = () => showBestiary(false);
 $('#event').addEventListener('click', e => { const ic = e.target.closest('.item-card'); if (ic){ pickItem(+ic.dataset.item); return; } const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
 $('#event').addEventListener('mouseleave', () => { const E = S && S.event; if (E && E.items && S.selItem != null && E.items[S.selItem]) setInfo(describeItem(E.items[S.selItem], 'shop')); });
@@ -3773,7 +3837,8 @@ function showPick(kind){
     const news = Object.keys(ABILITIES).filter(k => !owned.includes(k)).map(key => ({ type: 'new', key }));
     opts = shuffle(ups).slice(0, 2).concat(shuffle(news)); opts = shuffle(opts.slice(0, 3));
     if (!opts.length) opts = [{ type: 'gold', key: 'gold' }];
-    opts.push({ type: 'item', item: makeItem(pick(GEAR_SLOTS), rollRarity(S.wave, true), S.wave) }); // a boss also drops a piece of rare gear
+    const drop = makeItem(pick(GEAR_SLOTS), dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave); discoverGear(drop);
+    opts.push({ type: 'item', item: drop }); // a boss also drops a piece of rare gear
   }
   picking = { kind, opts, step: 'choose', chosen: null };
   renderPick();
@@ -3912,6 +3977,13 @@ function dbgTick(dt){
   on('#dbgGold', () => { if (!needRun()) return; S.gold += 50; if (mode === 'shop') renderShop(); });
   on('#dbgSetLevel', () => { if (!needRun()) return; S.level = +$('#dbgLevel').value; S.xp = 0; computeTraits(); if (mode === 'shop') renderShop(); toast(`Level ${S.level}`); });
   on('#dbgGive', () => { if (needRun()) dbgGiveUnit($('#dbgCls').value, $('#dbgMod').value, +$('#dbgStar').value); });
+  setTimeout(() => { $('#dbgGearBase').innerHTML = GEAR_SLOTS.map(sl => Object.keys(GEAR_BASES[sl]).map(b => `<option value="${sl}:${b}">${SLOT_NAME[sl]}: ${GEAR_BASES[sl][b].name}</option>`).join('')).join(''); }, 0); // the gear tables are defined further down
+  const dbgDrop = r => { if (!needRun()) return; if (picking) return toast('Close the current pick first'); showPick('boss'); const P = picking, o = P && P.opts.find(x => x.type === 'item'); if (o){ o.item = makeItem(pick(GEAR_SLOTS), r, S.wave); renderPick(); } };
+  on('#dbgDropRare', () => dbgDrop(1)); on('#dbgDropEpic', () => dbgDrop(2));
+  $('#dbgEpicBoss').onchange = e => { dbg.epicBoss = e.target.checked; };
+  on('#dbgGiveGear', () => { if (!needRun()) return; const [sl, b] = $('#dbgGearBase').value.split(':'), it = makeItem(sl, +$('#dbgGearR').value, S.wave, b); equipItem(it); discoverGear(it); if (mode === 'shop') renderShop(); toast(`${it.name} equipped`); });
+  on('#dbgUnlockFg', () => { meta.seen.e = BESTIARY.map(x => x[0]); meta.seen.a = BEST_AFF.map(x => x[0]); for (const sl of GEAR_SLOTS) for (const b of Object.keys(GEAR_BASES[sl])) meta.seen.g[b] = [0, 1, 2]; meta.relicsSeen = Object.keys(RELICS); saveMeta(); toast('Every Field Guide entry is unlocked'); });
+  on('#dbgLockFg', () => { meta.seen = { e: [], a: [], g: {} }; meta.relicsSeen = []; saveMeta(); toast('Every Field Guide entry is locked again'); });
   on('#dbgMana', () => { if (needRun()) S.board.forEach(u => { if (u) u.mana = 100; }); });
   $('#dbgSpeed').addEventListener('click', e => { const b = e.target.closest('button[data-sp]'); if (!b) return; dbg.speed = +b.dataset.sp; $('#dbgSpeed').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); b.blur(); });
   on('#dbgRunes', () => { meta.runes += 100; saveMeta(); if (mode === 'title') renderTitle(); if (mode === 'meta') renderMeta(); toast('+100 runes'); });
@@ -4010,6 +4082,14 @@ function applyCloud(d){
   for (const k of Object.keys(meta)) if (Number.isFinite(d.meta[k])) meta[k] = Math.max(0, Math.round(d.meta[k]));
   if (Number.isFinite(d.meta.dmg)) meta.dmg = Math.max(0, Math.round(d.meta.dmg));
   if (Array.isArray(d.meta.relicsSeen)) meta.relicsSeen = [...new Set([...(meta.relicsSeen || []), ...d.meta.relicsSeen.filter(k => typeof k === 'string' && RELICS[k])])];
+  const ds = d.meta.seen;
+  if (ds && typeof ds === 'object'){
+    migrateMeta();
+    const okS = v => typeof v === 'string' && v.length < 20;
+    if (Array.isArray(ds.e)) meta.seen.e = [...new Set([...meta.seen.e, ...ds.e.filter(okS)])];
+    if (Array.isArray(ds.a)) meta.seen.a = [...new Set([...meta.seen.a, ...ds.a.filter(okS)])];
+    if (ds.g && typeof ds.g === 'object') for (const k of Object.keys(ds.g)) if (okS(k) && Array.isArray(ds.g[k])) meta.seen.g[k] = [...new Set([...(meta.seen.g[k] || []), ...ds.g[k].filter(r => [0, 1, 2].includes(r))])];
+  }
   migrateMeta();
   try {
     localStorage.setItem(META_KEY, JSON.stringify(meta));
@@ -4060,7 +4140,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a relic', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a relic', 'Bosses no longer heal you to full']],
+  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a relic', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a relic', 'Bosses no longer heal you to full', 'Twin Souls and Raven Banner are rare relics: the Merchant and the Cursed Altar offer them about a third as often', 'The Field Guide has a Gear tab, and beasts, elite traits, relics and gear stay hidden until you find them. Open it from the book in the shop (J)', 'The tutorial shows the Field Guide', 'Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
   ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
   ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
@@ -4241,6 +4321,7 @@ addEventListener('keydown', e => {
     else if (e.code === 'KeyQ') sortBench();
     else if (e.code === 'KeyG') buyHeal();
     else if (e.code === 'KeyC') openChar();
+    else if (e.code === 'KeyJ'){ openGuideFromTitle(); if (tut && tut.wantGuide) tut.guideOpened = true; }
   }
 });
 addEventListener('keyup', e => { keys[e.code] = false; if (e.code === 'Space' && mode !== 'title' && mode !== 'meta' && mode !== 'over') e.preventDefault(); });
@@ -4358,6 +4439,9 @@ const RELIC_ART = {
 const RELIC_ICON = {};
 for (const k in RELIC_ART){ const c = makeSprite(RELIC_ART[k][0], RELIC_ART[k][1]); RELIC_ICON[k] = c.toDataURL(); }
 const hasR = k => !!(S && S.relics && S.relics.includes(k));
+const RARE_RELIC = { twin_souls: 1, raven_banner: 1 }; // offered about a third as often as other relics
+const pickRelic = pool => weighted(Object.fromEntries(pool.map(k => [k, RARE_RELIC[k] ? .35 : 1])));
+const rareTag = k => RARE_RELIC[k] ? ' <span class="rare-tag">Rare relic</span>' : '';
 const relicSell = k => Math.floor(RELICS[k].price / 2);
 function relicsChanged(){
   if (!hasR('raven_banner') && S.board[8]){ const f = S.bench.indexOf(null); if (f >= 0){ S.bench[f] = S.board[8]; S.board[8] = null; } }
@@ -4379,7 +4463,7 @@ function sellRelic(k){
 }
 function describeRelic(k, owned){
   const R = RELICS[k];
-  return `<strong>${R.name}</strong><br>${R.desc}<br><span style="color:var(--muted)">Relic. Lasts for the rest of the raid.</span>` + (owned ? `<br><button class="btn sm" id="btnRelicSell" type="button" data-r="${k}">Sell for ${relicSell(k)} gold</button>` : `<br><span style="color:var(--gold)">${R.price} gold</span>`);
+  return `<strong>${R.name}</strong>${rareTag(k)}<br>${R.desc}<br><span style="color:var(--muted)">${RARE_RELIC[k] ? 'A rare relic: the Merchant seldom has one.' : 'Relic.'} Lasts for the rest of the raid.</span>` + (owned ? `<br><button class="btn sm" id="btnRelicSell" type="button" data-r="${k}">Sell for ${relicSell(k)} gold</button>` : `<br><span style="color:var(--gold)">${R.price} gold</span>`);
 }
 function renderRelicBar(){
   const bar = $('#relicBar'); if (!bar) return;
@@ -4420,7 +4504,7 @@ function makeItem(slot, r, wave, bk){
   it.price = Math.round((5 + wave * .9) * R.price * (slot === 'main' ? 1.15 : 1));
   return it;
 }
-const starterGear = () => { const g = { helm: null, chest: null, legs: null, main: makeItem('main', 0, 1, 'axe'), off: null }; g.main.name = 'Worn Axe'; return g; };
+const starterGear = () => { const g = { helm: null, chest: null, legs: null, main: makeItem('main', 0, 1, 'axe'), off: null }; g.main.name = 'Worn Axe'; discoverGear(g.main); return g; };
 // rarer gear later in the raid; bosses always give at least a rare piece
 function rollRarity(w, boss){
   const e = boss ? (w >= 15 ? .45 : .15) : clamp((w - 8) * .03, 0, .25), rr = boss ? 1 : clamp(.12 + w * .025, 0, .5), x = Math.random();
@@ -4599,7 +4683,7 @@ function activateShrine(SH){
 }
 function altarReward(){
   const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
-  if (S.relics.length < MAX_RELICS && pool.length){ const k = pick(pool); gainRelic(k); if (S.stats) S.stats.relicBuys.push({ k, w: S.wave, altar: true }); toast(`The altar grants you ${RELICS[k].name}`); }
+  if (S.relics.length < MAX_RELICS && pool.length){ const k = pickRelic(pool); gainRelic(k); if (S.stats) S.stats.relicBuys.push({ k, w: S.wave, altar: true }); toast(`The altar grants you ${RELICS[k].name}`); }
   else { S.gold += 15; statGold('Events', 15); toast('The altar grants you 15 gold'); }
   sfx('level');
 }
@@ -4608,9 +4692,10 @@ function altarReward(){
 function makeEvent(type){
   if (type === 'merchant'){
     const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
-    const offers = pool.length ? [pool[Math.floor(Math.random() * pool.length)]] : []; offers.forEach(discoverRelic);
+    const offers = pool.length ? [pickRelic(pool)] : []; offers.forEach(discoverRelic);
     const slots = shuffle(GEAR_SLOTS.slice()).slice(0, 3);
-    return { type, offers, bought: [], items: slots.map(sl => makeItem(sl, rollRarity(S.wave), S.wave)), boughtI: [] };
+    const items = slots.map(sl => makeItem(sl, rollRarity(S.wave), S.wave)); items.forEach(discoverGear);
+    return { type, offers, bought: [], items, boughtI: [] };
   }
   if (type === 'shrine') return { type, cost: Math.round(S.hero.maxHp * .2), gold: 8 + S.wave, done: false };
   return { type: 'altar', done: false };
@@ -4628,7 +4713,7 @@ function renderEvent(){
   if (E.type === 'merchant'){
     const full = S.relics.length >= MAX_RELICS, items = E.items || [];
     el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.merchant}" alt=""><div><h4>The Wandering Merchant</h4><p>"Steel for the living, relics for the bold." Gear goes on right away, and what you wore is sold for half.${full && E.offers.length ? ' <b>Your relic slots are full: sell one in the Character panel.</b>' : ''}</p></div></div>
-      <div class="ev-items">${items.map((it, i) => { const got = E.boughtI.includes(i), R = RARITY[it.r], cur = S.gear[it.slot], v = !got && cur ? VERDICT[gearDiff(it, cur).verdict] : null; return `<button class="relic-card item-card${S.selItem === i ? ' sel' : ''}" type="button" data-item="${i}" style="--rc:${R.col}" ${got || (!dbg.infGold && S.gold < it.price) ? 'disabled' : ''}>${v ? `<span class="verdict" style="color:${v[1]};border-color:${v[1]}">${v[0]}</span>` : ''}<img src="${itemIcon(it)}" alt=""><span class="rn" style="color:${R.col}">${esc(it.name)}</span><span class="rd">${SLOT_NAME[it.slot]} · ${itemStats(it).slice(0, 2).join(' · ')}</span><span class="rp">${got ? 'Bought' : it.price + ' gold'}</span></button>`; }).join('')}${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>`;
+      <div class="ev-items">${items.map((it, i) => { const got = E.boughtI.includes(i), R = RARITY[it.r], cur = S.gear[it.slot], v = !got && cur ? VERDICT[gearDiff(it, cur).verdict] : null; return `<button class="relic-card item-card${S.selItem === i ? ' sel' : ''}" type="button" data-item="${i}" style="--rc:${R.col}" ${got || (!dbg.infGold && S.gold < it.price) ? 'disabled' : ''}>${v ? `<span class="verdict" style="color:${v[1]};border-color:${v[1]}">${v[0]}</span>` : ''}<img src="${itemIcon(it)}" alt=""><span class="rn" style="color:${R.col}">${esc(it.name)}</span><span class="rd">${SLOT_NAME[it.slot]} · ${itemStats(it).slice(0, 2).join(' · ')}</span><span class="rp">${got ? 'Bought' : it.price + ' gold'}</span></button>`; }).join('')}${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}${rareTag(k)}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>`;
   } else if (E.type === 'shrine'){
     const can = S.hero.hp > E.cost + 1;
     el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.shrine}" alt=""><div><h4>Blood Shrine</h4><p>${E.done ? 'The gods have taken their due.' : `Offer blood to the gods: lose ${E.cost} health and gain ${E.gold} gold.`}</p></div></div>
@@ -4850,7 +4935,9 @@ const TUT_STEPS = [
   { mode: 'shop', target: ['#formation .slot[data-i="0"]', '#formation .slot[data-i="2"]', '#formation .slot[data-i="4"]', '#formation .slot[data-i="6"]', '#bench'], anim: 'drag', h: 'Formation and bench', p: 'Only units on the glowing marks around your hero at the fire fight. The bench holds the rest. Drag a unit from the bench onto a mark, or right-click it to send it between bench and formation. Levelling up with XP opens more marks.' },
   { mode: 'shop', target: '#traits', h: 'Synergies', p: () => `Units in the formation build synergies. Two of the same class or element switch a bonus on. Four of a class, or three of an element, make it stronger. We added ${tut.gift || 'a unit'} so ${tut.giftEl || 'an element'} is active. Hover or click a synergy row to read exactly what it does.`, enter: tutSynergy },
   { mode: 'shop', target: '#event', wide: true, h: 'The Wandering Merchant', p: 'The Merchant waits at every campfire. He sells gear for your hero (helmets, chestplates, leggings and weapons) and a relic that twists a rule for the rest of the raid. Press C for your Character panel with your gear, relics and abilities. Blood Shrines and Cursed Altars appear on the battlefield instead: stand in their circle to use them. Here is some gold to try.', enter: tutMerchant },
-  { mode: 'shop', target: '#btnStart', h: 'Start the wave', p: 'When your warband is ready, start the wave. In a real raid you can also press Space.', unlock: true, wait: () => mode === 'combat', hint: 'Click Start wave' },
+  { mode: 'shop', target: '#btnBook', h: 'The Field Guide', p: 'This book is your Field Guide. It keeps a page for everything you meet on your raids: every beast and how to dodge its attack, every elite trait, every relic and every type of gear. Entries unlock the first time you find them. Until then you see only a dark silhouette and a hint. Open it here in the shop with the book or J, and in battle from the pause menu.', enter: () => { tut.wantGuide = true; tut.guideOpened = false; }, wait: () => tut.guideOpened, hint: 'Click the book to open it' },
+  { mode: 'shop', target: '#bestiary .fg-tabs', h: 'Beasts, relics and gear', p: 'Beasts shows each enemy with its attack and a moving picture, and the elite traits below. Relics lists what the Merchant sells and what the Cursed Altar grants: rare ones like Twin Souls are marked in gold. Gear shows every helmet, chestplate, leggings and weapon type, and lights up each rarity you have found. The numbers on the tabs count your discoveries. Try the Gear tab.', enter: () => { tut.fgTab0 = fgTab; }, wait: () => fgTab === 'gear', hint: 'Click the Gear tab' },
+  { mode: 'shop', target: '#btnStart', h: 'Start the wave', enter: () => { tut.wantGuide = false; if (!$('#bestiary').hidden) showBestiary(false); }, p: 'When your warband is ready, start the wave. In a real raid you can also press Space.', unlock: true, wait: () => mode === 'combat', hint: 'Click Start wave' },
   { mode: 'combat', target: 'hero', r: 46, anim: 'keys', h: 'Move your hero', p: 'Walk with W A S D or the arrow keys. Your hero swings the weapon in the main hand at enemies in reach, but the warband does most of the work. Keep it close and stay out of reach of the enemies.', enter: () => { tut.x0 = S.hero.x; tut.y0 = S.hero.y; }, wait: () => Math.hypot(S.hero.x - tut.x0, S.hero.y - tut.y0) > 70, hint: 'Walk around a little' },
   { mode: 'combat', target: 'hero', r: 150, h: 'Your warband fights', p: 'Units attack the nearest enemies on their own. Here come some draugr. Some of them climb out of the ground. Keep moving while your warband deals with them.', enter: tutSpawn, wait: () => S.kills - tut.k0 >= 4, hint: 'Defeat 4 draugr' },
   { mode: 'combat', target: '#goldTxt', h: 'Souls and gold', p: 'Fallen enemies drop souls. Walk close to collect them. Every 10 souls become 1 gold. You also earn gold, and interest on saved gold, when a wave ends.' },
