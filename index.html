@@ -890,7 +890,8 @@ try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.
 const SET_KEY = 'valhalla.settings';
 const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true, ui: 'auto', quality: 'high', calm: false, fps: false, meter: false, share: null, focus: false }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
 function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(settings)); } catch (e) {} }
-const RUN_KEY = 'valhalla.run', STAMP_KEY = 'valhalla.stamp';
+const BUILD = 'dev'; // '' = public build; 'dev' (hotfixes) and 'next' (new features) are test builds
+const RUN_KEY = 'valhalla.run' + (BUILD ? '.' + BUILD : ''), STAMP_KEY = 'valhalla.stamp'; // test builds keep their own saved raid
 function bumpStamp(){ try { localStorage.setItem(STAMP_KEY, String(Date.now())); } catch (e) {} try { cloudQueue(); } catch (e) {} }
 function localStamp(){ try { return +localStorage.getItem(STAMP_KEY) || 0; } catch (e) { return 0; } }
 function saveMeta(){ try { localStorage.setItem(META_KEY, JSON.stringify(meta)); } catch (e) {} bumpStamp(); }
@@ -3433,7 +3434,6 @@ $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem"
 
 /* ================= FEEDBACK ================= */
 const VERSION = '0.17.3'; // major.minor.patch
-const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
 const FEEDBACK_REPO = (() => {
@@ -3498,7 +3498,7 @@ $('#fbCopy').onclick = () => {
   } catch (err){ fallback(); }
 };
 $('#btnFbTitle').onclick = () => openFeedback('title');
-$('#devTag').hidden = !BUILD;
+$('#devTag').hidden = !BUILD; $('#devTag').textContent = ` · ${BUILD.toUpperCase()} build`;
 $('#btnFbOver').onclick = () => openFeedback('over');
 $('#btnFbPause').onclick = () => openFeedback('pause');
 
@@ -3769,7 +3769,7 @@ async function openLeaderboard(){
 async function submitScore(e){
   e.preventDefault();
   const name = $('#lbName').value.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, 16), msg = $('#lbMsg');
-  if (!S || !S.endless || S.debugUsed || S.submitted || BUILD === 'dev') return;
+  if (!S || !S.endless || S.debugUsed || S.submitted || BUILD) return;
   if (!name){ msg.textContent = 'Type a name first (up to 16 characters).'; $('#lbName').focus(); return; }
   try { localStorage.setItem('valhalla.name', name); } catch (err) {}
   const row = { name, wave: S.wave, kills: S.kills, bosses: S.bosses, version: (VERSION + (BUILD ? '-' + BUILD : '')).slice(0, 16) };
@@ -3988,11 +3988,11 @@ let pendingRun = null;
 function afterRunStats(result){
   renderRunSummary();
   $('#shareMsg').textContent = '';
-  const ok = S.stats && !S.stats.botUsed && !S.tutorial && !S.debugUsed && BUILD !== 'dev';
+  const ok = S.stats && !S.stats.botUsed && !S.tutorial && !S.debugUsed && !BUILD;
   pendingRun = ok ? runRecord(result) : null;
   $('#shareAsk').hidden = !(ok && settings.share == null);
   if (ok && settings.share !== false) sendRun(pendingRun); // on by default, players can turn it off
-  if (BUILD === 'dev' && S.stats && !S.tutorial) $('#shareMsg').textContent = 'This is the test build, so run stats are not shared.';
+  if (BUILD && S.stats && !S.tutorial) $('#shareMsg').textContent = 'This is the test build, so run stats are not shared.';
 }
 $('#shareYes').onclick = () => { settings.share = true; saveSettings(); $('#shareAsk').hidden = true; };
 $('#shareNo').onclick = () => { settings.share = false; saveSettings(); $('#shareAsk').hidden = true; $('#shareMsg').textContent = 'Run stats are off. Future raids are not shared. You can turn it back on in Settings.'; };
@@ -4010,7 +4010,7 @@ function gameOver(win, quit){
   $('#oTitle').textContent = S.endless ? (quit ? `You left on wave ${S.wave}` : `The endless night took you on wave ${S.wave}`) : win ? 'Fenrir has fallen' : `You fell on wave ${S.wave}`;
   $('#oText').textContent = S.endless ? `You survived ${ew} endless wave${ew === 1 ? '' : 's'} after Fenrir. Your best is wave ${meta.bestEndless}.` : win ? 'The valkyries carry your warband to Valhalla. Your runes await in the forge.' : 'The runes from this raid are yours. Spend them in the forge and try again.';
   $('#oStats').innerHTML = `<dt>Waves cleared</dt><dd>${S.endless ? `20 + ${ew} endless` : `${cleared} of 20`}</dd><dt>Enemies slain</dt><dd>${S.kills}</dd><dt>Bosses slain</dt><dd>${S.bosses}</dd><dt>Runes earned</dt><dd class="runes">+${runes}</dd>`;
-  const lbNo = BUILD === 'dev' ? 'This is the test build, so its runs don\'t go on the leaderboard.' : S.debugUsed ? 'The debug menu was opened during this session, so this run can\'t go on the leaderboard. Reload the page to play a run that counts.' : '';
+  const lbNo = BUILD ? 'This is the test build, so its runs don\'t go on the leaderboard.' : S.debugUsed ? 'The debug menu was opened during this session, so this run can\'t go on the leaderboard. Reload the page to play a run that counts.' : '';
   $('#lbForm').hidden = !S.endless || !!lbNo;
   $('#lbBlocked').hidden = !S.endless || !lbNo; $('#lbBlocked').textContent = lbNo;
   $('#lbMsg').textContent = ''; $('#lbSend').disabled = false;
