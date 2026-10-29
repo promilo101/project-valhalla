@@ -446,12 +446,13 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .cp-box{width:min(1040px,100%);background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:14px 16px;display:grid;gap:14px}
 .cp-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .cp-head h2{margin-right:auto}
-.cp-body{display:grid;grid-template-columns:130px minmax(0,1fr) 280px;gap:18px;align-items:start}
+.cp-body{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
 .cp-side h3,.cp-foot h3{font-family:var(--font-display);font-weight:600;font-size:17px;margin:0 0 8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
 .cp-relics{flex-direction:column;align-items:flex-start;gap:8px}
 .cp-relics .rl{width:62px;height:62px}
 .cp-relics .rl img{width:40px;height:40px}
-.doll{display:grid;grid-template-columns:repeat(3,92px);grid-template-rows:repeat(3,92px);gap:10px;justify-content:center;grid-template-areas:". helm ." "main hero off" "chest hero legs"}
+.doll{display:grid;grid-template-columns:repeat(3,92px);grid-template-rows:repeat(4,92px);gap:10px;justify-content:center;grid-template-areas:"ring1 helm neck" "main hero off" "chest hero legs" "ring2 . ."}
+.gs.jw{border-radius:50%}
 .doll .hero-big{grid-area:hero;display:grid;place-items:center;background:radial-gradient(circle at 50% 60%,rgba(255,91,46,.16),transparent 70%)}
 .doll .hero-big img{width:84px;height:100px;image-rendering:pixelated;image-rendering:crisp-edges}
 .gs{display:grid;justify-items:center;align-content:center;gap:2px;background:var(--bg);border:1px solid var(--rc,var(--line));border-radius:2px;padding:4px;color:var(--fg);font:inherit;position:relative}
@@ -477,8 +478,31 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .bookbtn img{width:30px;height:30px;image-rendering:pixelated;image-rendering:crisp-edges}
 .bookbtn .cb-t{font-size:18px}
 .item-card{position:relative}
+.item-card{padding-top:24px!important}
+.ev-cmp{border:1px solid var(--frost);border-radius:2px;background:var(--bg);padding:8px 10px;max-width:620px}
+.ev-cmp .cmp{font-size:17px}
+.slot-strip{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:center;gap:4px;padding:2px 3px 2px 6px;font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#0d1018;background:var(--sc);border-radius:1px 1px 0 0;white-space:nowrap;overflow:hidden}
+.slot-strip > span:first-child{overflow:hidden;text-overflow:ellipsis}
+.slot-strip .verdict{position:static;letter-spacing:0;text-transform:none;flex:none}
+#charSum .hl{outline:2px solid var(--gold);outline-offset:1px;box-shadow:0 0 10px rgba(226,178,76,.7)}
+.cmp-fx span{font-size:14px;color:var(--gold);line-height:1.15;white-space:normal}
+.fg-sub{display:flex;flex-wrap:wrap;gap:4px}
+.fg-sub button{background:var(--bg);border:1px solid var(--line);border-radius:2px;padding:2px 10px;font:inherit;font-size:17px;color:var(--muted)}
+.fg-sub button.on{color:var(--gold);border-color:var(--gold)}
+.fg-sub small{font-size:14px}
+#achv{position:absolute;left:50%;top:104px;transform:translateX(-50%);z-index:45;display:flex;gap:12px;align-items:center;min-width:300px;max-width:calc(100% - 32px);padding:10px 16px 10px 12px;background:linear-gradient(90deg,#1b2030,#141822);border:1px solid var(--ac);border-radius:3px;box-shadow:0 8px 24px rgba(0,0,0,.6),0 0 18px color-mix(in srgb,var(--ac) 35%,transparent);pointer-events:none;overflow:hidden;zoom:var(--ui,1)}
+#achv::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);transform:translateX(-100%)}
+#achv.go{animation:acIn 2.5s cubic-bezier(.2,.9,.3,1.1) forwards}
+#achv.go::after{animation:acShine 1.2s ease-out .35s}
+#achv img{width:44px;height:44px;image-rendering:pixelated;image-rendering:crisp-edges;background:#0d1018;border:1px solid var(--ac);border-radius:2px;padding:3px;flex:none}
+.ac-k{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--ac)}
+.ac-n{font-family:var(--font-display);font-weight:600;font-size:21px;color:var(--fg)}
+@keyframes acIn{0%{transform:translate(-50%,-140%);opacity:0}10%{transform:translate(-50%,0);opacity:1}88%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,-30%);opacity:0}}
+@keyframes acShine{to{transform:translateX(100%)}}
+@media (prefers-reduced-motion:reduce){#achv.go{animation:none}#achv.go::after{animation:none}}
+
 .item-card.sel{outline:2px solid var(--frost);outline-offset:1px}
-.verdict{position:absolute;bottom:4px;right:4px;font-size:13px;line-height:1;padding:1px 4px;background:#0d1018;border:1px solid;border-radius:2px}
+.verdict{position:absolute;top:2px;right:3px;z-index:1;font-size:13px;line-height:1;padding:1px 4px;background:#0d1018;border:1px solid;border-radius:2px}
 .cmp{display:grid;gap:3px;margin-top:4px;font-size:16px}
 .cmp-h,.cmp-i{display:grid;grid-template-columns:1fr 1fr;gap:8px;color:var(--muted);font-size:14px;letter-spacing:.08em;text-transform:uppercase}
 .cmp-i{text-transform:none;letter-spacing:0;font-size:15px}
@@ -662,8 +686,8 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="shop" hidden aria-label="Shop and formation">
     <div class="s-form">
-      <button class="charbtn" id="btnChar" type="button"><span class="cb-top"><img class="px" id="charBtnImg" alt=""><span class="cb-tt"><span class="cb-t">Character <kbd>C</kbd></span><span class="cb-s">Gear, abilities, relics</span></span></span><span class="cb-row" id="charSum"></span></button>
-      <button class="bookbtn" id="btnBook" type="button"><img id="bookImg" alt=""><span class="cb-tt"><span class="cb-t">Field Guide <kbd>J</kbd></span><span class="cb-s">Beasts, relics and gear you have found</span></span></button>
+      <button class="charbtn" id="btnChar" type="button"><span class="cb-top"><img class="px" id="charBtnImg" alt=""><span class="cb-tt"><span class="cb-t">Character <kbd>C</kbd></span><span class="cb-s">Gear, jewelry, abilities</span></span></span><span class="cb-row" id="charSum"></span></button>
+      <button class="bookbtn" id="btnBook" type="button"><img id="bookImg" alt=""><span class="cb-tt"><span class="cb-t">Field Guide <kbd>J</kbd></span><span class="cb-s">Beasts and gear you have found</span></span></button>
       <div class="head" style="margin-top:12px"><h3>Formation</h3></div>
       <p class="note" id="slotNote">2 of 8 slots</p>
       <p class="note form-help">Drag units from the bench onto the glowing marks around your hero at the fire. Right-click a unit to swap it between bench and formation.</p>
@@ -697,11 +721,12 @@ a.btn{text-decoration:none;display:inline-block}
   </section>
 
   <div id="lootFx" hidden aria-live="polite"></div>
+  <div id="achv" hidden role="status"></div>
   <section id="charPanel" class="screen" hidden aria-labelledby="charTitle">
     <div class="cp-box">
       <div class="cp-head"><h2 id="charTitle">Character</h2><span class="note"><kbd>C</kbd> or <kbd>Esc</kbd> to close</span><button class="btn sm" id="cpClose" type="button">Close</button></div>
       <div class="cp-body">
-        <div class="cp-side"><h3>Relics</h3><div class="relics cp-relics" id="relicRow" aria-label="Relics"></div><p class="note">Click a relic to see it or sell it</p></div>
+        <div class="cp-side" hidden><div class="relics cp-relics" id="relicRow"></div></div>
         <div class="cp-mid"><div class="doll" id="doll"></div><dl class="cp-stats" id="cpStats"></dl></div>
         <div class="cp-info info" id="charInfo"></div>
       </div>
@@ -731,7 +756,7 @@ a.btn{text-decoration:none;display:inline-block}
         <dt><kbd>M</kbd></dt><dd>Mute or unmute all sound</dd>
         <dt><kbd>Tab</kbd></dt><dd>Show or hide the damage meter</dd>
         <dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Hero abilities, aimed at the mouse cursor</dd>
-        <dt><kbd>C</kbd></dt><dd>In the shop: open your Character panel with gear, relics and abilities</dd>
+        <dt><kbd>C</kbd></dt><dd>In the shop: open your Character panel with gear, jewelry and abilities</dd>
         <dt><kbd>J</kbd></dt><dd>In the shop: open the Field Guide</dd>
         <dt><kbd>F</kbd></dt><dd>In battle: switch between targeting the nearest enemy and bosses and elites first</dd>
         <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 2 minutes)</dd>
@@ -862,7 +887,7 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="best-head"><h2 id="bestTitle">Field Guide</h2><button class="btn sm" id="btnBestBack" type="button">Back</button></div>
       <div class="fg-tabs" role="tablist" aria-label="Field Guide sections">
         <button class="fg-tab" role="tab" type="button" id="fgTabBeasts" data-tab="beasts" aria-controls="fgBeasts" aria-selected="true">Beasts <small id="bestBeastN"></small></button>
-        <button class="fg-tab" role="tab" type="button" id="fgTabRelics" data-tab="relics" aria-controls="fgRelics" aria-selected="false" tabindex="-1">Relics <small id="bestRelicN"></small></button>
+        <button class="fg-tab" role="tab" type="button" id="fgTabRelics" data-tab="relics" aria-controls="fgRelics" aria-selected="false" tabindex="-1" hidden>Relics <small id="bestRelicN"></small></button>
         <button class="fg-tab" role="tab" type="button" id="fgTabGear" data-tab="gear" aria-controls="fgGear" aria-selected="false" tabindex="-1">Gear <small id="bestGearN"></small></button>
       </div>
       <div class="best-scroll" id="fgBeasts" role="tabpanel" aria-labelledby="fgTabBeasts" tabindex="0">
@@ -876,7 +901,8 @@ a.btn{text-decoration:none;display:inline-block}
         <div class="best-grid best-relics" id="bestRelics"></div>
       </div>
       <div class="best-scroll" id="fgGear" role="tabpanel" aria-labelledby="fgTabGear" tabindex="0" hidden>
-        <p class="note best-intro">Gear for your hero, sold by the Wandering Merchant and dropped by bosses. Each type appears here the first time you find it, and the rarities you have found light up: Common, Rare and Epic.</p>
+        <p class="note best-intro">Gear for your hero, sold by the Wandering Merchant and dropped by bosses. Rings and necklaces carry a special power. Each type appears here the first time you find it, and the rarities you have found light up: Common, Rare and Epic.</p>
+        <div class="fg-sub" id="fgGearSub" role="group" aria-label="Gear slots"></div>
         <div class="best-grid best-relics" id="bestGear"></div>
       </div>
     </div>
@@ -1756,6 +1782,12 @@ function newRun(R){
   };
   if (R) applyRun(R);
   if (!S.gear) S.gear = starterGear();
+  for (const s2 of GEAR_SLOTS) if (!(s2 in S.gear)) S.gear[s2] = null;
+  if (R && Array.isArray(R.relics) && !GEAR_SLOTS.some(k => S.gear[k] && S.gear[k].fx)) for (const k of R.relics){ // a raid saved before 1.0: relics turn into jewelry, or gold if no slot is free
+    if (!JEWEL[k]) continue; const t = JEWEL[k].t, slot = t === 'neck' ? (S.gear.neck ? null : 'neck') : !S.gear.ring1 ? 'ring1' : !S.gear.ring2 ? 'ring2' : null;
+    if (slot){ const it = makeJewel(k, JEWEL[k].epic ? 2 : 1, S.wave); S.gear[slot] = it; it.at = slot; } else S.gold += relicSell(k);
+  }
+  S.relics = wornFx();
   computeTraits();
   S.hero.maxHp = heroMaxHp(); S.hero.hp = R ? clamp(R.hp, 1, S.hero.maxHp) : S.hero.maxHp;
   if (!R && !tut){ rollShop(); meta.runs++; saveMeta(); }
@@ -3291,7 +3323,7 @@ function openShop(){
   shopReadyAt = performance.now() + 800; S.selItem = null; S.rollN = 0; S.xpN = 0; S.healN = 0; S.selRelic = null;
   if (!S.relics) S.relics = [];
   if (S.resumed) S.resumed = false; // a continued raid keeps its saved event
-  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 5; statGold('Relics', 5); setTimeout(() => toast("Ghost Ship Chest: +5 gold"), 400); } }
+  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 5; statGold('Jewelry', 5); setTimeout(() => toast("Ghost Ship Ring: +5 gold"), 400); } }
   setMode('shop'); $('#info').innerHTML = DEFAULT_INFO; renderShop(); }
 const DEFAULT_INFO = 'Click a card to buy it. Lock a card with its padlock to keep it through rerolls and into the next shop. Reroll, XP and healing get 50% more expensive each time you use them in the same shop. Health does not refill by itself: buy healing here, or bring priests, Blood units and good armor. Drag a unit onto a slot to move or swap it, or right-click to send it between bench and formation. Three of a kind combine into one more star.';
 let toastT = 0;
@@ -3437,10 +3469,10 @@ const dragImgs = {};
 function dragImg(u){ const k = ukey(u); if (!dragImgs[k]){ const im = new Image(); im.src = ICON[k]; dragImgs[k] = im; } return dragImgs[k]; }
 /* ---------- Character panel: gear, relics and hero abilities ---------- */
 const setInfo = html => { $('#info').innerHTML = html; };
-const charDefault = () => '<strong>Your hero</strong><br>Hover or click a piece of gear, a relic or an ability to see what it does. Gear comes from the Merchant and from bosses, and lasts for this raid. Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells.';
+const charDefault = () => '<strong>Your hero</strong><br>Hover or click a piece of gear or an ability to see what it does. Gear comes from the Merchant and from bosses, and lasts for this raid. Rings and necklaces each carry a special power. Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells.';
 function renderChar(){
   if (!S) return;
-  const slot = sl => { const it = S.gear[sl]; return it ? `<button class="gs" type="button" data-gs="${sl}" style="grid-area:${sl};--rc:${RARITY[it.r].col}"><img src="${itemIcon(it)}" alt=""><span class="gn">${esc(it.name)}</span><span class="gl">${SLOT_NAME[sl]}</span></button>` : `<button class="gs empty" type="button" data-gs="${sl}" style="grid-area:${sl}"><span class="gl">${SLOT_NAME[sl]}</span><span class="gl">empty</span></button>`; };
+  const slot = sl => { const it = S.gear[sl], jw = typeOf(sl) === 'ring' || sl === 'neck' ? ' jw' : ''; return it ? `<button class="gs${jw}" type="button" data-gs="${sl}" style="grid-area:${sl};--rc:${RARITY[it.r].col}"><img src="${itemIcon(it)}" alt=""><span class="gn">${esc(it.name)}</span><span class="gl">${SLOT_NAME[sl]}</span></button>` : `<button class="gs empty${jw}" type="button" data-gs="${sl}" style="grid-area:${sl}"><span class="gl">${SLOT_NAME[sl]}</span><span class="gl">empty</span></button>`; };
   $('#doll').innerHTML = GEAR_SLOTS.map(slot).join('') + `<div class="hero-big"><img src="${ICON.hero}" alt="Your hero"></div>`;
   const ar = gearStat('armor'), wa = gearStat('ward'), w = S.gear.main;
   const pct = v => Math.round((1 - armorCut(v)) * 100);
@@ -3449,20 +3481,19 @@ function renderChar(){
 function renderCharSum(){
   if (!S) return;
   $('#charBtnImg').src = ICON.hero;
-  const g = GEAR_SLOTS.map(sl => S.gear[sl] ? `<img src="${itemIcon(S.gear[sl])}" alt="${esc(S.gear[sl].name)}" title="${esc(S.gear[sl].name)}" style="--rc:${RARITY[S.gear[sl].r].col}">` : '<i title="Empty"></i>').join('');
+  const g = GEAR_SLOTS.map(sl => S.gear[sl] ? `<img data-gs="${typeOf(sl)}" src="${itemIcon(S.gear[sl])}" alt="${esc(S.gear[sl].name)}" title="${esc(S.gear[sl].name)}" style="--rc:${RARITY[S.gear[sl].r].col}">` : `<i data-gs="${typeOf(sl)}" title="${SLOT_NAME[sl]}: empty"></i>`).join('');
   const a = S.abil.filter(Boolean).map(x => `<img src="${ABIL_ICON[x.key]}" alt="${ABILITIES[x.key].name}" title="${ABILITIES[x.key].name}">`).join('');
-  const r = (S.relics || []).map(k => `<img src="${RELIC_ICON[k]}" alt="${RELICS[k].name}" title="${RELICS[k].name}">`).join('');
-  $('#charSum').innerHTML = g + (a ? '<span style="width:100%"></span>' + a : '') + (r ? '<span style="width:100%"></span>' + r : '');
+  $('#charSum').innerHTML = g + (a ? '<span style="width:100%"></span>' + a : '');
 }
 function openChar(){ if (!S || mode !== 'shop' || picking) return; $('#charPanel').hidden = false; renderShop(); renderChar(); $('#charInfo').innerHTML = charDefault(); sfx('click'); }
 function closeChar(){ $('#charPanel').hidden = true; S && (S.selRelic = null); if (S && mode === 'shop') renderShop(); }
 $('#btnChar').onclick = e => { e.currentTarget.blur(); openChar(); };
 $('#cpClose').onclick = closeChar;
 new MutationObserver(() => { if (!$('#charPanel').hidden) $('#charInfo').innerHTML = $('#info').innerHTML; }).observe($('#info'), { childList: true, subtree: true, characterData: true });
-$('#doll').addEventListener('mouseover', e => { const b = e.target.closest('.gs'); if (!b || !S) return; const it = S.gear[b.dataset.gs]; setInfo(it ? describeItem(it, 'worn') : `<strong>${SLOT_NAME[b.dataset.gs]}</strong><br>Empty. The Merchant sells gear at every campfire, and bosses drop rarer pieces.`); });
+$('#doll').addEventListener('mouseover', e => { const b = e.target.closest('.gs'); if (!b || !S) return; const it = S.gear[b.dataset.gs], jw = typeOf(b.dataset.gs) === 'ring' || b.dataset.gs === 'neck'; setInfo(it ? describeItem(it, 'worn') : `<strong>${SLOT_NAME[b.dataset.gs]}</strong><br>Empty. ${jw ? 'Rings and necklaces carry a special power. The Merchant has one at every campfire, and the Cursed Altar grants one.' : 'The Merchant sells gear at every campfire, and bosses drop rarer pieces.'}`); });
 $('#doll').addEventListener('click', e => { const b = e.target.closest('.gs'); if (!b || !S) return; const it = S.gear[b.dataset.gs]; if (it) setInfo(describeItem(it, 'worn')); });
 $('#charInfo').addEventListener('click', e => { const b = e.target.closest('#btnRelicSell'); if (b){ sellRelic(b.dataset.r); return; } const g = e.target.closest('#btnGearSell'); if (g) sellGear(g.dataset.gs); });
-for (const box of ['#info', '#charInfo']) $(box).addEventListener('click', e => { const b = e.target.closest('#btnBuyItem'); if (b){ buyItem(+b.dataset.item); return; } if (e.target.closest('#btnCancelItem')){ S.selItem = null; renderShop(); setInfo(DEFAULT_INFO); return; } if (box === '#info'){ const g = e.target.closest('#btnGearSell'); if (g) sellGear(g.dataset.gs); } });
+for (const box of ['#info', '#charInfo']) $(box).addEventListener('click', e => { const b = e.target.closest('.btn-buy-item'); if (b){ buyItem(+b.dataset.item, b.dataset.slot); return; } if (e.target.closest('#btnCancelItem')){ S.selItem = null; renderShop(); setInfo(DEFAULT_INFO); return; } if (box === '#info'){ const g = e.target.closest('#btnGearSell'); if (g) sellGear(g.dataset.gs); } });
 let showAllTr = false;
 function fitShopCols(){ const sh = $('#shop'); if (!sh || sh.hidden) return; sh.classList.toggle('wide4', sh.clientWidth >= 1480); sh.classList.toggle('xl', sh.clientWidth >= 2200); }
 $('#traits').addEventListener('click', e => { if (e.target.closest('#trAll')){ showAllTr = !showAllTr; renderShop(); } });
@@ -3589,30 +3620,47 @@ const relicSeen = k => Array.isArray(meta.relicsSeen) && meta.relicsSeen.include
 const BEAST_HINT = { draugr: 'Something stirs in the barrows.', wolf: 'Something howls in the dark.', raven: 'Wings beat above the mist.', witch: 'A voice chants in the fog.', armored: 'Iron scrapes on stone.' };
 const AFF_HINT = { frozen: 'An elite with a cold aura.', burning: 'An elite that smoulders.', warded: 'An elite hidden behind runes.', swift: 'An elite too fast to follow.' };
 const AFF_NAME = { frozen: 'Frozen', burning: 'Burning', warded: 'Warded', swift: 'Swift' };
-const seenE = k => meta.seen && meta.seen.e.includes(k), seenA = k => meta.seen && meta.seen.a.includes(k), seenG = k => (meta.seen && meta.seen.g[k]) || [];
+const seenE = k => meta.seen && meta.seen.e.includes(k), seenA = k => meta.seen && meta.seen.a.includes(k);
+const seenG = k => (meta.seen && meta.seen.g[k]) || (Array.isArray(meta.relicsSeen) && meta.relicsSeen.includes(k) ? [JEWEL[k] && JEWEL[k].epic ? 2 : 0] : []); // relics found before 1.0 count as found jewelry
+let fgGearSub = 'helm';
+const achQ = []; let achBusy = false; const achIcons = {};
+function achieve(label, name, icon, col){ achQ.push({ label, name, icon, col }); if (!achBusy) achNext(); }
+function achNext(){
+  let a = achQ.shift(); const el = $('#achv'); if (!a){ achBusy = false; el.hidden = true; return; }
+  if (achQ.length >= 2){ const more = achQ.splice(0); a = { label: `${more.length + 1} new entries`, name: [a, ...more].slice(0, 3).map(x => x.name).join(', ') + (more.length > 2 ? ' and more' : ''), icon: a.icon, col: a.col }; } // a busy shop gives one banner, not a long queue
+  achBusy = true; el.style.setProperty('--ac', a.col || '#e2b24c');
+  el.innerHTML = `<img src="${a.icon}" alt=""><div><div class="ac-k">Field Guide · ${a.label}</div><div class="ac-n">${esc(a.name)}</div></div>`;
+  el.hidden = false; el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); sfx('chime');
+  setTimeout(achNext, 2600);
+}
+const beastIcon = k => achIcons[k] || (achIcons[k] = SPR[k].toDataURL());
 function discover(kind, k){
   if (!meta.seen || (S && S.tutorial)) return;
   if (kind === 'e' && !BEAST_HINT[k]) return;
   const list = meta.seen[kind]; if (list.includes(k)) return;
   list.push(k); saveMeta(); cloudQueue && cloudQueue();
-  const name = kind === 'e' ? ENEMIES[k].name : AFF_NAME[k] + ' elites';
-  setTimeout(() => toast(`New in the Field Guide: ${name}`), 400);
+  if (kind === 'e') achieve('New beast', ENEMIES[k].name, beastIcon(k), '#e2b24c');
+  else achieve('New elite trait', AFF_NAME[k] + ' elites', beastIcon('draugr'), AFF_COL[k]);
 }
 function discoverGear(it){
   if (!it || !meta.seen || (S && S.tutorial)) return;
   const have = meta.seen.g[it.b] || (meta.seen.g[it.b] = []); if (have.includes(it.r)) return;
   const first = !have.length; have.push(it.r); saveMeta();
-  if (first) setTimeout(() => toast(`New gear in the Field Guide: ${GEAR_BASES[it.slot][it.b].name}`), 700);
+  if (first) achieve(it.fx ? 'New ' + SLOT_NAME[it.slot].toLowerCase() : 'New gear', GEAR_BASES[it.slot][it.b].name, itemIcon(it), RARITY[it.r].col);
+  else achieve(`${RARITY[it.r].name} found`, GEAR_BASES[it.slot][it.b].name, itemIcon(it), RARITY[it.r].col);
 }
 const GEAR_DESC = { plate: 'Plate: heavy physical armor, some magic armor and health.', mail: 'Mail: physical and magic armor in equal parts, and the most health.', rune: 'Rune-woven: heavy magic armor against curses, fire and frost.', axe: 'Slow, heavy blows at short reach.', sword: 'Quick strikes at short reach.', spear: 'Steady blows with long reach.', shield: 'Physical and magic armor for the off hand.', handaxe: 'Adds damage to every blow of your main weapon, and ability damage.', talisman: 'Magic armor and ability damage.' };
 function renderBestGear(){
-  const all = []; for (const sl of GEAR_SLOTS) for (const b of Object.keys(GEAR_BASES[sl])) all.push([sl, b]);
+  const all = []; for (const sl of ITEM_TYPES) for (const b of Object.keys(GEAR_BASES[sl])) all.push([sl, b]);
   const n = all.filter(([, b]) => seenG(b).length).length;
   $('#bestGearN').textContent = `${n}/${all.length}`;
-  $('#bestGear').innerHTML = all.map(([sl, b]) => {
-    const got = seenG(b), B = GEAR_BASES[sl][b], top = got.length ? Math.max(...got) : 0, it = { slot: sl, b, r: top };
-    if (!got.length) return `<div class="brl locked"><img src="${itemIcon(it)}" alt=""><div><h4>Undiscovered ${SLOT_NAME[sl].toLowerCase()}</h4><p>Not found yet. The Merchant and the bosses carry gear.</p></div></div>`;
-    return `<div class="brl"><img src="${itemIcon(it)}" alt=""><div><h4 style="color:${RARITY[top].col}">${B.name} <small style="color:var(--muted)">${SLOT_NAME[sl]}</small></h4><p>${GEAR_DESC[B.fl || b] || ''}</p><p class="rar">${RARITY.map((R, r) => `<span style="color:${got.includes(r) ? R.col : '#3a4256'}">${got.includes(r) ? '◆' : '◇'} ${R.name}</span>`).join(' ')}</p></div></div>`;
+  const SUB = { helm: 'Helmets', chest: 'Chestplates', legs: 'Leggings', main: 'Main hand', off: 'Off hand', ring: 'Rings', neck: 'Necklaces' };
+  $('#fgGearSub').innerHTML = ITEM_TYPES.map(t => { const list = all.filter(([sl]) => sl === t); return `<button type="button" data-sub="${t}" class="${fgGearSub === t ? 'on' : ''}" aria-pressed="${fgGearSub === t}">${SUB[t]} <small>${list.filter(([, b]) => seenG(b).length).length}/${list.length}</small></button>`; }).join('');
+  $('#bestGear').innerHTML = all.filter(([sl]) => sl === fgGearSub).map(([sl, b]) => {
+    const got = seenG(b), B = GEAR_BASES[sl][b], top = got.length ? Math.max(...got) : 0, it = { slot: sl, b, r: top, fx: B.fx };
+    if (!got.length) return `<div class="brl locked"><img src="${itemIcon(it)}" alt=""><div><h4>Undiscovered ${SLOT_NAME[sl].toLowerCase()}</h4><p>${B.fx ? RELIC_HINT[B.fx] : 'Not found yet. The Merchant and the bosses carry gear.'}</p></div></div>`;
+    const rars = B.fx && JEWEL[B.fx].epic ? [2] : [0, 1, 2];
+    return `<div class="brl"><img src="${itemIcon(it)}" alt=""><div><h4 style="color:${RARITY[top].col}">${B.name} <small style="color:var(--muted)">${SLOT_NAME[sl]}</small>${B.fx && JEWEL[B.fx].epic ? ' <span class="rare-tag">Epic only</span>' : ''}</h4><p>${B.fx ? RELICS[B.fx].desc : GEAR_DESC[B.fl || b] || ''}</p><p class="rar">${rars.map(r => { const R = RARITY[r]; return `<span style="color:${got.includes(r) ? R.col : '#3a4256'}">${got.includes(r) ? '◆' : '◇'} ${R.name}</span>`; }).join(' ')}</p></div></div>`;
   }).join('');
 }
 function discoverRelic(k){
@@ -3633,7 +3681,7 @@ function openGuideFromTitle(){ guideFromTitle = true; $('#pause').hidden = false
 function showBestiary(on){
   if (!on && guideFromTitle){ guideFromTitle = false; $('#bestiary').hidden = true; $('#pause .box:not(.best)').hidden = false; $('#pause').hidden = true; (mode === 'shop' ? $('#btnBook') : $('#btnGuide')).focus(); return; }
   $('#bestiary').hidden = !on; $('#pause .box:not(.best)').hidden = on;
-  if (on){ buildBestiary(); renderBestRelics(); renderBestGear(); if (!bestRaf) bestRaf = requestAnimationFrame(drawBestiary); $('#btnBestBack').focus(); } else $('#btnBest').focus();
+  if (on){ if (fgTab === 'relics') fgTab = 'gear'; buildBestiary(); renderBestRelics(); renderBestGear(); if (!bestRaf) bestRaf = requestAnimationFrame(drawBestiary); $('#btnBestBack').focus(); } else $('#btnBest').focus();
 }
 // Field Guide tabs; add a button with data-tab and a panel to add a new section
 let fgTab = 'beasts';
@@ -3651,16 +3699,19 @@ function fgShow(tab){
 document.querySelector('.fg-tabs').addEventListener('click', e => { const b = e.target.closest('.fg-tab'); if (b){ fgShow(b.dataset.tab); b.focus(); } });
 document.querySelector('.fg-tabs').addEventListener('keydown', e => {
   if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
-  const tabs = [...document.querySelectorAll('.fg-tab')], i = tabs.findIndex(b => b.dataset.tab === fgTab), n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+  const tabs = [...document.querySelectorAll('.fg-tab:not([hidden])')], i = tabs.findIndex(b => b.dataset.tab === fgTab), n = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
   e.preventDefault(); e.stopPropagation(); fgShow(n.dataset.tab); n.focus();
 });
 $('#btnBest').onclick = () => { showBestiary(true); fgShow(fgTab); };
 $('#btnGuide').onclick = openGuideFromTitle;
+$('#fgGearSub').addEventListener('click', e => { const b = e.target.closest('button[data-sub]'); if (!b) return; fgGearSub = b.dataset.sub; renderBestGear(); const nb = $(`#fgGearSub [data-sub="${fgGearSub}"]`); nb && nb.focus(); });
 const BOOK_ICON = makeSprite(['.XXXXXXX.', 'XYYYYYYKX', 'XYGGGYYKX', 'XYGYGYYKX', 'XYGGGYYKX', 'XYYYYYYKX', 'XYYYYYYKX', 'XXXXXXXKX', '.WWWWWWW.'], { X: '#5a3a2a', Y: '#8e1232', G: '#e2b24c', K: '#3a2418', W: '#e8e3d6' }).toDataURL();
 $('#bookImg').src = BOOK_ICON;
 $('#btnBook').onclick = e => { e.currentTarget.blur(); openGuideFromTitle(); if (tut && tut.wantGuide) tut.guideOpened = true; };
 $('#btnBestBack').onclick = () => showBestiary(false);
-$('#event').addEventListener('click', e => { const ic = e.target.closest('.item-card'); if (ic){ pickItem(+ic.dataset.item); return; } const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
+$('#event').addEventListener('click', e => { const bb = e.target.closest('.btn-buy-item'); if (bb){ buyItem(+bb.dataset.item, bb.dataset.slot); return; } if (e.target.closest('#btnCancelItem')){ S.selItem = null; renderShop(); return; } const ic = e.target.closest('.item-card'); if (ic){ pickItem(+ic.dataset.item); return; } const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
+$('#event').addEventListener('mouseover', e => { const ic = e.target.closest('.item-card'); document.querySelectorAll('#charSum .hl').forEach(x => x.classList.remove('hl')); if (ic) document.querySelectorAll(`#charSum [data-gs="${ic.dataset.type}"]`).forEach(x => x.classList.add('hl')); });
+$('#event').addEventListener('mouseleave', () => { document.querySelectorAll('#charSum .hl').forEach(x => x.classList.remove('hl')); });
 $('#event').addEventListener('mouseleave', () => { const E = S && S.event; if (E && E.items && S.selItem != null && E.items[S.selItem]) setInfo(describeItem(E.items[S.selItem], 'shop')); });
 $('#event').addEventListener('mouseover', e => { const ic = e.target.closest('.item-card'); if (ic && S.event && S.event.items){ setInfo(describeItem(S.event.items[+ic.dataset.item], 'shop')); return; } const r = e.target.closest('.relic-card'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, false); });
 $('#relicRow').addEventListener('click', e => { const r = e.target.closest('.rl[data-r]'); if (!r) return; S.selRelic = S.selRelic === r.dataset.r ? null : r.dataset.r; renderShop(); $('#info').innerHTML = describeRelic(r.dataset.r, true); });
@@ -3837,7 +3888,7 @@ function showPick(kind){
     const news = Object.keys(ABILITIES).filter(k => !owned.includes(k)).map(key => ({ type: 'new', key }));
     opts = shuffle(ups).slice(0, 2).concat(shuffle(news)); opts = shuffle(opts.slice(0, 3));
     if (!opts.length) opts = [{ type: 'gold', key: 'gold' }];
-    const drop = makeItem(pick(GEAR_SLOTS), dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave); discoverGear(drop);
+    const dt = pick(jewelPool().length ? ITEM_TYPES : ARMS), drop = dt === 'ring' || dt === 'neck' ? (jewelPool(dt).length ? makeJewel(pickRelic(jewelPool(dt)), dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave) : makeItem(pick(ARMS), dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave)) : makeItem(dt, dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave); discoverGear(drop);
     opts.push({ type: 'item', item: drop }); // a boss also drops a piece of rare gear
   }
   picking = { kind, opts, step: 'choose', chosen: null };
@@ -3845,7 +3896,7 @@ function showPick(kind){
 }
 function pickCardHTML(o, i){
   if (o.type === 'item'){
-    const it = o.item, R = RARITY[it.r], cur = S.gear && S.gear[it.slot];
+    const it = o.item, R = RARITY[it.r], cur = curFor(it);
     let body = itemStats(it).join(' · ');
     if (cur){ const D = gearDiff(it, cur), V = VERDICT[D.verdict]; body = D.rows.filter(r => r.k !== 'range').map(r => `${r.n} ${r.k === 'as' ? r.a.toFixed(2) : Math.round(r.a)} ${r.d ? `<b style="color:${r.d > 0 ? '#7dc46a' : '#ff6b6b'}">${r.d > 0 ? '+' : '−'}${r.k === 'as' ? Math.abs(r.d).toFixed(2) : Math.abs(Math.round(r.d))}</b>` : ''}`).join('<br>') + `<br><b style="color:${V[1]}">${V[0]}</b> <small style="color:var(--muted)">vs your ${esc(cur.name)}, sold for ${itemSell(cur)} gold</small>`; }
     return `<button class="pcard loot r${it.r}" type="button" data-p="${i}" style="--c:${R.col}"><span class="pk">${i + 1}</span><span class="loot-tag">Boss drop</span><img class="pi px" src="${itemIcon(it)}" alt=""><span class="pn" style="color:${R.col}">${esc(it.name)}</span><span class="pt">${R.name} ${SLOT_NAME[it.slot].toLowerCase()}</span><span class="pd">${body}</span></button>`;
@@ -3977,12 +4028,12 @@ function dbgTick(dt){
   on('#dbgGold', () => { if (!needRun()) return; S.gold += 50; if (mode === 'shop') renderShop(); });
   on('#dbgSetLevel', () => { if (!needRun()) return; S.level = +$('#dbgLevel').value; S.xp = 0; computeTraits(); if (mode === 'shop') renderShop(); toast(`Level ${S.level}`); });
   on('#dbgGive', () => { if (needRun()) dbgGiveUnit($('#dbgCls').value, $('#dbgMod').value, +$('#dbgStar').value); });
-  setTimeout(() => { $('#dbgGearBase').innerHTML = GEAR_SLOTS.map(sl => Object.keys(GEAR_BASES[sl]).map(b => `<option value="${sl}:${b}">${SLOT_NAME[sl]}: ${GEAR_BASES[sl][b].name}</option>`).join('')).join(''); }, 0); // the gear tables are defined further down
-  const dbgDrop = r => { if (!needRun()) return; if (picking) return toast('Close the current pick first'); showPick('boss'); const P = picking, o = P && P.opts.find(x => x.type === 'item'); if (o){ o.item = makeItem(pick(GEAR_SLOTS), r, S.wave); renderPick(); } };
+  setTimeout(() => { $('#dbgGearBase').innerHTML = ITEM_TYPES.map(sl => Object.keys(GEAR_BASES[sl]).map(b => `<option value="${sl}:${b}">${SLOT_NAME[sl]}: ${GEAR_BASES[sl][b].name}</option>`).join('')).join(''); }, 0); // the gear tables are defined further down
+  const dbgDrop = r => { if (!needRun()) return; if (picking) return toast('Close the current pick first'); showPick('boss'); const P = picking, o = P && P.opts.find(x => x.type === 'item'); if (o){ o.item = makeItem(pick(ARMS), r, S.wave); renderPick(); } };
   on('#dbgDropRare', () => dbgDrop(1)); on('#dbgDropEpic', () => dbgDrop(2));
   $('#dbgEpicBoss').onchange = e => { dbg.epicBoss = e.target.checked; };
-  on('#dbgGiveGear', () => { if (!needRun()) return; const [sl, b] = $('#dbgGearBase').value.split(':'), it = makeItem(sl, +$('#dbgGearR').value, S.wave, b); equipItem(it); discoverGear(it); if (mode === 'shop') renderShop(); toast(`${it.name} equipped`); });
-  on('#dbgUnlockFg', () => { meta.seen.e = BESTIARY.map(x => x[0]); meta.seen.a = BEST_AFF.map(x => x[0]); for (const sl of GEAR_SLOTS) for (const b of Object.keys(GEAR_BASES[sl])) meta.seen.g[b] = [0, 1, 2]; meta.relicsSeen = Object.keys(RELICS); saveMeta(); toast('Every Field Guide entry is unlocked'); });
+  on('#dbgGiveGear', () => { if (!needRun()) return; const [sl, b] = $('#dbgGearBase').value.split(':'), it = makeItem(sl, +$('#dbgGearR').value, S.wave, b); if (it.fx && wornFx().includes(it.fx)) return toast('You already wear that power'); equipItem(it); discoverGear(it); if (mode === 'shop') renderShop(); toast(`${it.name} equipped`); });
+  on('#dbgUnlockFg', () => { meta.seen.e = BESTIARY.map(x => x[0]); meta.seen.a = BEST_AFF.map(x => x[0]); for (const sl of ITEM_TYPES) for (const b of Object.keys(GEAR_BASES[sl])) meta.seen.g[b] = GEAR_BASES[sl][b].fx && JEWEL[GEAR_BASES[sl][b].fx].epic ? [2] : [0, 1, 2]; meta.relicsSeen = Object.keys(RELICS); saveMeta(); toast('Every Field Guide entry is unlocked'); });
   on('#dbgLockFg', () => { meta.seen = { e: [], a: [], g: {} }; meta.relicsSeen = []; saveMeta(); toast('Every Field Guide entry is locked again'); });
   on('#dbgMana', () => { if (needRun()) S.board.forEach(u => { if (u) u.mana = 100; }); });
   $('#dbgSpeed').addEventListener('click', e => { const b = e.target.closest('button[data-sp]'); if (!b) return; dbg.speed = +b.dataset.sp; $('#dbgSpeed').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); b.blur(); });
@@ -4140,7 +4191,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a relic', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a relic', 'Bosses no longer heal you to full', 'Twin Souls and Raven Banner are rare relics: the Merchant and the Cursed Altar offer them about a third as often', 'The Field Guide has a Gear tab, and beasts, elite traits, relics and gear stay hidden until you find them. Open it from the book in the shop (J)', 'The tutorial shows the Field Guide', 'Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow']],
+  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a ring or necklace', 'Bosses no longer heal you to full', 'Relics are now jewelry: you wear two rings and a necklace, and each carries one of the old relic powers. Rarer jewelry adds health and ability damage', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces, so they are rare', 'Merchant cards show the slot a piece fits in, and hovering one lights up that slot on the Character button', 'The Field Guide has a Gear tab with a page for each slot, and beasts, elite traits and gear stay hidden until you find them. Each new find pops up a Field Guide banner. Open it from the book in the shop (J)', 'The tutorial shows the Field Guide', 'Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
   ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
   ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
@@ -4227,7 +4278,7 @@ function renderRunSummary(){
     <section><h3>Health after each wave</h3>${spark}</section>
     <section><h3>Your build</h3><div class="build">${board.map(u => `<img src="${ICON[ukey(u)]}" alt="${cardName(u)} ${u.star} star" title="${cardName(u)} ${'★'.repeat(u.star)}">`).join('')}</div>
       <div class="line"><span>Abilities</span><b>${S.abil.filter(Boolean).map(a => ABILITIES[a.key].name + ' ' + LV[a.lvl - 1]).join(', ') || 'None'}</b></div>
-      <div class="line"><span>Relics</span><b>${(S.relics || []).map(k => RELICS[k].name).join(', ') || 'None'}</b></div></section>`;
+      <div class="line"><span>Jewelry</span><b>${(S.relics || []).map(k => JEWEL[k] ? JEWEL[k].name : k).join(', ') || 'None'}</b></div></section>`;
 }
 /* ---------- anonymous run stats for balancing ---------- */
 const RUNS_URL = 'https://zgzvhcwzrtjoapnozroo.supabase.co/rest/v1/runs';
@@ -4399,7 +4450,7 @@ function srcLabel(k){
   if (k === 'syn_priest') return 'Priests synergy';
   if (k === 'hero_weapon') return 'Hero weapon';
   if (k === 'pu_mead') return POWERUPS.mead.name;
-  if (k.startsWith('relic_')) return RELICS[k.slice(6)] ? RELICS[k.slice(6)].name : k;
+  if (k.startsWith('relic_')) return JEWEL[k.slice(6)] ? JEWEL[k.slice(6)].name : k;
   if (k.startsWith('abil_')) return ABILITIES[k.slice(5)] ? ABILITIES[k.slice(5)].name : k;
   const [c, m] = k.split('_'); return CLASSES[c] && MODS[m] ? `${MODS[m].name} ${CLASSES[c].name}` : k;
 }
@@ -4447,7 +4498,7 @@ function relicsChanged(){
   if (!hasR('raven_banner') && S.board[8]){ const f = S.bench.indexOf(null); if (f >= 0){ S.bench[f] = S.board[8]; S.board[8] = null; } }
   const h = S.hero, ratio = h.hp / h.maxHp; computeTraits(); h.maxHp = heroMaxHp(); h.hp = Math.max(1, Math.min(h.maxHp, Math.round(h.maxHp * ratio)));
 }
-function gainRelic(k){ discoverRelic(k); if (!S.relics) S.relics = []; if (S.relics.length >= MAX_RELICS || S.relics.includes(k)) return false; S.relics.push(k); relicsChanged(); return true; }
+function gainRelic(k){ if (!JEWEL[k] || !S.gear || wornFx().includes(k)) return false; const it = makeJewel(k, JEWEL[k].epic ? 2 : 1, S.wave || 1); discoverGear(it); equipItem(it, JEWEL[k].t === 'ring' && S.gear.ring1 && S.gear.ring2 ? 'ring2' : null); return true; }
 function buyRelic(k){
   const R = RELICS[k]; if (!R || !S.event || S.event.type !== 'merchant' || S.event.bought.includes(k)) return;
   if (S.relics.length >= MAX_RELICS) return toast('Your relic slots are full. Sell a relic first.');
@@ -4469,12 +4520,23 @@ function renderRelicBar(){
   const bar = $('#relicBar'); if (!bar) return;
   const list = mode === 'combat' && S && S.relics ? S.relics : [];
   bar.hidden = !list.length;
-  bar.innerHTML = list.map(k => `<img src="${RELIC_ICON[k]}" alt="${RELICS[k].name}" title="${RELICS[k].name}: ${RELICS[k].desc}">`).join('');
+  bar.innerHTML = list.map(k => `<img src="${RELIC_ICON[k]}" alt="${JEWEL[k].name}" title="${JEWEL[k].name}: ${RELICS[k].desc}">`).join('');
 }
 
 /* ================= GEAR: helmet, chestplate, leggings and two hands, kept for one raid ================= */
-const GEAR_SLOTS = ['helm', 'chest', 'legs', 'main', 'off'];
-const SLOT_NAME = { helm: 'Helmet', chest: 'Chestplate', legs: 'Leggings', main: 'Main hand', off: 'Off hand' };
+const GEAR_SLOTS = ['helm', 'chest', 'legs', 'main', 'off', 'ring1', 'ring2', 'neck']; // what the hero wears
+const ITEM_TYPES = ['helm', 'chest', 'legs', 'main', 'off', 'ring', 'neck']; // what items can be
+const ARMS = ['helm', 'chest', 'legs', 'main', 'off'];
+const typeOf = k => k === 'ring1' || k === 'ring2' ? 'ring' : k;
+const SLOT_NAME = { helm: 'Helmet', chest: 'Chestplate', legs: 'Leggings', main: 'Main hand', off: 'Off hand', ring: 'Ring', ring1: 'Ring', ring2: 'Ring', neck: 'Necklace' };
+// the old relics live on as jewelry: each ring or necklace carries one of their powers
+const JEWEL = {
+  twin_souls:     { t: 'neck', name: 'Amulet of Twin Souls', epic: 1 }, raven_banner: { t: 'neck', name: 'Raven Torc', epic: 1 },
+  draugr_pact:    { t: 'neck', name: 'Pact Amulet' }, mead_hall: { t: 'neck', name: 'Mead Hall Pendant' },
+  iron_oath:      { t: 'ring', name: 'Ring of the Iron Oath' }, ember_boots: { t: 'ring', name: 'Ember Ring' }, odins_eye: { t: 'ring', name: "Odin's Eye Ring" },
+  huginn_feather: { t: 'ring', name: 'Raven Feather Ring' }, gleipnir_link: { t: 'ring', name: 'Gleipnir Ring' }, usurer_coin: { t: 'ring', name: "Moneylender's Ring" },
+  berserk_mark:   { t: 'ring', name: "Berserker's Ring" }, naglfar_chest: { t: 'ring', name: 'Ghost Ship Ring' },
+};
 const RARITY = [
   { name: 'Common', col: '#c9cfdb', m: 1, price: 1 },
   { name: 'Rare', col: '#5fb0ff', m: 1.5, price: 1.8 },
@@ -4489,11 +4551,19 @@ const GEAR_BASES = {
   main:  { axe: { name: 'Axe', dmg: 1.15, as: .85, range: 24 }, sword: { name: 'Sword', dmg: 1, as: 1.05, range: 22 }, spear: { name: 'Spear', dmg: .9, as: .95, range: 36 } },
   off:   { shield: { name: 'Shield', fl: 'plate' }, handaxe: { name: 'Hand Axe', dmg: .5 }, talisman: { name: 'Talisman', fl: 'rune', pow: .4 } },
 };
+GEAR_BASES.ring = {}; GEAR_BASES.neck = {};
+for (const k in JEWEL) GEAR_BASES[JEWEL[k].t][k] = { name: JEWEL[k].name, fx: k };
 const GEAR_PREFIX = [['Worn', 'Plain', 'Rough'], ['Fine', 'Runed', 'Keen'], ['Jarl-Forged', 'Valkyrie', 'Dwarf-Made']];
 let itemUid = 0;
 function makeItem(slot, r, wave, bk){
   const bases = GEAR_BASES[slot]; bk = bk && bases[bk] ? bk : pick(Object.keys(bases));
-  const B = bases[bk], R = RARITY[r];
+  const B = bases[bk];
+  if (B.fx){ // jewelry: the power is fixed, rarity adds health and ability damage
+    if (JEWEL[B.fx].epic) r = 2;
+    const Pj = 4 + .8 * wave;
+    return { id: ++itemUid, slot, b: bk, fx: B.fx, r, w: wave, name: B.name, hp: [0, Math.round(Pj * 1.5), Math.round(Pj * 2.4)][r], armor: 0, ward: 0, dmg: 0, as: 0, range: 0, pow: r === 2 ? 5 : 0, price: Math.round(RELICS[B.fx].price * [1, 1.25, 1.5][r] * (1 + wave * .02)) };
+  }
+  const R = RARITY[r];
   const it = { id: ++itemUid, slot, b: bk, r, w: wave, name: `${pick(GEAR_PREFIX[r])} ${B.name}`, hp: 0, armor: 0, ward: 0, dmg: 0, as: 0, range: 0, pow: 0, price: 0 };
   const P = (SLOT_W[slot] || .35) * (6 + 1.6 * wave) * R.m;
   if (B.fl){ const F = FLAVOR[B.fl]; it.armor = Math.round(P * F.armor); it.ward = Math.round(P * F.ward); it.hp = Math.round(P * F.hp * 1.6); }
@@ -4504,7 +4574,7 @@ function makeItem(slot, r, wave, bk){
   it.price = Math.round((5 + wave * .9) * R.price * (slot === 'main' ? 1.15 : 1));
   return it;
 }
-const starterGear = () => { const g = { helm: null, chest: null, legs: null, main: makeItem('main', 0, 1, 'axe'), off: null }; g.main.name = 'Worn Axe'; discoverGear(g.main); return g; };
+const starterGear = () => { const g = { helm: null, chest: null, legs: null, main: makeItem('main', 0, 1, 'axe'), off: null, ring1: null, ring2: null, neck: null }; g.main.name = 'Worn Axe'; discoverGear(g.main); return g; };
 // rarer gear later in the raid; bosses always give at least a rare piece
 function rollRarity(w, boss){
   const e = boss ? (w >= 15 ? .45 : .15) : clamp((w - 8) * .03, 0, .25), rr = boss ? 1 : clamp(.12 + w * .025, 0, .5), x = Math.random();
@@ -4514,16 +4584,23 @@ function validItem(it, slot){
   if (!it || typeof it !== 'object') return null;
   slot = slot || it.slot; if (it.slot !== slot || !GEAR_BASES[slot] || !GEAR_BASES[slot][it.b]) return null;
   const n = (v, hi) => Number.isFinite(v) ? clamp(v, 0, hi) : 0;
-  return { id: ++itemUid, slot, b: it.b, r: clamp(it.r | 0, 0, 2), w: n(it.w, 999), name: String(it.name || GEAR_BASES[slot][it.b].name).slice(0, 40), hp: n(it.hp, 9999), armor: n(it.armor, 9999), ward: n(it.ward, 9999), dmg: n(it.dmg, 9999), as: n(it.as, 5), range: n(it.range, 80), pow: n(it.pow, 9999), price: n(it.price, 9999) };
+  return { id: ++itemUid, slot, b: it.b, fx: GEAR_BASES[slot][it.b].fx, r: clamp(it.r | 0, 0, 2), w: n(it.w, 999), name: String(it.name || GEAR_BASES[slot][it.b].name).slice(0, 40), hp: n(it.hp, 9999), armor: n(it.armor, 9999), ward: n(it.ward, 9999), dmg: n(it.dmg, 9999), as: n(it.as, 5), range: n(it.range, 80), pow: n(it.pow, 9999), price: n(it.price, 9999) };
 }
-function validGear(G){ if (!G || typeof G !== 'object') return null; const out = {}; for (const s of GEAR_SLOTS) out[s] = validItem(G[s], s); return out; }
+function validGear(G){ if (!G || typeof G !== 'object') return null; const out = {}; for (const s of GEAR_SLOTS){ out[s] = validItem(G[s], typeOf(s)); if (out[s]) out[s].at = s; } return out; }
+// which worn slot a piece goes into: rings take a free ring slot, otherwise they replace the cheaper ring
+function targetSlot(it){ if (it.slot !== 'ring') return it.slot; if (!S.gear.ring1) return 'ring1'; if (!S.gear.ring2) return 'ring2'; return S.gear.ring2.price < S.gear.ring1.price ? 'ring2' : 'ring1'; }
+const curFor = it => S && S.gear ? S.gear[targetSlot(it)] : null;
+const wornFx = () => GEAR_SLOTS.map(k => S.gear[k] && S.gear[k].fx).filter(Boolean);
+function makeJewel(fx, r, wave){ return makeItem(JEWEL[fx].t, r, wave, fx); }
+function jewelPool(type){ const worn = wornFx(); return Object.keys(JEWEL).filter(k => !worn.includes(k) && (!type || JEWEL[k].t === type)); }
 const gearStat = k => S && S.gear ? GEAR_SLOTS.reduce((a, s) => a + ((S.gear[s] && S.gear[s][k]) || 0), 0) : 0;
 const abilBonus = () => gearStat('dmg') + gearStat('pow'); // in percent
 const armorCut = v => 100 / (100 + v);
 const itemSell = it => Math.floor(it.price / 2);
-function gearChanged(){ const h = S.hero, ratio = h.hp / h.maxHp; h.maxHp = heroMaxHp(); h.hp = Math.max(1, Math.min(h.maxHp, Math.round(h.maxHp * ratio))); }
-function equipItem(it){
-  const old = S.gear[it.slot]; S.gear[it.slot] = it;
+function gearChanged(){ S.relics = wornFx(); relicsChanged(); } // jewelry powers work through the old relic rules
+function equipItem(it, key){
+  key = key || targetSlot(it);
+  const old = S.gear[key]; S.gear[key] = it; it.at = key;
   if (old){ S.gold += itemSell(old); statGold('Selling', itemSell(old)); }
   gearChanged(); return old;
 }
@@ -4534,6 +4611,7 @@ function sellGear(slot){
 }
 function itemStats(it){
   const a = [];
+  if (it.fx) a.push(`<span style="color:var(--gold)">${RELICS[it.fx].desc}</span>`);
   if (it.dmg) a.push(`${it.dmg} damage`);
   if (it.slot === 'main') a.push(`${it.as.toFixed(2)} attacks/s`, `${it.range > 30 ? 'long' : 'short'} reach`);
   if (it.dmg) a.push(`+${it.dmg}% ability damage`);
@@ -4544,12 +4622,13 @@ function itemStats(it){
   return a;
 }
 function describeItem(it, how){
-  const R = RARITY[it.r], cur = S.gear && S.gear[it.slot];
+  const R = RARITY[it.r], cur = curFor(it);
   let h = `<strong style="color:${R.col}">${esc(it.name)}</strong><br><span style="color:var(--muted)">${R.name} ${SLOT_NAME[it.slot].toLowerCase()}</span><br>${itemStats(it).join('<br>')}`;
   if (it.slot === 'main') h += '<br><span style="color:var(--muted)">Your hero strikes the nearest enemy in reach with it.</span>';
-  if (how === 'shop' && cur && cur !== it) return `<strong>${SLOT_NAME[it.slot]} · ${it.price} gold</strong><br>` + compareHTML(it, cur, S.event && S.event.items ? S.event.items.indexOf(it) : null);
+  if (how === 'shop' && cur && cur !== it) return `<strong>${SLOT_NAME[it.slot]} · ${it.price} gold</strong>${it.slot === 'ring' ? '<br><span style="color:var(--muted)">Compared with your weaker ring</span>' : ''}<br>` + compareHTML(it, cur, null);
   if (how === 'shop') h += `<br><span style="color:var(--gold)">${it.price} gold</span>`;
-  if (how === 'worn') h += `<br><button class="btn sm" id="btnGearSell" type="button" data-gs="${it.slot}">Sell for ${itemSell(it)} gold</button>`;
+  if (it.fx && JEWEL[it.fx].epic) h += '<br><span class="rare-tag">Rare power</span> <span style="color:var(--muted)">only on Epic jewelry</span>';
+  if (how === 'worn') h += `<br><button class="btn sm" id="btnGearSell" type="button" data-gs="${it.at || it.slot}">Sell for ${itemSell(it)} gold</button>`;
   return h;
 }
 const CMP_ROWS = [['dmg', 'Damage'], ['as', 'Attacks per second'], ['range', 'Reach'], ['abil', 'Ability damage %'], ['hp', 'Max health'], ['armor', 'Physical armor'], ['ward', 'Magic armor']];
@@ -4561,9 +4640,10 @@ function gearDiff(it, cur){
     const d = Math.round((a - b) * 100) / 100; if (d > 0) up++; if (d < 0) down++;
     rows.push({ k, n, a, b, d });
   }
+  if (cur && (it.fx || cur.fx) && it.fx !== cur.fx) return { rows, up, down, verdict: 'power' };
   return { rows, up, down, verdict: !cur ? 'new' : up && !down ? 'up' : down && !up ? 'down' : up && down ? 'mixed' : 'same' };
 }
-const VERDICT = { up: ['▲ Upgrade', '#7dc46a'], down: ['▼ Worse', '#ff6b6b'], mixed: ['◆ Mixed', '#e2b24c'], same: ['= Same', '#8a92a6'] };
+const VERDICT = { up: ['▲ Upgrade', '#7dc46a'], down: ['▼ Worse', '#ff6b6b'], mixed: ['◆ Mixed', '#e2b24c'], same: ['= Same', '#8a92a6'], power: ['✦ New power', '#e2b24c'] };
 function compareHTML(it, cur, buyIdx){
   const D = gearDiff(it, cur), R = RARITY[it.r], C = cur && RARITY[cur.r];
   const fmt = (k, v) => k === 'as' ? v.toFixed(2) : k === 'range' ? (v ? (v > 30 ? 'long' : 'short') : '–') : Math.round(v);
@@ -4571,10 +4651,14 @@ function compareHTML(it, cur, buyIdx){
   const net = D.rows.filter(r => r.d && r.k !== 'range' && r.k !== 'as').map(r => `${r.d > 0 ? '+' : '−'}${Math.abs(Math.round(r.d))} ${r.n.toLowerCase().replace(' %', '')}`);
   let h = `<div class="cmp"><div class="cmp-h"><span>New</span><span>Equipped</span></div>
     <div class="cmp-i"><span><img src="${itemIcon(it)}" alt=""><b style="color:${R.col}">${esc(it.name)}</b></span><span><img src="${itemIcon(cur)}" alt=""><b style="color:${C.col}">${esc(cur.name)}</b></span></div>
+    ${it.fx || cur.fx ? `<div class="cmp-i cmp-fx"><span>${it.fx ? RELICS[it.fx].desc : '–'}</span><span>${cur.fx ? RELICS[cur.fx].desc : '–'}</span></div>` : ''}
     ${D.rows.map(r => `<div class="cmp-r"><span class="cmp-n">${r.n}</span><span>${fmt(r.k, r.a)}</span><span>${diff(r)}</span><span>${fmt(r.k, r.b)}</span></div>`).join('')}
     <div class="cmp-v" style="color:${VERDICT[D.verdict][1]}">${VERDICT[D.verdict][0]}${net.length ? ' · Net: ' + net.join(', ') : ''}</div>
     <div class="note">Your ${esc(cur.name)} is sold for ${itemSell(cur)} gold.</div>`;
-  if (buyIdx != null) h += `<div class="row" style="margin-top:6px"><button class="btn sm primary" type="button" id="btnBuyItem" data-item="${buyIdx}" ${!dbg.infGold && S.gold < it.price ? 'disabled' : ''}>Buy and equip · ${it.price} gold</button><button class="btn sm" type="button" id="btnCancelItem">Cancel</button></div>`;
+  if (buyIdx != null){
+    const poor = !dbg.infGold && S.gold < it.price ? 'disabled' : '', other = it.slot === 'ring' && S.gear.ring1 && S.gear.ring2 ? (targetSlot(it) === 'ring1' ? 'ring2' : 'ring1') : null;
+    h += `<div class="row" style="margin-top:6px"><button class="btn sm primary btn-buy-item" type="button" data-item="${buyIdx}" data-slot="${targetSlot(it)}" ${poor}>Buy and equip · ${it.price} gold</button>${other ? `<button class="btn sm btn-buy-item" type="button" data-item="${buyIdx}" data-slot="${other}" ${poor}>Replace ${esc(S.gear[other].name)} instead</button>` : ''}<button class="btn sm" type="button" id="btnCancelItem">Cancel</button></div>`;
+  }
   return h + '</div>';
 }
 const ITEM_ART = {
@@ -4594,9 +4678,11 @@ const ITEM_ART = {
   handaxe:  ['.........', '...XXX...', '..XXXX...', '..XXYX...', '....B....', '....B....', '....B....', '....B....', '.........'],
   talisman: ['....X....', '...X.X...', '..X...X..', '...XXX...', '..XYYYX..', '.XYYKYYX.', '.XYKYKYX.', '..XYYYX..', '...XXX...'],
 };
+const SLOT_COL = { helm: '#6f8fb8', chest: '#8a6ab8', legs: '#5f9a8a', main: '#b8664a', off: '#9a8a5a', ring: '#c8a24a', neck: '#c86a9a' };
 const ITEM_COL = { plate: '#a8b0bc', mail: '#7f889a', rune: '#6a4fa0', blade: '#d6dbe4' };
 const itemIconCache = {};
 function itemIcon(it){
+  if (it.fx) return RELIC_ICON[it.fx];
   const key = it.b + it.r; if (itemIconCache[key]) return itemIconCache[key];
   const B = GEAR_BASES[it.slot][it.b], X = it.b === 'shield' ? '#6a4428' : B.fl ? ITEM_COL[B.fl] : ITEM_COL.blade;
   return itemIconCache[key] = makeSprite(ITEM_ART[it.b], { X, Y: RARITY[it.r].col, B: '#7a5230', K: '#14101a' }).toDataURL();
@@ -4604,17 +4690,17 @@ function itemIcon(it){
 // a piece for an empty slot is bought at once; if the slot is taken, the first click opens the comparison
 function pickItem(i){
   const E = S.event; if (!E || !E.items || !E.items[i]) return; const it = E.items[i];
-  if (!S.gear[it.slot] || S.selItem === i) return buyItem(i);
-  S.selItem = i; sfx('click'); renderShop(); setInfo(describeItem(it, 'shop'));
+  if (!curFor(it) || S.selItem === i) return buyItem(i);
+  S.selItem = i; sfx('click'); renderShop();
 }
-function buyItem(i){
+function buyItem(i, key){
   S.selItem = null;
   const E = S.event; if (!E || E.type !== 'merchant' || !E.items || E.boughtI.includes(i)) return;
   const it = E.items[i]; if (!it) return;
   if (!dbg.infGold && S.gold < it.price) return toast('Not enough gold');
   if (!dbg.infGold){ S.gold -= it.price; statGold('Gear', it.price, true); }
-  E.boughtI.push(i); const old = equipItem(it);
-  if (S.stats){ (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: it.slot, b: it.b, r: it.r, w: S.wave }); const ev = S.stats.events[S.stats.events.length - 1]; if (ev && ev.t === 'merchant') ev.a = true; }
+  E.boughtI.push(i); const old = equipItem(it, key && GEAR_SLOTS.includes(key) && typeOf(key) === it.slot ? key : null);
+  if (S.stats){ (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: it.slot, b: it.b, r: it.r, w: S.wave }); if (it.fx) S.stats.relicBuys.push({ k: it.fx, w: S.wave }); const ev = S.stats.events[S.stats.events.length - 1]; if (ev && ev.t === 'merchant') ev.a = true; }
   sfx('merge'); toast(old ? `${it.name} equipped · ${old.name} sold for ${itemSell(old)} gold` : `${it.name} equipped`);
   renderShop(); setInfo(describeItem(it, 'worn'));
 }
@@ -4655,7 +4741,7 @@ function tickShrine(dt){
   const SH = S.shrine, h = S.hero;
   if (SH && !SH.done){
     const d2 = dist2(h.x, h.y, SH.x, SH.y);
-    if (!SH.hinted && d2 < 50 * 50){ SH.hinted = true; toast(SH.kind === 'shrine' ? `Blood Shrine: stand in the circle to trade ${Math.round(h.maxHp * .2)} health for ${SH.gold} gold` : 'Cursed Altar: stand in the circle to summon its champions. Kill them in 30 seconds for a relic'); }
+    if (!SH.hinted && d2 < 50 * 50){ SH.hinted = true; toast(SH.kind === 'shrine' ? `Blood Shrine: stand in the circle to trade ${Math.round(h.maxHp * .2)} health for ${SH.gold} gold` : 'Cursed Altar: stand in the circle to summon its champions. Kill them in 30 seconds for a ring or necklace'); }
     SH.prog = d2 < 18 * 18 ? SH.prog + dt : Math.max(0, SH.prog - dt * 2);
     if (SH.prog >= 1.5) activateShrine(SH);
   }
@@ -4682,8 +4768,8 @@ function activateShrine(SH){
   }
 }
 function altarReward(){
-  const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
-  if (S.relics.length < MAX_RELICS && pool.length){ const k = pickRelic(pool); gainRelic(k); if (S.stats) S.stats.relicBuys.push({ k, w: S.wave, altar: true }); toast(`The altar grants you ${RELICS[k].name}`); }
+  const free = ['ring', 'neck'].filter(t => (t === 'ring' ? !S.gear.ring1 || !S.gear.ring2 : !S.gear.neck) && jewelPool(t).length);
+  if (free.length){ const t = pick(free), it = makeJewel(pickRelic(jewelPool(t)), Math.max(1, rollRarity(S.wave, true)), S.wave); discoverGear(it); equipItem(it); if (S.stats) S.stats.relicBuys.push({ k: it.fx, w: S.wave, altar: true }); toast(`The altar grants you the ${it.name}`); }
   else { S.gold += 15; statGold('Events', 15); toast('The altar grants you 15 gold'); }
   sfx('level');
 }
@@ -4691,10 +4777,10 @@ function altarReward(){
 /* ================= SHOP EVENTS: the Wandering Merchant, a Blood Shrine, a Cursed Altar ================= */
 function makeEvent(type){
   if (type === 'merchant'){
-    const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
-    const offers = pool.length ? [pickRelic(pool)] : []; offers.forEach(discoverRelic);
-    const slots = shuffle(GEAR_SLOTS.slice()).slice(0, 3);
-    const items = slots.map(sl => makeItem(sl, rollRarity(S.wave), S.wave)); items.forEach(discoverGear);
+    const pool = jewelPool(), offers = [];
+    const items = shuffle(ARMS.slice()).slice(0, 3).map(sl => makeItem(sl, rollRarity(S.wave), S.wave));
+    if (pool.length) items.push(makeJewel(pickRelic(pool), rollRarity(S.wave), S.wave));
+    items.forEach(discoverGear);
     return { type, offers, bought: [], items, boughtI: [] };
   }
   if (type === 'shrine') return { type, cost: Math.round(S.hero.maxHp * .2), gold: 8 + S.wave, done: false };
@@ -4711,9 +4797,9 @@ function renderEvent(){
   el.hidden = !E;
   if (!E) return;
   if (E.type === 'merchant'){
-    const full = S.relics.length >= MAX_RELICS, items = E.items || [];
-    el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.merchant}" alt=""><div><h4>The Wandering Merchant</h4><p>"Steel for the living, relics for the bold." Gear goes on right away, and what you wore is sold for half.${full && E.offers.length ? ' <b>Your relic slots are full: sell one in the Character panel.</b>' : ''}</p></div></div>
-      <div class="ev-items">${items.map((it, i) => { const got = E.boughtI.includes(i), R = RARITY[it.r], cur = S.gear[it.slot], v = !got && cur ? VERDICT[gearDiff(it, cur).verdict] : null; return `<button class="relic-card item-card${S.selItem === i ? ' sel' : ''}" type="button" data-item="${i}" style="--rc:${R.col}" ${got || (!dbg.infGold && S.gold < it.price) ? 'disabled' : ''}>${v ? `<span class="verdict" style="color:${v[1]};border-color:${v[1]}">${v[0]}</span>` : ''}<img src="${itemIcon(it)}" alt=""><span class="rn" style="color:${R.col}">${esc(it.name)}</span><span class="rd">${SLOT_NAME[it.slot]} · ${itemStats(it).slice(0, 2).join(' · ')}</span><span class="rp">${got ? 'Bought' : it.price + ' gold'}</span></button>`; }).join('')}${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}${rareTag(k)}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>`;
+    const items = E.items || [];
+    el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.merchant}" alt=""><div><h4>The Wandering Merchant</h4><p>"Steel for the living, rings for the bold." Gear goes on right away, and what you wore is sold for half.</p></div></div>
+      <div class="ev-items">${items.map((it, i) => { const got = E.boughtI.includes(i), R = RARITY[it.r], cur = curFor(it), v = !got && cur ? VERDICT[gearDiff(it, cur).verdict] : null; return `<button class="relic-card item-card${S.selItem === i ? ' sel' : ''}" type="button" data-item="${i}" data-type="${it.slot}" style="--rc:${R.col};--sc:${SLOT_COL[it.slot]}" ${got || (!dbg.infGold && S.gold < it.price) ? 'disabled' : ''}><span class="slot-strip"><span>${SLOT_NAME[it.slot]}${!cur ? ' · empty' : ''}</span>${v ? `<span class="verdict" style="color:${v[1]};border-color:${v[1]}">${v[0]}</span>` : ''}</span><img src="${itemIcon(it)}" alt=""><span class="rn" style="color:${R.col}">${esc(it.name)}</span><span class="rd">${itemStats(it).slice(0, 2).join(' · ')}</span><span class="rp">${got ? 'Bought' : it.price + ' gold'}</span></button>`; }).join('')}${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}${rareTag(k)}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>${S.selItem != null && items[S.selItem] && !E.boughtI.includes(S.selItem) && curFor(items[S.selItem]) ? `<div class="ev-cmp"><strong>${SLOT_NAME[items[S.selItem].slot]} · ${items[S.selItem].price} gold</strong>${compareHTML(items[S.selItem], curFor(items[S.selItem]), S.selItem)}</div>` : ''}`;
   } else if (E.type === 'shrine'){
     const can = S.hero.hp > E.cost + 1;
     el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.shrine}" alt=""><div><h4>Blood Shrine</h4><p>${E.done ? 'The gods have taken their due.' : `Offer blood to the gods: lose ${E.cost} health and gain ${E.gold} gold.`}</p></div></div>
@@ -4804,6 +4890,7 @@ function sfx(name, p){
   AU.last[name] = now;
   const r = (a, b) => a + Math.random() * (b - a);
   switch (name){
+    case 'chime': tone(988, .3, { type: 'triangle', vol: .05 }); tone(1480, .45, { type: 'triangle', vol: .045, delay: .09 }); tone(1976, .5, { vol: .025, delay: .17 }); break;
     case 'loot': tone(110, .7, { to: 55, vol: .18 }); noise(.5, { f: 6000, to: 9000, ft: 'highpass', vol: .05 }); [523, 659, 784, 1046, 1318].forEach((f, k) => tone(f, .5, { type: 'triangle', vol: .07, delay: .07 * k })); tone(1568, 1, { vol: .05, delay: .4 }); tone(2093, 1.1, { vol: .03, delay: .48 }); break;
     case 'hit': noise(.06, { f: r(500, 800), ft: 'lowpass', vol: .07 }); tone(r(140, 180), .06, { type: 'triangle', vol: .04, to: 80 }); break;
     case 'crit': tone(r(900, 1100), .1, { type: 'triangle', vol: .07, to: 1500 }); noise(.08, { f: 3000, ft: 'highpass', vol: .05 }); break;
@@ -4934,9 +5021,9 @@ const TUT_STEPS = [
   { mode: 'shop', target: '#cards', anim: 'merge', h: 'Three of a kind', p: 'Three copies of the same unit merge into a stronger unit with two stars. Three two-star units make a three-star. Cards you already own glow. We put two more copies in the shop.', enter: tutMerge, wait: () => owned().some(u => u.star >= 2), hint: 'Buy the two glowing copies' },
   { mode: 'shop', target: ['#formation .slot[data-i="0"]', '#formation .slot[data-i="2"]', '#formation .slot[data-i="4"]', '#formation .slot[data-i="6"]', '#bench'], anim: 'drag', h: 'Formation and bench', p: 'Only units on the glowing marks around your hero at the fire fight. The bench holds the rest. Drag a unit from the bench onto a mark, or right-click it to send it between bench and formation. Levelling up with XP opens more marks.' },
   { mode: 'shop', target: '#traits', h: 'Synergies', p: () => `Units in the formation build synergies. Two of the same class or element switch a bonus on. Four of a class, or three of an element, make it stronger. We added ${tut.gift || 'a unit'} so ${tut.giftEl || 'an element'} is active. Hover or click a synergy row to read exactly what it does.`, enter: tutSynergy },
-  { mode: 'shop', target: '#event', wide: true, h: 'The Wandering Merchant', p: 'The Merchant waits at every campfire. He sells gear for your hero (helmets, chestplates, leggings and weapons) and a relic that twists a rule for the rest of the raid. Press C for your Character panel with your gear, relics and abilities. Blood Shrines and Cursed Altars appear on the battlefield instead: stand in their circle to use them. Here is some gold to try.', enter: tutMerchant },
-  { mode: 'shop', target: '#btnBook', h: 'The Field Guide', p: 'This book is your Field Guide. It keeps a page for everything you meet on your raids: every beast and how to dodge its attack, every elite trait, every relic and every type of gear. Entries unlock the first time you find them. Until then you see only a dark silhouette and a hint. Open it here in the shop with the book or J, and in battle from the pause menu.', enter: () => { tut.wantGuide = true; tut.guideOpened = false; }, wait: () => tut.guideOpened, hint: 'Click the book to open it' },
-  { mode: 'shop', target: '#bestiary .fg-tabs', h: 'Beasts, relics and gear', p: 'Beasts shows each enemy with its attack and a moving picture, and the elite traits below. Relics lists what the Merchant sells and what the Cursed Altar grants: rare ones like Twin Souls are marked in gold. Gear shows every helmet, chestplate, leggings and weapon type, and lights up each rarity you have found. The numbers on the tabs count your discoveries. Try the Gear tab.', enter: () => { tut.fgTab0 = fgTab; }, wait: () => fgTab === 'gear', hint: 'Click the Gear tab' },
+  { mode: 'shop', target: '#event', wide: true, h: 'The Wandering Merchant', p: 'The Merchant waits at every campfire. He sells gear for your hero: helmets, chestplates, leggings and weapons, and a ring or necklace with a special power that twists a rule for the rest of the raid. You wear two rings and one necklace. The coloured strip on each card shows the slot it fits. Press C for your Character panel with your gear and abilities. Blood Shrines and Cursed Altars appear on the battlefield instead: stand in their circle to use them. Here is some gold to try.', enter: tutMerchant },
+  { mode: 'shop', target: '#btnBook', h: 'The Field Guide', p: 'This book is your Field Guide. It keeps a page for everything you meet on your raids: every beast and how to dodge its attack, every elite trait, and every type of gear, rings and necklaces. Entries unlock the first time you find them. Until then you see only a dark silhouette and a hint. Open it here in the shop with the book or J, and in battle from the pause menu.', enter: () => { tut.wantGuide = true; tut.guideOpened = false; }, wait: () => tut.guideOpened, hint: 'Click the book to open it' },
+  { mode: 'shop', target: '#bestiary .fg-tabs', h: 'Beasts and gear', p: 'Beasts shows each enemy with its attack and a moving picture, and the elite traits below. Gear has a page for every slot: helmets, chestplates, leggings, main hand, off hand, rings and necklaces. Each entry lights up the rarities you have found, and rare powers like the Amulet of Twin Souls are marked in gold. The numbers count your discoveries, and a banner pops up whenever you find something new. Try the Gear tab.', enter: () => { tut.fgTab0 = fgTab; }, wait: () => fgTab === 'gear', hint: 'Click the Gear tab' },
   { mode: 'shop', target: '#btnStart', h: 'Start the wave', enter: () => { tut.wantGuide = false; if (!$('#bestiary').hidden) showBestiary(false); }, p: 'When your warband is ready, start the wave. In a real raid you can also press Space.', unlock: true, wait: () => mode === 'combat', hint: 'Click Start wave' },
   { mode: 'combat', target: 'hero', r: 46, anim: 'keys', h: 'Move your hero', p: 'Walk with W A S D or the arrow keys. Your hero swings the weapon in the main hand at enemies in reach, but the warband does most of the work. Keep it close and stay out of reach of the enemies.', enter: () => { tut.x0 = S.hero.x; tut.y0 = S.hero.y; }, wait: () => Math.hypot(S.hero.x - tut.x0, S.hero.y - tut.y0) > 70, hint: 'Walk around a little' },
   { mode: 'combat', target: 'hero', r: 150, h: 'Your warband fights', p: 'Units attack the nearest enemies on their own. Here come some draugr. Some of them climb out of the ground. Keep moving while your warband deals with them.', enter: tutSpawn, wait: () => S.kills - tut.k0 >= 4, hint: 'Defeat 4 draugr' },
