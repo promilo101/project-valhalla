@@ -658,6 +658,26 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .share-ask p{margin:0;font-size:17px;color:#c9cfdb}
 .notes-link{position:absolute;right:max(14px, env(safe-area-inset-right, 0px));bottom:12px;background:none;border:0;padding:4px 6px;color:var(--muted);font:inherit;font-size:18px;display:flex;align-items:center;gap:6px;cursor:pointer}
 .notes-link:hover{color:var(--fg)}
+#title .screen-inner{justify-items:center;text-align:center;width:min(900px,100%)}
+#title .t-eye{letter-spacing:.3em}
+#title .t-h1{white-space:nowrap;font-size:clamp(40px,7vw,84px)}
+#title .t-lead{margin:2px 0 6px}
+#title .t-main{justify-content:center}
+#title .btn.big{font-size:24px;padding:12px 34px}
+#title .t-grid{display:grid;grid-template-columns:repeat(4,auto);justify-content:center;gap:8px;width:100%}
+#title .t-grid .btn{white-space:nowrap;justify-content:center}
+#title .t-links{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;color:var(--muted);font-size:17px}
+#title .t-link{background:none;border:0;padding:2px 4px;color:var(--muted);font:inherit;cursor:pointer}
+#title .t-link:hover,#title .t-link[aria-expanded="true"]{color:var(--fg)}
+#title .t-link:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
+#title .notes-link{position:static;padding:2px 4px;font-size:inherit}
+#title .t-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;text-align:left}
+#title .t-controls[hidden]{display:none}
+#title .t-controls section{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:8px 10px}
+#title .t-controls h3{margin:0 0 6px;font-size:15px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#title .t-controls .keys{grid-template-columns:auto 1fr;font-size:15px;gap:4px 10px}
+#title .t-best{margin:0}
+@media (max-width:760px){#title .t-grid{grid-template-columns:repeat(2,minmax(0,1fr))}#title .t-controls{grid-template-columns:1fr}}
 .notes-link:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
 .notes-link .dot{width:8px;height:8px;border-radius:50%;background:var(--ember);box-shadow:0 0 8px var(--ember)}
 .notes{display:grid;gap:16px;max-height:min(60vh,520px);overflow:auto;padding-right:6px}
@@ -809,36 +829,47 @@ a.btn{text-decoration:none;display:inline-block}
   </section>
   <section id="title" class="screen">
     <div class="screen-inner">
-      <div class="eyebrow">Prototype <span id="verTxt">0.16.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
-      <h1>Project <span>Valhalla</span></h1>
-      <p class="lead">Lead your warband through 20 waves of draugr, wolves and giants. Draw cards between waves, combine three of a kind, and survive Fenrir.</p>
-      <div class="row">
-        <button class="btn primary" id="btnContinue" type="button" hidden>Continue raid</button>
-        <button class="btn primary" id="btnNew" type="button">Start a new raid</button>
-        <button class="btn tut-btn" id="btnTut" type="button">How to play<span class="dot" id="tutDot" hidden></span></button>
-        <button class="btn" id="btnMeta" type="button">Rune Forge · <span class="runes" id="tRunes">0</span> runes</button>
-        <button class="btn" id="btnLb" type="button">Leaderboard</button>
-        <button class="btn" id="btnGuide" type="button">Field Guide</button>
-        <button class="btn" id="btnSettings" type="button">Settings</button>
-        <button class="btn" id="btnFbTitle" type="button">Send feedback</button>
+      <div class="eyebrow t-eye">Early Access <span id="verTxt">0.20.0</span><span id="devTag"> · DEV build</span></div>
+      <h1 class="t-h1">Project <span>Valhalla</span></h1>
+      <p class="lead t-lead">Lead your warband through 20 waves and survive Fenrir.</p>
+      <div class="row t-main">
+        <button class="btn primary big" id="btnContinue" type="button" hidden>Continue raid</button>
+        <button class="btn primary big" id="btnNew" type="button">Start a new raid</button>
       </div>
-      <dl class="keys">
-        <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> / arrows</dt><dd>Move the hero. Your warband fights on its own.</dd>
-        <dt><kbd>Space</kbd></dt><dd>Dash in battle · start the next wave in the shop</dd>
-        <dt><kbd>P</kbd></dt><dd>Pause</dd>
-        <dt><kbd>T</kbd></dt><dd>Show or hide power-up tooltips</dd>
-        <dt><kbd>M</kbd></dt><dd>Mute or unmute all sound</dd>
-        <dt><kbd>Tab</kbd></dt><dd>Show or hide the damage meter</dd>
-        <dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Hero abilities, aimed at the mouse cursor</dd>
-        <dt><kbd>C</kbd></dt><dd>In the shop: open your Character panel with gear, jewelry and abilities</dd>
-        <dt><kbd>J</kbd></dt><dd>In the shop: open the Field Guide</dd>
-        <dt><kbd>F</kbd></dt><dd>In battle: switch between targeting the nearest enemy and bosses and elites first</dd>
-        <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 2 minutes)</dd>
-        <dt>Shop</dt><dd><kbd>R</kbd> reroll · <kbd>F</kbd> buy XP · <kbd>E</kbd> sell · <kbd>Q</kbd> sort bench · <kbd>G</kbd> heal</dd>
-        <dt>Units</dt><dd>Drag to move · right-click to swap between bench and formation</dd>
-      </dl>
-      <p class="note" id="bestTxt">Requires a keyboard. Made for desktop browsers.</p>
-      <button class="notes-link" id="btnNotes" type="button"><span id="notesLbl">What's new</span><span class="dot" id="notesDot" hidden></span></button>
+      <div class="t-grid">
+        <button class="btn tut-btn" id="btnTut" type="button">How to play<span class="dot" id="tutDot" hidden></span></button>
+        <button class="btn" id="btnMeta" type="button">Rune Forge · <span class="runes" id="tRunes">0</span></button>
+        <button class="btn" id="btnGuide" type="button">Field Guide</button>
+        <button class="btn" id="btnLb" type="button">Leaderboard</button>
+      </div>
+      <div class="t-links">
+        <button class="t-link" id="btnSettings" type="button">Settings</button><span aria-hidden="true">·</span>
+        <button class="t-link" id="btnControls" type="button" aria-expanded="false" aria-controls="controls">Controls</button><span aria-hidden="true">·</span>
+        <button class="t-link" id="btnFbTitle" type="button">Send feedback</button><span aria-hidden="true">·</span>
+        <button class="notes-link t-link" id="btnNotes" type="button"><span id="notesLbl">What's new</span><span class="dot" id="notesDot" hidden></span></button>
+      </div>
+      <div class="t-controls" id="controls" hidden>
+        <section><h3>Battle</h3><dl class="keys">
+            <dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>Move (or the arrow keys). Your warband fights on its own</dd>
+            <dt><kbd>Space</kbd></dt><dd>Dash</dd>
+            <dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Hero abilities, aimed at the mouse</dd>
+            <dt><kbd>F</kbd></dt><dd>Target nearest, or bosses and elites first</dd>
+            <dt><kbd>B</kbd></dt><dd>Open the shop in Endless (every 2 minutes)</dd>
+            <dt><kbd>P</kbd></dt><dd>Pause</dd></dl></section>
+        <section><h3>Shop</h3><dl class="keys">
+            <dt><kbd>Space</kbd></dt><dd>Start the next wave</dd>
+            <dt><kbd>R</kbd> <kbd>F</kbd></dt><dd>Reroll · buy XP</dd>
+            <dt><kbd>E</kbd> <kbd>Q</kbd> <kbd>G</kbd></dt><dd>Sell · sort bench · heal</dd>
+            <dt><kbd>C</kbd></dt><dd>Character panel: gear, jewelry, abilities</dd>
+            <dt><kbd>J</kbd></dt><dd>Field Guide</dd>
+            <dt>Units</dt><dd>Drag to move · right-click to swap bench and formation</dd></dl></section>
+        <section><h3>General</h3><dl class="keys">
+            <dt><kbd>Tab</kbd></dt><dd>Damage meter</dd>
+            <dt><kbd>T</kbd></dt><dd>Power-up tooltips</dd>
+            <dt><kbd>M</kbd></dt><dd>Mute all sound</dd>
+            <dt><kbd>Esc</kbd></dt><dd>Menu and back</dd></dl></section>
+      </div>
+      <p class="note t-best" id="bestTxt">Needs a keyboard · made for desktop browsers</p>
     </div>
   </section>
 
@@ -4175,6 +4206,7 @@ $('#fbCopy').onclick = () => {
   } catch (err){ fallback(); }
 };
 $('#btnFbTitle').onclick = () => openFeedback('title');
+$('#btnControls').onclick = e => { const c = $('#controls'), on = c.hidden; c.hidden = !on; e.currentTarget.setAttribute('aria-expanded', String(on)); e.currentTarget.textContent = on ? 'Hide controls' : 'Controls'; };
 $('#devTag').hidden = !BUILD; $('#devTag').textContent = ` · ${BUILD.toUpperCase()} build`;
 $('#btnFbOver').onclick = () => openFeedback('over');
 $('#btnFbPause').onclick = () => openFeedback('pause');
@@ -4586,7 +4618,7 @@ async function cloudStartup(){
 const CHANGES = [
   ['0.20.0', 'Gear and the campfire', {
     Highlights: ['A new intro when a raid begins, and Fenrir\'s death now brings the Endless Winter: his dying breath freezes the field, and snow falls through all of Endless mode', 'Gear for your hero: helmet, chestplate, leggings, two weapon hands, two rings and a necklace', 'Your warband gathers at the campfire, and the Character panel (C) holds your gear and abilities', 'The Field Guide (J): beasts, units, abilities, battlefield events and gear, each unlocked as you find it', 'Battlefield events: the Blood Shrine, the Cursed Altar, Odin\'s Messenger and Sleipnir\'s Tracks', 'A new enemy from wave 7: the Draugr Spearman'],
-    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'A banner pops up for every new Field Guide find', 'The end screen is more compact: damage dealt, damage by class and healing, with More stats for the rest', 'A Damage meter button with its Tab hotkey sits below the minimap, next to Tooltips', 'The tutorial shows the Field Guide and the damage meter'],
+    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'A banner pops up for every new Field Guide find', 'A cleaner title screen: one main button, the four main menus in a row, and the controls behind a Controls link', 'The end screen is more compact: damage dealt, damage by class and healing, with More stats for the rest', 'A Damage meter button with its Tab hotkey sits below the minimap, next to Tooltips', 'The tutorial shows the Field Guide and the damage meter'],
     Changed: ['Relics are now jewelry. Each ring or necklace carries one of the old relic powers', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces', 'Bosses no longer heal you to full', 'Swift Stride is now Sleipnir\'s Tracks: run through six hoof marks within 8 seconds for an extra dash slot', 'Blood Shrines and Cursed Altars moved from the campfire to the battlefield', 'The boss reward screen separates the abilities from the boss\'s gear, with a tag on every card. Every boss reward card has the same soft sheen and sparkle, so none pulls your eye more than the others. The gear reveal plays once you pick it', 'Merchant cards show each piece\'s slot on a plain grey strip, so colour always means rarity', 'The pause menu is cleaner: Resume, the Field Guide, Settings and feedback, with Give up on its own', 'Rings and necklaces no longer show beside the ability bar in battle. You find them in the Character panel'],
     Fixed: ['A fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet', 'The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
   }],
@@ -4633,9 +4665,9 @@ function renderTitle(){
   $('#tutDot').hidden = tutSeen();
   const R = readRunSave(), bc = $('#btnContinue');
   bc.hidden = !R; if (R) bc.textContent = `Continue raid · wave ${R.wave}${R.endless ? ' (endless)' : ''}`;
-  $('#btnNew').classList.toggle('primary', !R);
+  $('#btnNew').classList.toggle('primary', !R); $('#btnNew').classList.toggle('big', !R); if (!$('#btnNew').dataset.armed) $('#btnNew').textContent = R ? 'New raid' : 'Start a new raid';
   $('#tRunes').textContent = meta.runes;
-  $('#bestTxt').textContent = meta.runs ? `Best result: wave ${meta.best} of 20${meta.wins ? ` · ${meta.wins} win${meta.wins > 1 ? 's' : ''}` : ''}${meta.bestEndless ? ` · endless wave ${meta.bestEndless}` : ''}. Requires a keyboard.` : 'Requires a keyboard. Made for desktop browsers.';
+  $('#bestTxt').textContent = meta.runs ? `Best: wave ${meta.best} of 20${meta.wins ? ` · ${meta.wins} win${meta.wins > 1 ? 's' : ''}` : ''}${meta.bestEndless ? ` · endless wave ${meta.bestEndless}` : ''} · ${meta.runs} raid${meta.runs > 1 ? 's' : ''} played` : 'Needs a keyboard · made for desktop browsers';
 }
 function renderMeta(){
   renderCloud();
