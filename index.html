@@ -1865,7 +1865,9 @@ for (let v = 0; v < 4; v++){
 let S = null, uid = 0, mode = 'title', paused = false;
 const keys = {};
 const SLOT_OFF = Array.from({ length: 8 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 4; return { x: Math.cos(a) * 24, y: Math.sin(a) * 20 }; });
-SLOT_OFF.push({ x: 0, y: 34 }); // the 9th slot, opened by the Raven Banner: a rear guard behind the hero
+// with the Raven Banner's 9th slot the whole ring widens and spreads nine places evenly, clear of the campfire below
+const SLOT_OFF9 = Array.from({ length: 9 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI * 2 / 9; return { x: Math.cos(a) * 29, y: Math.sin(a) * 23 }; });
+const slotPos = i => (S && (hasR('raven_banner') || S.board[8]) ? SLOT_OFF9 : SLOT_OFF)[i] || SLOT_OFF9[i];
 
 function newRun(R){
   if (R && R.v !== 1) R = null; // called from a click handler: no save to restore
@@ -2587,7 +2589,7 @@ function update(dt){
   const furyM = (S.fury > 0 ? 1.6 : 1) * (S.cry > 0 ? S.cryM : 1) * (hasR('berserk_mark') && h.hp < h.maxHp * .4 ? 1.5 : 1);
   S.board.forEach((u, i) => {
     if (!u || i >= slotCount()) return;
-    const o = SLOT_OFF[i], tx = h.x + o.x, ty = h.y + o.y, k = Math.min(1, dt * 9);
+    const o = slotPos(i), tx = h.x + o.x, ty = h.y + o.y, k = Math.min(1, dt * 9);
     if (u.leap){
       const L = u.leap; L.t += dt; const q = Math.min(1, L.t / L.dur);
       u.x = L.sx + (L.tx - L.sx) * q; u.y = L.sy + (L.ty - L.sy) * q; u.hz = Math.sin(q * Math.PI) * 28;
@@ -3153,12 +3155,12 @@ function render(dt){
     const nMarks = hasR('raven_banner') || st.board[8] ? 9 : 8, open = slotCount();
     for (let i = 0; i < nMarks; i++){
       if (st.board[i] && i < open) continue;
-      const o = SLOT_OFF[i], mx = h.x + o.x, my = h.y + o.y + 5;
+      const o = slotPos(i), mx = h.x + o.x, my = h.y + o.y + 5;
       ctx.beginPath(); ctx.ellipse(mx, my, 6, 2.6, 0, 0, 6.283);
       if (i < open){ ctx.fillStyle = 'rgba(226,178,76,.14)'; ctx.fill(); ctx.strokeStyle = `rgba(226,178,76,${.5 + .3 * Math.sin(ct * 3 + i)})`; ctx.lineWidth = 1; ctx.stroke(); }
       else { ctx.strokeStyle = 'rgba(140,150,170,.3)'; ctx.lineWidth = 1; ctx.setLineDash([2, 2]); ctx.stroke(); ctx.setLineDash([]); }
     }
-    st.board.forEach((u, i) => { if (!u || i >= slotCount()) return; u.x = h.x + SLOT_OFF[i].x; u.y = h.y + SLOT_OFF[i].y; u.face = u.x < fireX ? 1 : u.x > fireX ? -1 : u.face; u.hz = 0; u.leap = null; });
+    st.board.forEach((u, i) => { if (!u || i >= slotCount()) return; u.x = h.x + slotPos(i).x; u.y = h.y + slotPos(i).y; u.face = u.x < fireX ? 1 : u.x > fireX ? -1 : u.face; u.hz = 0; u.leap = null; });
   }
   if (S && S.shrine && !S.shrine.done && !camp && S.shrine.kind === 'messenger'){ // Odin's Messenger, a golden raven
     const SH = S.shrine, tt = st.time || 0, fly = SH.st !== 'perch' && SH.rest >= 0, bob = fly ? Math.sin(tt * 10) * 2 - 5 : Math.sin(tt * 3);
@@ -3249,7 +3251,7 @@ function render(dt){
       if (camp && ((ct + u.id * 1.7) % 4) < .3){ const tip = u.cls === 'archer' ? '#ffffff' : UNIT_EL[u.mod].X; ctx.fillStyle = tip; ctx.globalAlpha = .9; ctx.fillRect(Math.round(u.x + u.face * 4), Math.round(u.y - 8 - hz), 1, 1); ctx.fillRect(Math.round(u.x + u.face * 4) - 1, Math.round(u.y - 7 - hz), 3, 1); ctx.globalAlpha = 1; }
       const usc = u.star === 3 ? 1.2 : u.star === 2 ? 1.1 : 1;
       drawSprite(u.cls + '_' + u.mod, u.x + lunge, u.y + Math.sin(st.time * 5 + u.id) * .6 - hz - (usc - 1) * 5, usc, u.face);
-      drawStars(Math.round(u.x), Math.round(u.y - hz) - 10 - (u.star - 1), u.star);
+      if (S && u.y - h.y > 12 && !camp) drawStars(Math.round(u.x), Math.round(u.y) + 11, u.star); else drawStars(Math.round(u.x), Math.round(u.y - hz) - 10 - (u.star - 1), u.star);
       if (u.st && mode === 'combat'){ ctx.fillStyle = '#10131b'; ctx.fillRect(Math.round(u.x) - 5, Math.round(u.y) + 8, 10, 1); ctx.fillStyle = '#86d4ff'; ctx.fillRect(Math.round(u.x) - 5, Math.round(u.y) + 8, Math.round(10 * u.mana / 100), 1); }
     } else {
       shadow(h.x, h.y + 6, 5);
@@ -3257,15 +3259,15 @@ function render(dt){
       const blink = h.inv > 0 && Math.floor(st.time * 20) % 2 === 0;
       if (!blink) drawSprite('hero', h.x, h.y + (Math.sin(h.walk * 14) > 0 ? -1 : 0), 1, h.face);
       if (S && S.slash && S.slash.t > 0){ const sl = S.slash, k = 1 - sl.t / .14; ctx.strokeStyle = `rgba(232,236,242,${.9 * (1 - k)})`; ctx.lineWidth = 1.5; ctx.beginPath(); if (sl.b === 'spear'){ ctx.moveTo(h.x + Math.cos(sl.a) * 6, h.y + Math.sin(sl.a) * 6); ctx.lineTo(h.x + Math.cos(sl.a) * (10 + 24 * k), h.y + Math.sin(sl.a) * (10 + 24 * k)); } else ctx.arc(h.x, h.y, sl.b === 'axe' ? 15 : 13, sl.a - 1.1 + k * .9, sl.a + .1 + k * .9); ctx.stroke(); }
-      if (S && mode === 'combat'){
-        const bx = Math.round(h.x) - 8, by = Math.round(h.y) + 9, f = clamp(h.hp / h.maxHp, 0, 1), low = f < .3 && Math.floor(st.time * 4) % 2 === 0;
-        ctx.fillStyle = '#05060a'; ctx.fillRect(bx - 1, by - 1, 18, 4);
-        ctx.fillStyle = '#2a1118'; ctx.fillRect(bx, by, 16, 2);
-        ctx.fillStyle = low ? '#ff6b6b' : '#c4213f'; ctx.fillRect(bx, by, Math.round(16 * f), 2);
-        const cap = dashCap(), pw = 3, gap = 1, tw = cap * pw + (cap - 1) * gap, px0 = Math.round(h.x - tw / 2);
-        for (let i = 0; i < cap; i++){ ctx.fillStyle = i < h.dashCh ? '#86d4ff' : i < h.dashSlots ? '#1d2a42' : 'rgba(58,66,86,.6)'; ctx.fillRect(px0 + i * (pw + gap), by + 4, pw, 1); }
-      }
     }
+  }
+  if (S && mode === 'combat'){ // the hero's health bar and dash pips go on top of everything, so no unit can hide them
+    const bx = Math.round(h.x) - 8, by = Math.round(h.y) + 9, f = clamp(h.hp / h.maxHp, 0, 1), low = f < .3 && Math.floor(st.time * 4) % 2 === 0;
+    ctx.fillStyle = '#05060a'; ctx.fillRect(bx - 1, by - 1, 18, 3);
+    ctx.fillStyle = '#2a1118'; ctx.fillRect(bx, by, 16, 1);
+    ctx.fillStyle = low ? '#ff6b6b' : '#c4213f'; ctx.fillRect(bx, by, Math.round(16 * f), 1);
+    const cap = dashCap(), pw = 3, gap = 1, tw = cap * pw + (cap - 1) * gap, px0 = Math.round(h.x - tw / 2);
+    for (let i = 0; i < cap; i++){ ctx.fillStyle = i < h.dashCh ? '#86d4ff' : i < h.dashSlots ? '#1d2a42' : 'rgba(58,66,86,.6)'; ctx.fillRect(px0 + i * (pw + gap), by + 3, pw, 1); }
   }
 
   // the chain binding the hero to Fenrir
@@ -3632,7 +3634,7 @@ function renderShop(){
 function positionCamp(){
   const box = $('#formation'); if (!box || box.hidden || !S) return;
   const sx = cv.clientWidth / VW, sy = cv.clientHeight / VH, sz = Math.round(15 * sy), h = S.hero;
-  box.querySelectorAll('.slot').forEach(el => { const o = SLOT_OFF[+el.dataset.i]; el.style.left = Math.round((h.x + o.x - lastCamX) * sx) + 'px'; el.style.top = Math.round((h.y + o.y - 2 - lastCamY) * sy) + 'px'; el.style.width = el.style.height = sz + 'px'; });
+  box.querySelectorAll('.slot').forEach(el => { const o = slotPos(+el.dataset.i); el.style.left = Math.round((h.x + o.x - lastCamX) * sx) + 'px'; el.style.top = Math.round((h.y + o.y - 2 - lastCamY) * sy) + 'px'; el.style.width = el.style.height = sz + 'px'; });
 }
 const dragImgs = {};
 function dragImg(u){ const k = ukey(u); if (!dragImgs[k]){ const im = new Image(); im.src = ICON[k]; dragImgs[k] = im; } return dragImgs[k]; }
@@ -4472,7 +4474,7 @@ const CHANGES = [
     Highlights: ['Gear for your hero: helmet, chestplate, leggings, two weapon hands, two rings and a necklace', 'Your warband gathers at the campfire, and the Character panel (C) holds your gear and abilities', 'The Field Guide (J): beasts, units, abilities, battlefield events and gear, each unlocked as you find it', 'Battlefield events: the Blood Shrine, the Cursed Altar, Odin\'s Messenger and Sleipnir\'s Tracks', 'A new enemy from wave 7: the Draugr Spearman'],
     New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'A banner pops up for every new Field Guide find', 'The tutorial shows the Field Guide and the damage meter'],
     Changed: ['Relics are now jewelry. Each ring or necklace carries one of the old relic powers', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces', 'Bosses no longer heal you to full', 'Swift Stride is now Sleipnir\'s Tracks: run through six hoof marks within 8 seconds for an extra dash slot', 'Blood Shrines and Cursed Altars moved from the campfire to the battlefield', 'The boss reward screen separates the abilities from the boss\'s gear, with a tag on every card', 'Merchant cards show each piece\'s slot on a plain grey strip, so colour always means rarity', 'The pause menu is cleaner: Resume, the Field Guide, Settings and feedback, with Give up on its own', 'Rings and necklaces no longer show beside the ability bar in battle. You find them in the Character panel'],
-    Fixed: ['The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
+    Fixed: ['With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet', 'The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
   }],
   ['0.17.5', 'Quieter music', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat']],
   ['0.17.4', 'Small fixes', ['Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow. Shots fly through him to the wights']],
