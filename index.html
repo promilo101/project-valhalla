@@ -890,7 +890,7 @@ try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.
 const SET_KEY = 'valhalla.settings';
 const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true, ui: 'auto', quality: 'high', calm: false, fps: false, meter: false, share: null, focus: false }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
 function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(settings)); } catch (e) {} }
-const BUILD = 'dev'; // '' = public build; 'dev' (hotfixes) and 'next' (new features) are test builds
+const BUILD = 'next'; // '' = public build; 'dev' (hotfixes) and 'next' (new features) are test builds
 const RUN_KEY = 'valhalla.run' + (BUILD ? '.' + BUILD : ''), STAMP_KEY = 'valhalla.stamp'; // test builds keep their own saved raid
 function bumpStamp(){ try { localStorage.setItem(STAMP_KEY, String(Date.now())); } catch (e) {} try { cloudQueue(); } catch (e) {} }
 function localStamp(){ try { return +localStorage.getItem(STAMP_KEY) || 0; } catch (e) { return 0; } }
