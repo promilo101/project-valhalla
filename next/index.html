@@ -1037,7 +1037,7 @@ a.btn{text-decoration:none;display:inline-block}
     </fieldset>
     <fieldset><legend>Spawn</legend>
       <div class="r"><select id="dbgBoss" aria-label="Boss"><option value="jarl:A">Draugr King, Grave Lord (A)</option><option value="jarl:B">Draugr King, Mound-Dweller (B)</option><option value="giant:A">Giant, Glacier Lord (A)</option><option value="giant:B">Giant, Frostbeard (B)</option><option value="herald:A">Herald, Half-Faced (A)</option><option value="herald:B">Herald, Hel's Valkyrie (B)</option><option value="fenrir:B">Fenrir, World-Eater</option><option value="fenrir:A">Fenrir, the Chained</option></select><button type="button" id="dbgSpawnBoss">Spawn boss</button></div>
-      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Witch</option><option value="wight">Barrow Wight</option><option value="wisp">Soul Wisp</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
+      <div class="r"><select id="dbgEnemy" aria-label="Enemy"><option value="draugr">Draugr</option><option value="wolf">Wolf</option><option value="raven">Raven</option><option value="armored">Iron Draugr</option><option value="witch">Witch</option><option value="spear">Draugr Spearman</option><option value="wight">Barrow Wight</option><option value="wisp">Soul Wisp</option></select><label for="dbgElite"><input type="checkbox" id="dbgElite"> Elite</label><button type="button" id="dbgSpawnEnemy">Spawn 5</button></div>
       <div class="r"><select id="dbgPu" aria-label="Power-up"></select><button type="button" id="dbgSpawnPu">Spawn power-up</button></div>
     </fieldset>
     <fieldset><legend>Economy and units</legend>
@@ -1197,6 +1197,7 @@ const ENEMIES = {
   raven:   { name: 'Raven',           hp: 7,   spd: 64, dmg: 4,  r: 4, armor: 0,   ward: 0,   spr: 'raven', fly: true },
   armored: { name: 'Iron Draugr',     hp: 42,  spd: 22, dmg: 10, r: 6, armor: 140, ward: 10,  spr: 'armored' },
   witch:   { name: 'Witch',        hp: 20,  spd: 30, dmg: 7,  r: 5, armor: 10,  ward: 120, spr: 'witch', ranged: true },
+  spear:   { name: 'Draugr Spearman', hp: 26, spd: 28, dmg: 8,  r: 5, armor: 40,  ward: 10,  spr: 'spear', ranged: true },
   jarl:    { name: 'The Draugr King', hp: 650,  spd: 24, dmg: 14, r: 11, armor: 40, ward: 30,  spr: 'jarlA0',   boss: 'jarl',   scale: 1 },
   giant:   { name: 'The Frost Giant', hp: 2800, spd: 15, dmg: 22, r: 20, armor: 70, ward: 50,  spr: 'giantA0',  boss: 'giant',  scale: 2 },
   herald:  { name: 'Herald of Hel',   hp: 4600, spd: 26, dmg: 16, r: 11, armor: 30, ward: 70, spr: 'heraldA0', boss: 'herald', scale: 1 },
@@ -1211,18 +1212,18 @@ const WAVES = [
   { name: 'Witches in the Mist', d: 'Witches throw bolts and curse the ground beneath you.', mix: { draugr: 3, witch: 1 } },
   { name: 'The Draugr King', d: 'Mini-boss. He raises his dead, hurls his axe, and hides in his barrow when wounded.', mix: { draugr: 1 }, boss: 'jarl' },
   { name: 'Raven Swarm', d: 'Many weak ravens. Hit many at once.', mix: { raven: 6, draugr: 1 }, rate: 1.7, hp: .8 },
-  { name: 'The Iron Dead', d: 'Heavy armor. Magic damage works best. Step out of their hammer slams.', mix: { armored: 3, draugr: 2 } },
+  { name: 'The Iron Dead', d: 'Heavy armor, and spearmen throw from behind it. Magic damage works best. Step out of hammer slams, and change direction when spears fly.', mix: { armored: 3, draugr: 1, spear: 2 } },
   { name: 'The Witch Circle', d: 'Witches resist magic. Physical damage works best.', mix: { witch: 3, wolf: 2 } },
-  { name: 'Blood Moon', d: 'Every enemy is faster tonight.', mix: { draugr: 2, wolf: 2, raven: 1, witch: 1 }, spd: 1.35 },
+  { name: 'Blood Moon', d: 'Every enemy is faster tonight.', mix: { draugr: 2, wolf: 2, raven: 1, witch: 1, spear: 1 }, spd: 1.35 },
   { name: 'The Frost Giant', d: 'Mini-boss. Stay out of his stomps and boulders. When wounded, his breath freezes the ground.', mix: { wolf: 1, draugr: 1 }, boss: 'giant' },
   { name: 'Ice Wind', d: 'Wolves and ravens ride the storm.', mix: { wolf: 3, raven: 2, draugr: 2 }, spd: 1.15 },
-  { name: 'Army of the Dead', d: 'A wall of draugr marches in.', mix: { draugr: 4, armored: 2 }, rate: 1.3 },
+  { name: 'Army of the Dead', d: 'A wall of draugr marches in, spears raised.', mix: { draugr: 4, armored: 2, spear: 1 }, rate: 1.3 },
   { name: 'Voices of Hel', d: 'Mixed forces. Bring both physical and magic damage.', mix: { witch: 3, armored: 2, draugr: 2 } },
   { name: 'Blood Moon II', d: 'The moon bleeds again. Everything is faster.', mix: { draugr: 2, wolf: 3, raven: 2, witch: 1 }, spd: 1.35, rate: 1.2 },
   { name: 'Herald of Hel', d: 'Mini-boss. Rings of orbs, and half the arena turns deadly. When wounded, she sends souls after you.', mix: { draugr: 1, witch: 1 }, boss: 'herald' },
   { name: 'The Wolf Pack', d: "Fenrir's offspring gather.", mix: { wolf: 6, draugr: 1 }, rate: 1.4 },
   { name: 'The Iron Wall', d: 'Armor and witchcraft side by side.', mix: { armored: 4, witch: 2 } },
-  { name: 'Omens of Ragnarök', d: 'Everything Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2 }, rate: 1.6 },
+  { name: 'Omens of Ragnarök', d: 'Everything Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2, spear: 1 }, rate: 1.6 },
   { name: 'The Last Night', d: 'More elites than ever.', mix: { draugr: 2, wolf: 2, armored: 2, witch: 2 }, rate: 1.4, elite: .2 },
   { name: 'Fenrir', d: "Final boss. He charges when his eyes glow, snaps his chains and, when wounded, devours the sun.", mix: { wolf: 1 }, boss: 'fenrir' },
 ];
@@ -1230,12 +1231,12 @@ const WAVE_DUR = 40;
 const SHOP_CD = 120; // seconds of battle between shop visits in Endless mode
 const ENDLESS_WAVES = [
   { name: 'The Endless Winter', d: 'Three winters with no summer. Wolves and ravens ride the cold.', mix: { wolf: 3, raven: 2, draugr: 2 }, spd: 1.15 },
-  { name: "Crew of the Ghost Ship", d: 'A ship of the dead lands its crew.', mix: { draugr: 4, armored: 3 }, rate: 1.2 },
+  { name: "Crew of the Ghost Ship", d: 'A ship of the dead lands its crew, spears first.', mix: { draugr: 3, armored: 3, spear: 2 }, rate: 1.2 },
   { name: 'The Wild Hunt', d: 'Fast hunters close in from every side.', mix: { wolf: 5, raven: 3 }, spd: 1.3 },
   { name: "Hel's Tide", d: 'Witches behind a wall of iron.', mix: { witch: 3, armored: 3, draugr: 2 } },
   { name: "The Hellhound's Howl", d: 'The hound of Hel calls his pack. More elites.', mix: { wolf: 4, draugr: 2, armored: 1 }, elite: .12 },
   { name: "Embers of the Fire Giant", d: 'Everything burns and runs faster.', mix: { draugr: 3, wolf: 2, witch: 2, raven: 1 }, spd: 1.25, rate: 1.2 },
-  { name: 'Night Without End', d: 'Every enemy Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2 }, rate: 1.4 },
+  { name: 'Night Without End', d: 'Every enemy Hel has, all at once.', mix: { draugr: 3, wolf: 2, raven: 2, armored: 2, witch: 2, spear: 1 }, rate: 1.4 },
   { name: 'Children of Loki', d: 'Witches and ravens swarm the field.', mix: { witch: 3, raven: 4 }, rate: 1.3 },
 ];
 const ENDLESS_BOSSES = ['jarl', 'giant', 'herald', 'fenrir'];
@@ -1248,7 +1249,7 @@ function waveDef(n){
   let w;
   if (k % 5 === 0){
     const b = ENDLESS_BOSSES[(k / 5 - 1) % ENDLESS_BOSSES.length];
-    w = { name: b === 'fenrir' ? 'Fenrir returns, the Chained' : `${ENEMIES[b].name} returns`, d: 'Boss. Stronger every time it comes back.', mix: { draugr: 2, wolf: 2, armored: 1, witch: 1 }, boss: b, endless: true };
+    w = { name: b === 'fenrir' ? 'Fenrir returns, the Chained' : `${ENEMIES[b].name} returns`, d: 'Boss. Stronger every time it comes back.', mix: { draugr: 2, wolf: 2, armored: 1, witch: 1, spear: 1 }, boss: b, endless: true };
   } else w = Object.assign({ endless: true }, ENDLESS_WAVES[(k - 1 - Math.floor(k / 5)) % ENDLESS_WAVES.length]);
   return endlessCache[n] = w;
 }
@@ -1662,7 +1663,7 @@ function buildUnitSprite(cls, mod){
   return makeSprite(rows.map(r => r.join('')), map, ex);
 }
 /* ---- Basic enemies: built from shapes like the bosses. Frames: 0 and 1 walk, 'W' the wind-up or special pose ---- */
-const ENEMY_ANIM = { draugr: 4, wolf: 9, raven: 8, armored: 3, witch: 2.5, wight: 3, wisp: 6 };
+const ENEMY_ANIM = { draugr: 4, wolf: 9, raven: 8, armored: 3, witch: 2.5, spear: 4, wight: 3, wisp: 6 };
 function buildEnemySprite(type, fr){
   const f = fr === 1 ? 1 : 0, W = fr === 'W', R = Math.round;
   const SKIN = ['#7d9a80', '#9ab89c', '#56705a'], SKIN_D = ['#5e7a62', '#6f8c72', '#465c4a'];
@@ -1752,6 +1753,22 @@ function buildEnemySprite(type, fr){
       info.eyes = [[9, 4]]; info.glow = '#d6a2ff';
     });
   }
+  if (type === 'spear') return pxBuild(17, 18, [
+    { m: ['#3e3428', '#54463a', '#2a221a'], draw: a => { a.poly([[5, 12], [7.6, 12], [7.6 + f, 17.6], [5 + f, 17.6]]); a.poly([[8.2, 12], [10.8, 12], [11.2 - f, 17.6], [8.4 - f, 17.6]]); } },
+    { m: ['#8a6a3a', '#b08a4a', '#5c4424'], draw: a => W ? a.line(.6, 3.6, 15.2, 1.6, 1.1) : a.line(3.2, .8, 3.2, 17.4, 1.1) },
+    { m: ['#4e4a3a', '#6a6450', '#34301f'], draw: a => a.poly([[4.4, 7.4], [10.6, 7], [11.2, 12.6], [9.8, 14], [8.4, 12.8], [7, 14.2], [5.6, 12.8], [4, 13.8]]) },
+    { m: SKIN, edge: true, draw: a => a.ell(10, 5, 2.7, 2.8) },
+    { m: ['#6d7484', '#9aa2b2', '#454b58'], edge: true, draw: a => a.poly([[7.2, 4], [8.4, 1.8], [10.4, 1.2], [12.6, 2.2], [13, 3.8]]) },
+    { m: SKIN_D, draw: a => W ? a.line(6, 8, 8.4, 3, 1.4) : a.line(6.4, 8.4, 3.6, 9.4 - f * .6, 1.4) },
+    { m: ['#5a4028', '#74543a', '#3c2a18'], edge: true, draw: a => a.ell(12.4, 10.4, 2.9, 3.4) },
+  ], (put, at, info) => {
+    put(11, 5, '#ffe08a'); put(9, 5, '#b08a4a');                                        // pale gold eyes
+    put(12, 7, '#1e2a24'); put(11, 7, '#e8e3d6');                                       // slack jaw
+    put(12, 10, '#c8ced8'); put(12, 11, '#a8b0bc'); put(11, 8, '#8a6440'); put(14, 12, '#8a6440');   // shield boss and studs
+    if (W){ put(16, 1, '#e6ebf5'); put(15, 1, '#c8ced8'); put(16, 0, '#c8ced8'); }      // spear tip, raised to throw
+    else { put(3, 0, '#e6ebf5'); put(2, 1, '#c8ced8'); put(4, 1, '#c8ced8'); }
+    info.eyes = [[11, 5]]; info.glow = '#ffe08a';
+  });
   if (type === 'wight') return pxBuild(13, 15, [
     { m: ['#2e5e4c', '#4fa88a', '#1c3e32'], draw: a => { a.line(3, 6, .8, 10 + f, 1.3); a.line(10, 6, 12.2, 10 - f, 1.3); } },
     { m: ['#3e7a64', '#6fc7a0', '#24503e'], draw: a => a.poly([[2.6, 4.4], [6.5, .8], [10.4, 4.4], [10.8, 10.4], [9.4 + f, 14.6], [7.6, 11.6], [6, 14.2 - f], [4.4, 11.6], [3.2 - f, 14.6], [2.2, 10.4]]) },
@@ -1825,7 +1842,7 @@ function newRun(R){
     wave: 1, gold: 5 + meta.gold, level: 1, xp: 0,
     hero: { x: 0, y: 0, hp: 100, maxHp: 100, inv: 0, dashSlots: 1, dashCh: 1, dashRt: 0, dashT: 0, dx: 0, dy: 1, face: 1, walk: 0 },
     bench: Array(8).fill(null), board: Array(9).fill(null), shop: [],
-    enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], haz: [], corpses: [], halfDeath: null, breath: null, chill: 0,
+    enemies: [], projs: [], eprojs: [], parts: [], orbs: [], texts: [], tele: [], bolts: [], rings: [], pups: [], chains: [], lunges: [], cracks: [], bossAxes: [], boulders: [], ice: [], haz: [], corpses: [], stuck: [], pin: 0, halfDeath: null, breath: null, chill: 0,
     souls: 0, kills: 0, bosses: 0, waveT: 0, spawnAcc: 0, shake: 0, boss: null, endDelay: 0, sel: null,
     debugUsed: dbgUsed, submitted: false,
     abil: [null, null, null], selAb: null, relics: [], event: null, sinceEvent: 0, stats: newStats(), cry: 0, cryM: 1, wall: 0, wallReflect: false, ravens: null, hornT: 0, hornRate: 0, rage: 0, rageDmg: 0, rageL3: false, quakes: [],
@@ -2095,7 +2112,7 @@ function spawnBoss(type, design){
   }
   $('#bossName').textContent = S.boss.title || ENEMIES[type].name;
 }
-function clearBossFx(){ S.chains = []; S.lunges = []; S.eclipse = 0; S.bind = null; S.bossAxes = []; S.boulders = []; S.ice = []; S.halfDeath = null; S.breath = null; S.chill = 0; S.haz = []; }
+function clearBossFx(){ S.chains = []; S.lunges = []; S.eclipse = 0; S.bind = null; S.bossAxes = []; S.boulders = []; S.ice = []; S.halfDeath = null; S.breath = null; S.chill = 0; S.haz = []; S.stuck = []; S.pin = 0; }
 // Endless mode: waves roll straight into the next one, with no shop in between
 function endlessNext(){
   const W = waveDef(S.wave);
@@ -2374,7 +2391,7 @@ function startDevour(e){
 }
 function updateBossFx(dt){
   const h = S.hero;
-  S.chill = Math.max(0, S.chill - dt);
+  S.chill = Math.max(0, S.chill - dt); S.pin = Math.max(0, (S.pin || 0) - dt); if (!S.stuck) S.stuck = [];
   for (const A of S.bossAxes){
     A.t += dt; const k = A.t - A.wind; if (k < 0) continue;
     const ex = Math.cos(A.ang), ey = Math.sin(A.ang);
@@ -2482,7 +2499,7 @@ function update(dt){
     if (B.t >= B.dur){ h.bash = null; if (B.l >= 3) quake(h.x, h.y, 40, B.dmg * .6); }
   } else if (h.dashT > 0){ h.dashT -= dt; h.x += h.dx * 270 * dt; h.y += h.dy * 270 * dt; if (Math.random() < .8) S.parts.push({ x: h.x, y: h.y, vx: 0, vy: 0, life: .25, max: .25, col: '#86d4ff', s: 2, add: true }); }
   else {
-    let spd = 78 * (S.chill > 0 ? .5 : 1) * (S.rage > 0 ? 1.3 : 1);
+    let spd = 78 * (S.chill > 0 ? .5 : 1) * (S.pin > 0 ? .6 : 1) * (S.rage > 0 ? 1.3 : 1);
     if (S.bind){
       const b = S.bind.e; S.bind.t -= dt;
       if (S.bind.t <= 0 || !b || b.dead) S.bind = null;
@@ -2620,7 +2637,7 @@ function update(dt){
     if (e.d.boss) bossAI(e, dt, dx, dy, d, sp);
     else enemyAI(e, dt, dx, dy, d, sp);
     e.x += e.kx * dt * 6; e.y += e.ky * dt * 6; e.kx *= .82; e.ky *= .82;
-    if (e.mst === 'crouch' || e.mst === 'leap' || e.mst === 'mark' || e.mst === 'dive') e.face = e.lx < 0 ? -1 : 1;
+    if (e.mst === 'crouch' || e.mst === 'leap' || e.mst === 'mark' || e.mst === 'dive' || e.mst === 'aim' || e.mst === 'jab') e.face = e.lx < 0 ? -1 : 1;
     else if (Math.abs(dx) > 1) e.face = dx < 0 ? -1 : 1;
     if (d < e.r + 6){
       if (e.d.wisp){ const hp0 = h.hp; heroDamage(e.dmg, 'Soul Wisp'); if (h.hp < hp0 && S.boss && !S.boss.dead){ const heal = S.boss.max * .03; S.boss.hp = Math.min(S.boss.max, S.boss.hp + heal); addText(S.boss.x, S.boss.y - S.boss.h / 2 - 6, '+' + Math.round(heal), '#7dc46a', true); S.bolts.push({ pts: [[h.x, h.y], [S.boss.x, S.boss.y]], life: .25 }); } e.dead = true; burst(e.x, e.y, 10, ['#a8f0d4', '#4fa88a'], 50); continue; }
@@ -2640,8 +2657,10 @@ function update(dt){
   S.enemies = S.enemies.filter(e => !e.dead);
 
   // enemy projectiles
-  for (const p of S.eprojs){ p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; if (dist2(p.x, p.y, h.x, h.y) < (p.r + 4) ** 2){ if (S.wall > 0 && S.wallReflect){ S.projs.push({ kind: 'holy', x: p.x, y: p.y, vx: -p.vx * 1.6, vy: -p.vy * 1.6, dmg: p.dmg * 3, dtype: 'magic', u: null, r: 3, life: 1.5, aoe: 0, pierce: 0, hits: null }); } else heroDamage(p.dmg, p.src || (S.boss ? S.boss.d.name + ' projectile' : 'Projectile')); p.life = 0; } }
+  for (const p of S.eprojs){ p.x += p.vx * dt; p.y += p.vy * dt; p.life -= dt; if (dist2(p.x, p.y, h.x, h.y) < (p.r + 4) ** 2){ if (S.wall > 0 && S.wallReflect){ S.projs.push({ kind: 'holy', x: p.x, y: p.y, vx: -p.vx * 1.6, vy: -p.vy * 1.6, dmg: p.dmg * 3, dtype: 'magic', u: null, r: 3, life: 1.5, aoe: 0, pierce: 0, hits: null }); } else { const hp0 = h.hp; heroDamage(p.dmg, p.src || (S.boss ? S.boss.d.name + ' projectile' : 'Projectile')); if (p.spear && h.hp < hp0){ if (!(S.pin > 0)) addText(h.x, h.y - 20, 'Pinned!', '#d8cfb8', false); S.pin = 1.5; } } p.life = 0; p.hit = true; } }
+  for (const p of S.eprojs) if (p.spear && p.life <= 0 && !p.hit && S.stuck.length < 30) S.stuck.push({ x: p.x, y: p.y, a: Math.atan2(p.vy, p.vx), life: 2, max: 2 });
   S.eprojs = S.eprojs.filter(p => p.life > 0);
+  for (const k of S.stuck) k.life -= dt; S.stuck = S.stuck.filter(k => k.life > 0);
   // telegraphs
   for (const t of S.tele){
     t.t += dt;
@@ -2690,7 +2709,8 @@ function onDash(){
   }
 }
 function chase(e, dt, dx, dy, d, sp, wob){ e.x += (dx / d - dy / d * wob) * sp * dt; e.y += (dy / d + dx / d * wob) * sp * dt; }
-const MOVE_WAVE = { wolf: 2, raven: 3, witch: 4, armored: 7 };
+const MOVE_WAVE = { wolf: 2, raven: 3, witch: 4, armored: 7, spear: 1 };
+const SPEAR_SPD = 230, SPEAR_AIM = .8;
 function enemyAI(e, dt, dx, dy, d, sp){
   const h = S.hero, t = e.type, on = S.wave >= (MOVE_WAVE[t] || 1);
   if (e.mst) e.mt -= dt;
@@ -2735,20 +2755,57 @@ function enemyAI(e, dt, dx, dy, d, sp){
     if (e.atkT <= 0 && d < 170){ e.atkT = rand(2.2, 3); S.eprojs.push({ x: e.x, y: e.y - 4, vx: dx / d * 85, vy: dy / d * 85, dmg: e.dmg, r: 3, life: 3, col: '#d6a2ff', src: 'Witch' }); }
     return;
   }
+  if (t === 'spear'){ // keeps range, aims ahead of where the hero is running, throws a spear along a red line
+    if (e.mst === 'aim'){ chase(e, dt, dx, dy, d, sp * .08, 0); if (e.mt <= 0) throwSpear(e); return; }
+    if (e.mst === 'jab'){
+      if (e.mt <= 0){
+        const px = h.x - e.x, py = h.y - e.y, along = px * e.lx + py * e.ly, side = Math.abs(-px * e.ly + py * e.lx);
+        if (along > -4 && along < 30 && side < 9) heroDamage(e.dmg * 1.2, 'Draugr Spearman: Jab');
+        S.parts.push({ x: e.x + e.lx * 22, y: e.y + e.ly * 22, vx: 0, vy: 0, life: .15, max: .15, col: '#e6ebf5', s: 2, add: true });
+        sfx('axe'); e.mst = 'rec'; e.mt = .6;
+      }
+      return;
+    }
+    if (e.mst === 'rec'){ e.x -= dx / d * sp * 1.3 * dt; e.y -= dy / d * sp * 1.3 * dt; if (e.mt <= 0) e.mst = null; return; }
+    e.mcd -= dt;
+    if (d < 26 && e.mcd <= 0){ e.mst = 'jab'; e.mt = e.mtM = .4; e.lx = dx / d; e.ly = dy / d; e.mcd = rand(1.6, 2.4); return; }
+    const dir = d > 125 ? 1 : d < 85 ? -1 : 0, strafe = dir ? 0 : .6 * e.orbDir;
+    e.x += (dx / d * dir - dy / d * strafe) * sp * dt; e.y += (dy / d * dir + dx / d * strafe) * sp * dt;
+    e.atkT -= dt;
+    if (e.atkT <= 0 && d < 190 && (S.spearT || 0) <= S.time) aimSpears(e);
+    return;
+  }
   // draugr shamble straight at you, wights and wisps drift
   chase(e, dt, dx, dy, d, sp, e.d.fly ? Math.sin(e.t * 6) * .5 : 0);
 }
+// a spearman starts to aim; up to two idle spearmen close by join in and throw a fan with gaps between the spears
+function aimSpears(e){
+  const h = S.hero, crew = [e];
+  for (const o of S.enemies) if (o !== e && o.type === 'spear' && !o.dead && !o.mst && !o.rise && crew.length < 3 && dist2(o.x, o.y, e.x, e.y) < 80 * 80 && dist2(o.x, o.y, h.x, h.y) < 200 * 200) crew.push(o);
+  const dur = e.elite ? .65 : SPEAR_AIM, lead = Math.min(1, (dur + Math.sqrt(dist2(e.x, e.y, h.x, h.y)) / SPEAR_SPD) * .85);
+  let lx = (S.hvx || 0) * lead, ly = (S.hvy || 0) * lead; const ll = Math.hypot(lx, ly); if (ll > 95){ lx *= 95 / ll; ly *= 95 / ll; }
+  const tx = h.x + lx, ty = h.y + ly, ax = tx - e.x, ay = ty - e.y, al = Math.hypot(ax, ay) || 1, nx = -ay / al, ny = ax / al;
+  crew.forEach((o, i) => {
+    const off = [0, -26, 26][i], gx = tx + nx * off - o.x, gy = ty + ny * off - o.y, gl = Math.hypot(gx, gy) || 1;
+    o.mst = 'aim'; o.mt = o.mtM = dur; o.lx = gx / gl; o.ly = gy / gl; o.atkT = rand(2.8, 3.8);
+  });
+  S.spearT = S.time + (crew.length > 1 ? 1.6 : .7);
+}
+function throwSpear(e){
+  S.eprojs.push({ x: e.x + e.lx * 6, y: e.y - 3 + e.ly * 6, vx: e.lx * SPEAR_SPD, vy: e.ly * SPEAR_SPD, dmg: e.dmg, r: 2.5, life: 1.15, col: '#d8dde6', src: 'Draugr Spearman', spear: true });
+  sfx('throw'); e.mst = 'rec'; e.mt = .35;
+}
 function enemyFrame(e){
   const t = e.type;
-  if (e.mst === 'crouch' || e.mst === 'mark' || e.mst === 'wind' || e.mst === 'cast' || e.mst === 'dive') return t + 'W';
+  if (e.mst === 'crouch' || e.mst === 'mark' || e.mst === 'wind' || e.mst === 'cast' || e.mst === 'dive' || e.mst === 'aim' || e.mst === 'jab') return t + 'W';
   if (e.mst === 'leap' || e.frz > 0 || e.stun > 0 || e.rise > 0) return t;
   return Math.floor(e.t * ENEMY_ANIM[t]) % 2 ? t + '1' : t;
 }
 function deathFx(e){
-  sfx({ draugr: 'bones', armored: 'clang', wolf: 'yelp', raven: 'caw', witch: 'shriek' }[e.type] || 'spirit');
+  sfx({ draugr: 'bones', spear: 'bones', armored: 'clang', wolf: 'yelp', raven: 'caw', witch: 'shriek' }[e.type] || 'spirit');
   if (e.elite) stopFor(.04);
   const t = e.type, P = (n, o) => { for (let i = 0; i < n; i++) S.parts.push(Object.assign({ x: e.x + rand(-3, 3), y: e.y + rand(-4, 3), vx: rand(-30, 30), vy: rand(-30, 10), life: rand(.4, .8), max: .8, s: 1, add: false }, o())); };
-  if (t === 'draugr'){ P(7, () => ({ col: pick(['#e8e3d6', '#c8c2b0', '#9a9488']), s: Math.random() < .4 ? 2 : 1 })); P(4, () => ({ col: '#456552', smoke: true, s: 2, vy: rand(-14, -4) })); addCorpse('bones', e); }
+  if (t === 'draugr' || t === 'spear'){ P(7, () => ({ col: pick(['#e8e3d6', '#c8c2b0', '#9a9488']), s: Math.random() < .4 ? 2 : 1 })); P(4, () => ({ col: '#456552', smoke: true, s: 2, vy: rand(-14, -4) })); addCorpse('bones', e); }
   else if (t === 'armored'){ P(10, () => ({ col: pick(['#ffd27a', '#ffffff', '#c8ced8']), add: true, vx: rand(-60, 60), vy: rand(-60, 0), life: rand(.2, .45) })); P(4, () => ({ col: '#7d8494', s: 2 })); addCorpse('ironhelm', e); }
   else if (t === 'wolf') P(10, () => ({ col: pick(['#6a6a78', '#8a8a98', '#4a4a56']), smoke: true, s: 2, vx: rand(-10, 10), vy: rand(-18, -6), life: rand(.6, 1.1), max: 1.1 }));
   else if (t === 'raven') P(8, () => ({ col: pick(['#1e1a26', '#3a2e4e', '#5e4a80']), vx: rand(-24, 24), vy: rand(-30, -6), g: 40, dr: .985, life: rand(.8, 1.4), max: 1.4, s: Math.random() < .5 ? 2 : 1 }));
@@ -3103,6 +3160,8 @@ function render(dt){
       }
       if (e.mst === 'crouch'){ ctx.strokeStyle = `rgba(255,80,60,${.2 + .4 * (1 - e.mt / (e.mtM || .55))})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(e.x, e.y + 3); ctx.lineTo(e.x + e.lx * 70, e.y + 3 + e.ly * 70); ctx.stroke(); }
       if (e.mst === 'mark'){ ctx.setLineDash([3, 3]); ctx.strokeStyle = 'rgba(255,74,58,.6)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.lx * 118, e.y + e.ly * 118); ctx.stroke(); ctx.setLineDash([]); }
+      if (e.mst === 'aim'){ const k = 1 - e.mt / (e.mtM || SPEAR_AIM), L = SPEAR_SPD * 1.15; ctx.strokeStyle = `rgba(255,74,58,${.25 + .55 * k})`; ctx.lineWidth = k > .75 ? 2 : 1; ctx.beginPath(); ctx.moveTo(e.x, e.y - 3); ctx.lineTo(e.x + e.lx * L, e.y - 3 + e.ly * L); ctx.stroke(); }
+      if (e.mst === 'jab'){ ctx.strokeStyle = `rgba(255,74,58,${.3 + .5 * (1 - e.mt / (e.mtM || .4))})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.lx * 28, e.y + e.ly * 28); ctx.stroke(); }
       if (e.enraged){ ctx.fillStyle = `rgba(255,59,43,${.18 + .1 * Math.sin(st.time * 8)})`; ctx.beginPath(); ctx.arc(e.x, e.y, e.r + 8, 0, 6.283); ctx.fill(); }
       if (e.d.boss === 'fenrir' && e.state === 'wind'){
         ctx.strokeStyle = 'rgba(255,59,43,.55)'; ctx.lineWidth = e.r * 1.2; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.cx * 160, e.y + e.cy * 160); ctx.stroke();
@@ -3174,6 +3233,7 @@ function render(dt){
     if (S.ravens){ for (let k = 0; k < S.ravens.n; k++){ const a = st.time * 4 + k * Math.PI * 2 / S.ravens.n; ctx.drawImage(Math.cos(a + Math.PI / 2) < 0 ? SPR.raven_f : SPR.raven, Math.round(hh.x + Math.cos(a) * 34 - 4), Math.round(hh.y + Math.sin(a) * 26 - 3)); } }
     if (S.abil.some(Boolean) && mouseSeen){ const A = aimPoint(), x = Math.round(A.x), y = Math.round(A.y); ctx.globalAlpha = .8; ctx.fillStyle = '#e2b24c'; ctx.fillRect(x - 4, y, 3, 1); ctx.fillRect(x + 2, y, 3, 1); ctx.fillRect(x, y - 4, 1, 3); ctx.fillRect(x, y + 2, 1, 3); ctx.globalAlpha = 1; }
   }
+  if (S && S.pin > 0){ ctx.strokeStyle = 'rgba(216,207,184,.7)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.ellipse(h.x, h.y + 7, 7, 2.5, 0, 0, 6.283); ctx.stroke(); }
   if (S && S.chill > 0){ ctx.globalAlpha = .35; ctx.fillStyle = '#86d4ff'; ctx.beginPath(); ctx.arc(h.x, h.y, 8, 0, 6.283); ctx.fill(); ctx.globalAlpha = 1; }
   if (S && S.bind && S.bind.e){
     const b = S.bind.e, dx = b.x - h.x, dy = b.y - h.y, dd = Math.hypot(dx, dy) || 1;
@@ -3205,8 +3265,16 @@ function render(dt){
       ctx.fillStyle = '#fff6d0'; ctx.fillRect(Math.round(p.x) - 1, Math.round(p.y) - 1, 2, 2);
     }
   }
+  if (!camp) for (const k of st.stuck || []){ // missed spears stand in the ground for a moment
+    ctx.globalAlpha = clamp(k.life / .5, 0, 1); const cx = Math.cos(k.a), cy = Math.sin(k.a);
+    ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(k.x - cx * 8, k.y - 7); ctx.lineTo(k.x, k.y); ctx.stroke();
+    ctx.fillStyle = '#3d2818'; ctx.fillRect(Math.round(k.x) - 1, Math.round(k.y), 3, 1); ctx.globalAlpha = 1;
+  }
   if (!camp) for (const p of st.eprojs){
     if (!inFair(p.x, 4)) continue;
+    if (p.spear){ const a = Math.atan2(p.vy, p.vx), cx = Math.cos(a), cy = Math.sin(a);
+      ctx.strokeStyle = '#8a6a3a'; ctx.lineWidth = 1.4; ctx.beginPath(); ctx.moveTo(p.x - cx * 11, p.y - cy * 11); ctx.lineTo(p.x, p.y); ctx.stroke();
+      ctx.fillStyle = '#e6ebf5'; ctx.beginPath(); ctx.moveTo(p.x + cx * 4, p.y + cy * 4); ctx.lineTo(p.x - cy * 1.8, p.y + cx * 1.8); ctx.lineTo(p.x + cy * 1.8, p.y - cx * 1.8); ctx.fill(); continue; }
     ctx.fillStyle = p.col === '#ff5b2e' ? 'rgba(255,60,30,.45)' : p.col === '#bfe9ff' ? 'rgba(134,212,255,.45)' : 'rgba(190,120,255,.45)'; ctx.beginPath(); ctx.arc(p.x, p.y, p.r + 2, 0, 6.283); ctx.fill();
     ctx.fillStyle = p.col; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * .6, 0, 6.283); ctx.fill();
   }
@@ -3628,6 +3696,7 @@ const BESTIARY = [
   ['raven', 'Raven', 3, 'Very fast flyer with little health.', '<b>Dive:</b> marks a dashed red line, then dives along it and past you.'],
   ['witch', 'Witch', 4, 'Keeps her distance and throws bolts. Resists magic.', '<b>Curse:</b> marks the ground under you. The patch slows you for a few seconds.'],
   ['armored', 'Iron Draugr', 7, 'Heavy armour. Magic damage works best.', '<b>Hammer slam:</b> raises the hammer and a circle marks where it lands. Leave the circle.'],
+  ['spear', 'Draugr Spearman', 7, 'Keeps its distance behind a shield. Magic damage works best.', '<b>Spear throw:</b> a red line shows the throw, aimed where you are running. Change direction to dodge. A hit slows you. Groups throw a fan with gaps. Up close it jabs.'],
 ];
 const BEST_AFF = [['frozen', 'Frozen', 'Leaves a trail of ice that slows you.'], ['burning', 'Burning', 'Explodes a moment after it dies. Leave the ring.'], ['warded', 'Warded', 'A rune shield soaks up damage first. Hits on it show in purple.'], ['swift', 'Swift', 'Moves about 45% faster and leaves an afterimage.']];
 const bestAnims = []; let bestRaf = 0;
@@ -3687,7 +3756,7 @@ const RELIC_HINT = {
 const relicSeen = k => Array.isArray(meta.relicsSeen) && meta.relicsSeen.includes(k);
 // heroes and maps: a new hero or level adds an entry here, and the Field Guide picks it up
 const HEROES = { viking: { name: 'Viking', abilities: ['bash', 'spear', 'quake', 'cry', 'wall', 'ravens', 'horn', 'rage'] } };
-const MAPS = { barrows: { name: 'The Barrows', enemies: ['draugr', 'wolf', 'raven', 'witch', 'armored'], bosses: ['jarl', 'giant', 'herald', 'fenrir'] } };
+const MAPS = { barrows: { name: 'The Barrows', enemies: ['draugr', 'wolf', 'raven', 'witch', 'armored', 'spear'], bosses: ['jarl', 'giant', 'herald', 'fenrir'] } };
 const BOSS_GUIDE = {
   jarl:   { wave: 5,  spr: 'jarlA0',   d: 'A dead king who still leads the draugr.', m: '<b>Axe Hurl:</b> throws his axe out along a line and it flies back. <b>Barrow Rise:</b> when wounded he hides in his barrow, and two Barrow Wights guard it. Kill them to drag him out.' },
   giant:  { wave: 10, spr: 'giantA0',  d: 'Slow, huge and hard to stagger.', m: '<b>Stomp:</b> a circle marks where his foot lands. <b>Glacier Hurl:</b> boulders burst into ice shards. <b>Frost Breath:</b> when wounded, a cone of cold slows you.' },
@@ -3697,7 +3766,7 @@ const BOSS_GUIDE = {
 const BOSS_HINT = { jarl: 'A crown rots in a barrow.', giant: 'The ground shakes with every step.', herald: 'A voice from beyond the grave.', fenrir: 'A howl that can swallow the sun.' };
 const seenB = k => meta.seen && meta.seen.b.includes(k), seenAb = k => meta.seen && meta.seen.ab.includes(k);
 let fgMap = 'barrows', fgHero = 'viking'; // the land and hero shown first
-const BEAST_HINT = { draugr: 'Something stirs in the barrows.', wolf: 'Something howls in the dark.', raven: 'Wings beat above the mist.', witch: 'A voice chants in the fog.', armored: 'Iron scrapes on stone.' };
+const BEAST_HINT = { draugr: 'Something stirs in the barrows.', wolf: 'Something howls in the dark.', raven: 'Wings beat above the mist.', witch: 'A voice chants in the fog.', armored: 'Iron scrapes on stone.', spear: 'Something whistles through the air.' };
 const AFF_HINT = { frozen: 'An elite with a cold aura.', burning: 'An elite that smoulders.', warded: 'An elite hidden behind runes.', swift: 'An elite too fast to follow.' };
 const AFF_NAME = { frozen: 'Frozen', burning: 'Burning', warded: 'Warded', swift: 'Swift' };
 const seenE = k => meta.seen && meta.seen.e.includes(k), seenA = k => meta.seen && meta.seen.a.includes(k);
@@ -4336,7 +4405,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a ring or necklace', 'Bosses no longer heal you to full', 'Relics are now jewelry: you wear two rings and a necklace, and each carries one of the old relic powers. Rarer jewelry adds health and ability damage', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces, so they are rare', 'Merchant cards show the slot a piece fits in, and hovering one lights up that slot on the Character button', 'The Field Guide has a Gear tab with a page for each slot, and beasts, elite traits and gear stay hidden until you find them. Each new find pops up a Field Guide banner. Open it from the book in the shop (J)', 'The Field Guide also has the bosses and every hero ability with all three levels. Beasts are sorted by land and by the waves where you meet them, ready for new lands and heroes', 'The tutorial shows the Field Guide and the damage meter', 'A Units tab in the Field Guide: every unit with its stats at one, two and three stars, its ability and its synergies, plus pages for the class and element synergies', 'The runes you find on the battlefield have their own Runes tab in the Field Guide. The pause menu is cleaner: Resume, then the Field Guide, Settings, feedback and Save and quit, and Give up on its own', 'Slot strips on Merchant cards are plain grey with a slot icon, so colour on gear always means rarity', 'Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow']],
+  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a ring or necklace', 'Bosses no longer heal you to full', 'Relics are now jewelry: you wear two rings and a necklace, and each carries one of the old relic powers. Rarer jewelry adds health and ability damage', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces, so they are rare', 'Merchant cards show the slot a piece fits in, and hovering one lights up that slot on the Character button', 'The Field Guide has a Gear tab with a page for each slot, and beasts, elite traits and gear stay hidden until you find them. Each new find pops up a Field Guide banner. Open it from the book in the shop (J)', 'The Field Guide also has the bosses and every hero ability with all three levels. Beasts are sorted by land and by the waves where you meet them, ready for new lands and heroes', 'The tutorial shows the Field Guide and the damage meter', 'A Units tab in the Field Guide: every unit with its stats at one, two and three stars, its ability and its synergies, plus pages for the class and element synergies', 'The runes you find on the battlefield have their own Runes tab in the Field Guide. The pause menu is cleaner: Resume, then the Field Guide, Settings, feedback and Save and quit, and Give up on its own', 'A new enemy, the Draugr Spearman, joins the Barrows from wave 7. It throws spears along a red line, aimed where you are running, and a hit slows you for a moment. Spearmen close together throw a fan of spears with gaps to slip through', 'Slot strips on Merchant cards are plain grey with a slot icon, so colour on gear always means rarity', 'Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
   ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
   ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
@@ -5027,7 +5096,7 @@ function noise(dur, o = {}){
   src.connect(fl); fl.connect(g); g.connect(o.bus || AU.sfx); src.start(t, Math.random() * .5); src.stop(t + dur + .05);
   AU.voices++; src.onended = () => { AU.voices--; g.disconnect(); };
 }
-const SFX_GAP = { hit: .05, crit: .09, axe: .07, arrow: .06, fire: .08, holy: .1, soul: .035, coin: .06, zap: .08, bones: .06, yelp: .08, caw: .08, clang: .1, shriek: .12, spirit: .08, warn: .15, slam: .08, hurt: .15, click: .03, burn: .3 };
+const SFX_GAP = { hit: .05, crit: .09, axe: .07, arrow: .06, fire: .08, holy: .1, soul: .035, coin: .06, zap: .08, bones: .06, yelp: .08, caw: .08, clang: .1, shriek: .12, throw: .07, spirit: .08, warn: .15, slam: .08, hurt: .15, click: .03, burn: .3 };
 const SFX_KEY = { loot: 1, horn: 1, roar: 1, bossdie: 1, victory: 1, death: 1, merge: 1, level: 1, cast: 1, power: 1, dash: 1, hurt: 1, warn: 1, slam: 1 };
 const RUN = ['jarl', 'giant', 'herald', 'fenrir'];
 function sfx(name, p){
@@ -5074,6 +5143,7 @@ function sfx(name, p){
     case 'yelp': tone(r(800, 900), .15, { type: 'triangle', to: 450, vol: .035 }); break;
     case 'caw': tone(r(600, 700), .14, { type: 'sawtooth', to: 420, vol: .025, lp: 1800 }); noise(.1, { f: 1500, vol: .02 }); break;
     case 'clang': tone(r(900, 1000), .4, { vol: .035 }); tone(1430, .35, { vol: .025 }); tone(2210, .25, { vol: .018 }); noise(.05, { f: 5000, ft: 'highpass', vol: .035 }); break;
+    case 'throw': noise(.16, { f: 900, to: 3200, q: 2, vol: .05 }); tone(r(320, 360), .08, { type: 'triangle', vol: .02 }); break;
     case 'shriek': tone(1100, .3, { vol: .025, to: 700 }); break;
     case 'spirit': tone(r(500, 700), .3, { to: 1200, vol: .022 }); break;
     case 'roar': { // each boss has its own voice
@@ -5412,7 +5482,7 @@ function botCombat(dt){
     if (d2 < nd && !e.rise){ nd = d2; near = e; }
     if (e.d.boss){ const d = Math.sqrt(d2), pull = d > 100 ? -.03 : d < 60 ? .05 : 0; fx += dx / d * pull; fy += dy / d * pull; }
     else if (d2 < 90 * 90){ fx += dx / d2; fy += dy / d2; }
-    if ((e.mst === 'crouch' || e.mst === 'mark') && d2 < 130 * 130){ // step sideways out of a pounce or dive line
+    if ((e.mst === 'crouch' || e.mst === 'mark' || e.mst === 'aim') && d2 < (e.mst === 'aim' ? 260 : 130) ** 2){ // step sideways out of a pounce or dive line
       const side = Math.sign(-dx * e.ly + dy * e.lx) || 1; fx += -e.ly * side * .03; fy += e.lx * side * .03;
     }
   }
