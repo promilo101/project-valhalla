@@ -666,11 +666,11 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #title .btn.big{font-size:24px;padding:12px 34px}
 #title .t-grid{display:grid;grid-template-columns:repeat(4,auto);justify-content:center;gap:8px;width:100%}
 #title .t-grid .btn{white-space:nowrap;justify-content:center}
-#title .t-links{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:6px;color:var(--muted);font-size:17px}
-#title .t-link{background:none;border:0;padding:2px 4px;color:var(--muted);font:inherit;cursor:pointer}
-#title .t-link:hover,#title .t-link[aria-expanded="true"]{color:var(--fg)}
+#title .t-links{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:8px;color:var(--muted);font-size:16px}
+#title .t-link{background:rgba(20,24,34,.75);border:1px solid var(--line);border-radius:2px;padding:4px 12px;color:#c9cfdb;font:inherit;font-size:16px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+#title .t-link:hover,#title .t-link[aria-expanded="true"]{color:var(--fg);border-color:color-mix(in srgb,var(--gold) 50%,var(--line));background:var(--panel-2)}
 #title .t-link:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
-#title .notes-link{position:static;padding:2px 4px;font-size:inherit}
+#title .notes-link{position:static;padding:4px 12px;font-size:16px}
 #title .t-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;text-align:left}
 #title .t-controls[hidden]{display:none}
 #title .t-controls section{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:8px 10px}
@@ -843,9 +843,9 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="btn" id="btnLb" type="button">Leaderboard</button>
       </div>
       <div class="t-links">
-        <button class="t-link" id="btnSettings" type="button">Settings</button><span aria-hidden="true">·</span>
-        <button class="t-link" id="btnControls" type="button" aria-expanded="false" aria-controls="controls">Controls</button><span aria-hidden="true">·</span>
-        <button class="t-link" id="btnFbTitle" type="button">Send feedback</button><span aria-hidden="true">·</span>
+        <button class="t-link" id="btnSettings" type="button">Settings</button>
+        <button class="t-link" id="btnControls" type="button" aria-expanded="false" aria-controls="controls">Controls</button>
+        <button class="t-link" id="btnFbTitle" type="button">Send feedback</button>
         <button class="notes-link t-link" id="btnNotes" type="button"><span id="notesLbl">What's new</span><span class="dot" id="notesDot" hidden></span></button>
       </div>
       <div class="t-controls" id="controls" hidden>
