@@ -905,11 +905,11 @@ const CLASSES = {
   warrior: { name: 'Warrior', dtype: 'phys',  range: 95,  atk: 12, as: .95,  rangeTxt: 'short',  ability: 'Berserker Leap', abDesc: 'leaps into the biggest group of enemies and lands with a quake that stuns and knocks them back. Attacks throw an axe that cuts through enemies and flies back' },
   archer:  { name: 'Archer',  dtype: 'phys',  range: 150, atk: 8,  as: 1.35, rangeTxt: 'long',   ability: 'Arrow Rain',    abDesc: 'fires seven piercing arrows in a fan' },
   mage:    { name: 'Mage',    dtype: 'magic', range: 125, atk: 11, as: 0.75, rangeTxt: 'medium', ability: "Great Fireball", abDesc: 'hurls a huge crimson fireball that explodes and burns' },
-  priest:  { name: 'Priest',  dtype: 'magic', range: 115, atk: 6,  as: 0.9,  rangeTxt: 'medium', ability: "Healing Light",   abDesc: 'heals the hero and sends out a holy wave' },
+  priest:  { name: 'Priest',  dtype: 'magic', range: 115, atk: 8,  as: 0.9,  rangeTxt: 'medium', ability: "Healing Light",   abDesc: 'heals the hero and sends out a holy wave' },
 };
 const CLS_ORDER = ['warrior', 'archer', 'mage', 'priest'];
 const MODS = {
-  jern:  { name: 'Iron',      tier: 1, col: '#a9aeb8', desc: '+30% damage' },
+  jern:  { name: 'Iron',      tier: 1, col: '#a9aeb8', desc: '+40% damage' },
   frost: { name: 'Frost',     tier: 1, col: '#86d4ff', desc: 'attacks slow enemies' },
   ild:   { name: 'Fire',      tier: 2, col: '#ff8a1e', desc: 'attacks set enemies ablaze' },
   blod:  { name: 'Blood',     tier: 2, col: '#c2185b', desc: 'damage heals the hero, +15% attack speed' },
@@ -942,9 +942,9 @@ const XP_COST = 5, XP_GAIN = 4, REROLL_COST = 3, WAVE_XP = 1, HEAL_COST = 10, HE
 const XPN = [0, 2, 4, 6, 10, 14, 20, 24, 0]; // xp to reach next level, index = current level (level = open formation slots) // xp to reach next level, index = current level (level = open formation slots)
 const MAX_LVL = 8;
 const TRAITS = [
-  { key: 'warrior', name: 'Warriors', steps: [2, 4], d: ['Hero takes 15% less damage · warriors +20% damage', 'Hero takes 30% less damage · warriors +50% damage'] },
-  { key: 'archer',  name: 'Archers',  steps: [2, 4], d: ['All units +15% attack speed', 'All units +35% attack speed'] },
-  { key: 'mage',    name: 'Mages',    steps: [2, 4], d: ['Magic damage +25%', 'Magic damage +60%'] },
+  { key: 'warrior', name: 'Warriors', steps: [2, 4], d: ['Hero takes 15% less damage · warriors +15% damage', 'Hero takes 30% less damage · warriors +40% damage'] },
+  { key: 'archer',  name: 'Archers',  steps: [2, 4], d: ['All units +15% attack speed · archers +15% damage', 'All units +35% attack speed · archers +30% damage'] },
+  { key: 'mage',    name: 'Mages',    steps: [2, 4], d: ['Magic damage +30%', 'Magic damage +75%'] },
   { key: 'priest',  name: 'Priests',  steps: [2, 4], d: ['Hero heals 1 health/s · +20 max health', 'Hero heals 3 health/s · +50 max health'] },
 ];
 const POWERUPS = {
@@ -1665,26 +1665,27 @@ function computeTraits(){
   const cls = { warrior: 0, archer: 0, mage: 0, priest: 0 }, mod = {};
   for (const k in MODS) mod[k] = 0;
   const twin = hasR('twin_souls'), oath = hasR('iron_oath');
-  S.board.forEach((u, i) => { if (u && i < slotCount()){ const w = twin && u.star >= 2 ? 2 : 1; cls[u.cls] += w; mod[u.mod] += w * (oath && u.mod === 'jern' ? 2 : 1); } });
+  S.board.forEach((u, i) => { if (u && i < slotCount()){ const w = twin && u.star >= 2 ? 2 : 1; cls[u.cls] += w; mod[u.mod] += oath && u.mod === 'jern' ? 2 : 1; } });
   S.tr = { cls, mod };
   const cw = cls.warrior, cp = cls.priest;
   S.dmgTaken = cw >= 4 ? .7 : cw >= 2 ? .85 : 1;
   S.regen = (cp >= 4 ? 3 : cp >= 2 ? 1 : 0) + (hasR('mead_hall') ? 1.5 : 0);
 }
 function modPow(m){ const n = S.tr.mod[m] || 0; return n >= 3 ? 2 : n >= 2 ? 1.5 : 1; }
-function heroMaxHp(){ const cp = S.tr.cls.priest; return Math.round((100 + meta.hp * 15 + (cp >= 4 ? 50 : cp >= 2 ? 20 : 0)) * (hasR('draugr_pact') ? .7 : 1)); }
+function heroMaxHp(){ const cp = S.tr.cls.priest; return Math.round((100 + meta.hp * 15 + (cp >= 4 ? 50 : cp >= 2 ? 20 : 0)) * (hasR('draugr_pact') ? .8 : 1)); }
 function calcStats(u){
   const c = CLASSES[u.cls], m = MODS[u.mod], t = S.tr.cls;
   const starM = [1, 1.8, 3.2][u.star - 1], tierM = 1 + .3 * (m.tier - 1);
-  let dmg = c.atk * starM * tierM * (1 + (c.dtype === 'magic' ? meta.magdmg : meta.physdmg) * .08) * (hasR('draugr_pact') ? 1.4 : 1);
+  let dmg = c.atk * starM * tierM * (1 + (c.dtype === 'magic' ? meta.magdmg : meta.physdmg) * .08) * (hasR('draugr_pact') ? 1.5 : 1);
   let as = c.as * (1 + meta.atkspd * .05);
   let mana = 1 + meta.mana * .1;
-  if (u.mod === 'jern') dmg *= 1 + .3 * modPow('jern');
+  if (u.mod === 'jern') dmg *= 1 + .4 * modPow('jern');
   if (u.mod === 'rune') mana *= 1 + .5 * modPow('rune');
   if (u.mod === 'blod') as *= 1.15;
-  if (u.cls === 'warrior') dmg *= t.warrior >= 4 ? 1.5 : t.warrior >= 2 ? 1.2 : 1;
+  if (u.cls === 'warrior') dmg *= t.warrior >= 4 ? 1.4 : t.warrior >= 2 ? 1.15 : 1;
+  if (u.cls === 'archer') dmg *= t.archer >= 4 ? 1.3 : t.archer >= 2 ? 1.15 : 1;
   as *= t.archer >= 4 ? 1.35 : t.archer >= 2 ? 1.15 : 1;
-  if (c.dtype === 'magic') dmg *= t.mage >= 4 ? 1.6 : t.mage >= 2 ? 1.25 : 1;
+  if (c.dtype === 'magic') dmg *= t.mage >= 4 ? 1.75 : t.mage >= 2 ? 1.3 : 1;
   return { dmg, as, mana, range: c.range, dtype: c.dtype };
 }
 
@@ -1919,11 +1920,11 @@ function spawnFromWave(){
 function spawnEnemy(type, x, y, elite){
   const d = ENEMIES[type], W = waveDef(S.wave);
   const ek = Math.max(0, S.wave - WAVES.length); // endless waves past Fenrir
-  const hs = d.boss ? (ek ? hpScale(S.wave) / hpScale(BOSS_HOME[type]) * .8 : 1) : hpScale(S.wave) * (W.hp || 1) * 1.06 ** ek * (S.cursed ? 1.4 : 1);
+  const hs = d.boss ? (ek ? hpScale(S.wave) / hpScale(BOSS_HOME[type]) * .7 : 1) : hpScale(S.wave) * (W.hp || 1) * 1.06 ** ek * (S.cursed ? 1.4 : 1);
   const sc = d.scale || 1, spr = SPR[d.spr];
   const e = {
     type, d, x, y, hp: d.hp * hs * (elite ? 4 : 1), spd: d.spd * (W.spd || 1) * rand(.9, 1.1),
-    dmg: d.dmg * (1 + .05 * (S.wave - 1)) * (1 + .04 * ek) * (elite ? 1.5 : 1), r: d.r * (elite ? 1.3 : 1), armor: d.armor, ward: d.ward,
+    dmg: (d.boss && ek ? d.dmg * (1 + .05 * (BOSS_HOME[type] - 1)) * (1 + .06 * ek) : d.dmg * (1 + .05 * (S.wave - 1)) * (1 + .04 * ek)) * (elite ? (type === 'wolf' ? 1.25 : 1.5) : 1), r: d.r * (elite ? 1.3 : 1), armor: d.armor, ward: d.ward,
     spr: d.spr, sc, w: spr.width * sc, h: spr.height * sc, elite, t: rand(0, 6), atkT: rand(1.2, 2.6), flash: 0,
     burn: 0, burnD: 0, slowT: 0, slow: 0, frz: 0, stun: 0, combo: 0, face: 1, state: 'walk', st: 0, cx: 0, cy: 0, kx: 0, ky: 0,
     mst: null, mt: 0, mcd: rand(1.2, 3), ccd: rand(2.5, 4.5), orbDir: Math.random() < .5 ? -1 : 1, rise: 0, riseM: 1,
@@ -1997,7 +1998,7 @@ function hit(e, raw, dtype, u, opt){
     if (m === 'ild' || opt.burn){ e.burn = 3; e.burnD = Math.max(e.burnD, raw * .35 * (m === 'ild' ? p : 1) / 3); e.burnSrc = ukey(u); }
     if (m === 'frost'){ e.slowT = 1.6; e.slow = Math.min(.6, .3 * p); }
     if (m === 'lyn' && Math.random() < .2 * p) chain(e, raw * .6, u);
-    if (m === 'blod') healHero(d * .03 * p);
+    if (m === 'blod') healHero(d * .02 * p);
   }
   if (opt.kx){ e.kx += opt.kx; e.ky += opt.ky; }
   if (e.hp <= 0) kill(e);
@@ -2432,7 +2433,7 @@ function enemyAI(e, dt, dx, dy, d, sp){
     }
     if (e.mst === 'rec'){ chase(e, dt, dx, dy, d, sp * .35, 0); if (e.mt <= 0) e.mst = null; return; }
     e.mcd -= dt;
-    if (on && e.mcd <= 0 && d > 36 && d < 88 && (S.pounceT || 0) <= S.time){ e.mst = 'crouch'; e.mt = .55; e.lx = dx / d; e.ly = dy / d; e.mcd = rand(3.5, 5.5); S.pounceT = S.time + .5; return; }
+    if (on && e.mcd <= 0 && d > 36 && d < 88 && (S.pounceT || 0) <= S.time){ e.mst = 'crouch'; e.mt = e.mtM = e.elite ? .75 : .55; e.lx = dx / d; e.ly = dy / d; e.mcd = rand(3.5, 5.5); S.pounceT = S.time + .5; return; }
     const orb = on && d > 55 && d < 120 ? .75 * e.orbDir : 0;
     return chase(e, dt, dx, dy, d, sp / Math.hypot(1, orb), orb);
   }
@@ -2805,7 +2806,7 @@ function render(dt){
           if (e.aff === 'frozen' && Math.random() < .12) st.parts.push({ x: e.x + rand(-6, 6), y: e.y - rand(0, 8), vx: rand(-4, 4), vy: rand(4, 12), life: .7, max: .7, col: '#e6f6ff', s: 1, add: true });
         }
       }
-      if (e.mst === 'crouch'){ ctx.strokeStyle = `rgba(255,80,60,${.2 + .4 * (1 - e.mt / .55)})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(e.x, e.y + 3); ctx.lineTo(e.x + e.lx * 70, e.y + 3 + e.ly * 70); ctx.stroke(); }
+      if (e.mst === 'crouch'){ ctx.strokeStyle = `rgba(255,80,60,${.2 + .4 * (1 - e.mt / (e.mtM || .55))})`; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(e.x, e.y + 3); ctx.lineTo(e.x + e.lx * 70, e.y + 3 + e.ly * 70); ctx.stroke(); }
       if (e.mst === 'mark'){ ctx.setLineDash([3, 3]); ctx.strokeStyle = 'rgba(255,74,58,.6)'; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(e.x, e.y); ctx.lineTo(e.x + e.lx * 118, e.y + e.ly * 118); ctx.stroke(); ctx.setLineDash([]); }
       if (e.enraged){ ctx.fillStyle = `rgba(255,59,43,${.18 + .1 * Math.sin(st.time * 8)})`; ctx.beginPath(); ctx.arc(e.x, e.y, e.r + 8, 0, 6.283); ctx.fill(); }
       if (e.d.boss === 'fenrir' && e.state === 'wind'){
@@ -3079,7 +3080,7 @@ function openShop(){
   shopReadyAt = performance.now() + 800; S.rollN = 0; S.xpN = 0; S.healN = 0; S.selRelic = null;
   if (!S.relics) S.relics = [];
   if (S.resumed) S.resumed = false; // a continued raid keeps its saved event
-  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 3; statGold('Relics', 3); setTimeout(() => toast("Ghost Ship Chest: +3 gold"), 400); } }
+  else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 5; statGold('Relics', 5); setTimeout(() => toast("Ghost Ship Chest: +5 gold"), 400); } }
   setMode('shop'); $('#info').innerHTML = DEFAULT_INFO; renderShop(); }
 const DEFAULT_INFO = 'Click a card to buy it. Lock a card with its padlock to keep it through rerolls and into the next shop. Reroll, XP and healing get 50% more expensive each time you use them in the same shop. Health only refills by itself after a boss. Drag a unit onto a slot to move or swap it, or right-click to send it between bench and formation. Three of a kind combine into one more star.';
 let toastT = 0;
@@ -3102,10 +3103,10 @@ function describe(x){
 }
 /* ---------- synergy explanations ---------- */
 const ELEM_STEPS = {
-  jern:  ['+30% damage', '+45% damage', '+60% damage'],
+  jern:  ['+40% damage', '+60% damage', '+80% damage'],
   frost: ['attacks slow enemies by 30%', 'slow 45%', 'slow 60%'],
   ild:   ['attacks burn for 35% of the hit over 3 s', 'burn 53%', 'burn 70%'],
-  blod:  ['damage heals the hero for 3% · +15% attack speed', 'heal 4.5%', 'heal 6%'],
+  blod:  ['damage heals the hero for 2% · +15% attack speed', 'heal 3%', 'heal 4%'],
   lyn:   ['20% chance to chain lightning to two more enemies', 'chain chance 30%', 'chain chance 40%'],
   rune:  ['+50% mana, so the unit ability fires more often', '+75% mana', '+100% mana'],
 };
@@ -3387,7 +3388,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.16.0'; // major.minor.patch
+const VERSION = '0.17.0'; // major.minor.patch
 const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3824,6 +3825,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.17.0', 'Balance pass', ['Blood heals the hero less: 2%, 3% and 4% of damage dealt (was 3%, 4.5% and 6%)', 'Twin Souls now only doubles class synergies, not elements, and costs 36 gold', 'Warriors deal a little less: +15% and +40% damage (was +20% and +50%)', 'Archers also give archers +15% and +30% damage', 'Mages are stronger: magic damage +30% and +75% (was +25% and +60%)', 'Priests hit harder', 'Elite wolves crouch longer before they pounce and hit a little softer', 'Bosses that return in Endless hit less hard and have a bit less health', 'Iron is stronger: +40%, +60% and +80% damage', 'Pact of the Dead: +50% damage and only 20% less maximum health', 'Ghost Ship Chest gives 5 gold every shop']],
   ['0.16.0', 'Damage meter and run summary', ['A damage meter: press Tab to see how much each unit deals this wave, or for the whole raid. In the shop it shows the last wave', 'A run summary on the result screen: damage by unit, class and element, what hit you hardest, where your gold went, and your health after each wave', 'Anonymous run stats help us balance the game. They are on by default, you are told once, and you can turn them off in Settings', 'The campfire music in the shop is softer and no longer buzzes']],
   ['0.15.0', 'Physical and magic damage', ['The Rune Forge upgrade Raw Damage is split into Physical Damage (warriors and archers) and Magic Damage (mages and priests), +8% per level each', 'Runes spent on Raw Damage are refunded, so you can choose again', 'Fixed: cloud saves now keep the relics you have found']],
   ['0.14.0', 'The Field Guide', ['The Bestiary is now the Field Guide, with tabs for Beasts and Relics. Open it from the main menu or the pause menu', 'Each relic unlocks in the guide the first time the Merchant offers it or the Altar grants it. Until then you only get a hint', 'Relics cost more: 18 to 35 gold, so buying one is a real decision', 'The tutorial now shows the Wandering Merchant and the other campfire visitors', 'Simpler names: the Seiðkona is now the Witch, the Draugr Jarl is the Draugr King, and other Old Norse names became plain English, such as Odin\'s Spear, Great Fireball, Swift Stride and Ghost Ship Chest']],
@@ -4077,15 +4079,15 @@ const RELICS = {
   iron_oath:      { name: 'Iron Oath', price: 24, desc: 'Iron units count double for the Iron synergy.' },
   ember_boots:    { name: 'Ember Boots', price: 26, desc: 'Dashing leaves a trail of fire that burns enemies.' },
   odins_eye:      { name: "Odin's Eye", price: 18, desc: 'Every 4th reroll in a shop is free.' },
-  draugr_pact:    { name: "Pact of the Dead", price: 28, desc: 'All units deal 40% more damage, but the hero has 30% less maximum health.' },
+  draugr_pact:    { name: "Pact of the Dead", price: 28, desc: 'All units deal 50% more damage, but the hero has 20% less maximum health.' },
   huginn_feather: { name: "Raven Feather", price: 24, desc: 'A random power-up appears near you at the start of every wave.' },
-  twin_souls:     { name: 'Twin Souls', price: 32, desc: 'Units with two or more stars count as two for synergies.' },
+  twin_souls:     { name: 'Twin Souls', price: 36, desc: 'Units with two or more stars count as two for class synergies.' },
   gleipnir_link:  { name: 'Binding Chain', price: 24, desc: 'Your first dash each wave stuns nearby enemies for 1.5 seconds.' },
   usurer_coin:    { name: "Moneylender's Coin", price: 18, desc: 'Interest goes up to 8 gold instead of 5, but healing costs double.' },
   mead_hall:      { name: 'Horn of the Mead Hall', price: 22, desc: 'The hero heals 1.5 health every second.' },
   berserk_mark:   { name: "Berserker's Mark", price: 26, desc: 'While the hero is below 40% health, all units attack 50% faster.' },
   raven_banner:   { name: 'Raven Banner', price: 35, desc: 'One extra formation slot.' },
-  naglfar_chest:  { name: "Ghost Ship Chest", price: 20, desc: 'Gain 3 gold every time the shop opens.' },
+  naglfar_chest:  { name: "Ghost Ship Chest", price: 20, desc: 'Gain 5 gold every time the shop opens.' },
 };
 const RELIC_ART = {
   iron_oath:      [['..XXXXX..', '.X.....X.', 'X...Y...X', 'X..YYY..X', 'X...Y...X', 'X...Y...X', 'X.......X', '.X.....X.', '..XXXXX..'], { X: '#a9aeb8', Y: '#e8ecf2' }],
