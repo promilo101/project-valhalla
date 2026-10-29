@@ -917,7 +917,7 @@ a.btn{text-decoration:none;display:inline-block}
         <h3 class="best-sub">Bosses <small id="bestBossN"></small></h3>
         <div class="best-grid" id="bestBosses"></div>
         <h3 class="best-sub">Elite traits</h3>
-        <p class="note best-intro">Elites have a coloured aura and a health bar. They are tougher and drop more souls and 1 gold. Each one has one trait. Beasts and traits appear here the first time you meet them.</p>
+        <p class="note best-intro">Elites have a coloured aura and a health bar. They are tougher and drop more souls and 1 gold. Each one has one trait. Beasts, bosses and traits appear here the first time you defeat one.</p>
         <div class="best-grid" id="bestElite"></div>
       </div>
       <div class="best-scroll" id="fgRelics" role="tabpanel" aria-labelledby="fgTabRelics" tabindex="0" hidden>
@@ -925,16 +925,16 @@ a.btn{text-decoration:none;display:inline-block}
         <div class="best-grid best-relics" id="bestRelics"></div>
       </div>
       <div class="best-scroll" id="fgRunes" role="tabpanel" aria-labelledby="fgTabRunes" tabindex="0" hidden>
-        <p class="note best-intro">Runes and treasures that appear on the battlefield during a wave. They show on the minimap and wait about 35 seconds. Walk over one to take it. Each appears here the first time you see one.</p>
+        <p class="note best-intro">Runes and treasures that appear on the battlefield during a wave. They show on the minimap and wait about 35 seconds. Walk over one to take it. Each appears here the first time you pick one up.</p>
         <div class="best-grid best-relics" id="bestRunes"></div>
       </div>
       <div class="best-scroll" id="fgAbil" role="tabpanel" aria-labelledby="fgTabAbil" tabindex="0" hidden>
-        <p class="note best-intro">Hero abilities, offered when you start a raid and after every boss. Each one appears here the first time it is offered to you, with all three levels.</p>
+        <p class="note best-intro">Hero abilities, offered when you start a raid and after every boss. Each one appears here the first time you take it, with all three levels.</p>
         <div class="fg-sub" id="fgHeroBar" role="group" aria-label="Heroes"></div>
         <div class="best-grid best-abil" id="bestAbil"></div>
       </div>
       <div class="best-scroll" id="fgGear" role="tabpanel" aria-labelledby="fgTabGear" tabindex="0" hidden>
-        <p class="note best-intro">Gear for your hero, sold by the Wandering Merchant and dropped by bosses. Rings and necklaces carry a special power. Each type appears here the first time you find it, and the rarities you have found light up: Common, Rare and Epic.</p>
+        <p class="note best-intro">Gear for your hero, sold by the Wandering Merchant and dropped by bosses. Rings and necklaces carry a special power. Each type appears here the first time you buy or take one, and the rarities you have owned light up: Common, Rare and Epic.</p>
         <div class="fg-sub" id="fgGearSub" role="group" aria-label="Gear slots"></div>
         <div class="best-grid best-relics" id="bestGear"></div>
       </div>
@@ -2067,7 +2067,7 @@ function startWave(){
 }
 function spawnBoss(type, design){
   const a = rand(0, Math.PI * 2);
-  S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110); sfx('roar', type); flash('255,255,255', .25); discover('b', type);
+  S.boss = spawnEnemy(type, S.hero.x + Math.cos(a) * 150, S.hero.y + Math.sin(a) * 110); sfx('roar', type); flash('255,255,255', .25);
   if (type === 'fenrir'){
     const d = design || (dbg.fenrir !== 'auto' ? dbg.fenrir : S.wave > WAVES.length ? 'A' : 'B');
     S.boss.design = d; S.boss.title = d === 'A' ? 'Fenrir, the Chained' : 'Fenrir, the World-Eater';
@@ -2144,7 +2144,7 @@ function spawnFromWave(){
   spawnEnemy(type, S.hero.x + Math.cos(a) * d, S.hero.y + Math.sin(a) * d, elite);
 }
 function spawnEnemy(type, x, y, elite){
-  const d = ENEMIES[type], W = waveDef(S.wave); discover('e', type);
+  const d = ENEMIES[type], W = waveDef(S.wave);
   const ek = Math.max(0, S.wave - WAVES.length); // endless waves past Fenrir
   const hs = d.boss ? (ek ? hpScale(S.wave) / hpScale(BOSS_HOME[type]) * .7 : 1) : hpScale(S.wave) * (W.hp || 1) * 1.06 ** ek * (S.cursed ? 1.4 : 1);
   const sc = d.scale || 1, spr = SPR[d.spr];
@@ -2158,7 +2158,7 @@ function spawnEnemy(type, x, y, elite){
   e.max = e.hp;
   // elite affixes: every elite gets one trait you can see at a glance
   if (elite && !d.boss){
-    e.aff = pick(['frozen', 'burning', 'warded', 'swift']); e.gx = x; e.gy = y; e.trT = 0; discover('a', e.aff);
+    e.aff = pick(['frozen', 'burning', 'warded', 'swift']); e.gx = x; e.gy = y; e.trT = 0;
     if (e.aff === 'swift') e.spd *= 1.45;
     if (e.aff === 'warded') e.shield = e.shieldMax = e.max * .35;
   }
@@ -2170,9 +2170,10 @@ function spawnEnemy(type, x, y, elite){
 function spawnPowerup(){
   const h = S.hero, a = rand(0, Math.PI * 2), d = rand(140, 320);
   const type = weighted({ mead: 3, fury: 3, thor: 2, raven: 2, hoard: 2, frost: 2, stride: S.hero.dashSlots >= dashCap() ? 0 : 2 });
-  S.pups.push({ type, x: h.x + Math.cos(a) * d, y: h.y + Math.sin(a) * d, life: 35, max: 35, t: 0 }); discover('p', type);
+  S.pups.push({ type, x: h.x + Math.cos(a) * d, y: h.y + Math.sin(a) * d, life: 35, max: 35, t: 0 });
 }
 function takePowerup(p){
+  discover('p', p.type);
   sfx('power');
   const h = S.hero, P = POWERUPS[p.type];
   addText(h.x, h.y - 16, P.name, P.col, true);
@@ -2242,6 +2243,7 @@ function chain(from, dmg, u){
 function kill(e){
   if (e.dead) return;
   e.dead = true; S.kills++;
+  discover(e.d.boss ? 'b' : 'e', e.type); if (e.elite && e.aff) discover('a', e.aff); // the Field Guide learns from what you defeat
   if (S.stats){ const k = e.lastSrc || 'hero'; S.stats.kills[k] = (S.stats.kills[k] || 0) + 1; }
   if (e.d.boss) burst(e.x, e.y, 60, ['#ff5b2e', '#ffd27a', '#bfe9ff', '#fff'], 120); else deathFx(e);
   if (e.tl && e.mst === 'wind') e.tl.cancel = true;
@@ -3729,7 +3731,7 @@ function renderBestAbil(){
   const H = HEROES[fgHero] || HEROES.viking;
   $('#fgHeroBar').innerHTML = Object.entries(HEROES).map(([k, h]) => `<button type="button" data-hero="${k}" class="${k === fgHero ? 'on' : ''}" aria-pressed="${k === fgHero}">${h.name} <small>${h.abilities.filter(seenAb).length}/${h.abilities.length}</small></button>`).join('') + '<span class="note fg-soon">More heroes to come</span>';
   $('#bestAbil').innerHTML = H.abilities.map(k => { const A = ABILITIES[k];
-    if (!seenAb(k)) return `<div class="brl locked"><img src="${ABIL_ICON[k]}" alt=""><div><h4>Undiscovered ability</h4><p>Not offered to you yet. Beat bosses to see more.</p></div></div>`;
+    if (!seenAb(k)) return `<div class="brl locked"><img src="${ABIL_ICON[k]}" alt=""><div><h4>Undiscovered ability</h4><p>Not taken yet. Bosses offer new abilities.</p></div></div>`;
     return `<div class="brl abil" style="--c:${A.col}"><img src="${ABIL_ICON[k]}" alt=""><div><h4 style="color:${A.col}">${A.name} <small style="color:var(--muted)">${H.name}</small></h4>${[1, 2, 3].map(l => `<p><b style="color:var(--gold);font-weight:400">${LV[l - 1]}</b> <small style="color:var(--muted)">${A.cd[l - 1]} s</small> · ${A.desc(l)}</p>`).join('')}</div></div>`; }).join('');
 }
 function renderBestGear(){
@@ -3972,11 +3974,10 @@ function showPick(kind){
     const news = Object.keys(ABILITIES).filter(k => !owned.includes(k)).map(key => ({ type: 'new', key }));
     opts = shuffle(ups).slice(0, 2).concat(shuffle(news)); opts = shuffle(opts.slice(0, 3));
     if (!opts.length) opts = [{ type: 'gold', key: 'gold' }];
-    const dt = pick(jewelPool().length ? ITEM_TYPES : ARMS), drop = dt === 'ring' || dt === 'neck' ? (jewelPool(dt).length ? makeJewel(pickRelic(jewelPool(dt)), dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave) : makeItem(pick(ARMS), dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave)) : makeItem(dt, dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave); discoverGear(drop);
+    const dt = pick(jewelPool().length ? ITEM_TYPES : ARMS), drop = dt === 'ring' || dt === 'neck' ? (jewelPool(dt).length ? makeJewel(pickRelic(jewelPool(dt)), dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave) : makeItem(pick(ARMS), dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave)) : makeItem(dt, dbg.epicBoss ? 2 : rollRarity(S.wave, true), S.wave);
     opts.push({ type: 'item', item: drop }); // a boss also drops a piece of rare gear
   }
   picking = { kind, opts, step: 'choose', chosen: null };
-  opts.forEach(o => { if (ABILITIES[o.key]) discover('ab', o.key); });
   renderPick();
 }
 function pickCardHTML(o, i){
@@ -4012,8 +4013,9 @@ function choosePick(i){
   const P = picking; if (!P) return; sfx('level');
   if (P.step === 'replace'){ if (i >= 0 && i < 3) S.abil[i] = { key: P.chosen, lvl: 1, cd: 0 }; return closePick(); }
   const o = P.opts[i]; if (!o) return;
+  if (ABILITIES[o.key]) discover('ab', o.key);
   if (o.type === 'gold'){ S.gold += 25; return closePick(); }
-  if (o.type === 'item'){ const old = equipItem(o.item); lootReveal(o.item, old ? `Equipped. Your ${old.name} was sold for ${itemSell(old)} gold` : 'Equipped'); if (S.stats) (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: o.item.slot, b: o.item.b, r: o.item.r, w: S.wave, boss: true }); return closePick(); }
+  if (o.type === 'item'){ discoverGear(o.item); const old = equipItem(o.item); lootReveal(o.item, old ? `Equipped. Your ${old.name} was sold for ${itemSell(old)} gold` : 'Equipped'); if (S.stats) (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: o.item.slot, b: o.item.b, r: o.item.r, w: S.wave, boss: true }); return closePick(); }
   if (o.type === 'up'){ const sl = S.abil.find(x => x && x.key === o.key); sl.lvl = Math.min(3, sl.lvl + 1); return closePick(); }
   const empty = S.abil.indexOf(null);
   if (empty >= 0){ S.abil[empty] = { key: o.key, lvl: 1, cd: 0 }; return closePick(); }
@@ -4662,7 +4664,7 @@ function makeItem(slot, r, wave, bk){
   it.price = Math.round((5 + wave * .9) * R.price * (slot === 'main' ? 1.15 : 1));
   return it;
 }
-const starterGear = () => { const g = { helm: null, chest: null, legs: null, main: makeItem('main', 0, 1, 'axe'), off: null, ring1: null, ring2: null, neck: null }; g.main.name = 'Worn Axe'; discoverGear(g.main); return g; };
+const starterGear = () => { const g = { helm: null, chest: null, legs: null, main: makeItem('main', 0, 1, 'axe'), off: null, ring1: null, ring2: null, neck: null }; g.main.name = 'Worn Axe'; return g; };
 // rarer gear later in the raid; bosses always give at least a rare piece
 function rollRarity(w, boss){
   const e = boss ? (w >= 15 ? .45 : .15) : clamp((w - 8) * .03, 0, .25), rr = boss ? 1 : clamp(.12 + w * .025, 0, .5), x = Math.random();
@@ -4791,7 +4793,7 @@ function buyItem(i, key){
   const it = E.items[i]; if (!it) return;
   if (!dbg.infGold && S.gold < it.price) return toast('Not enough gold');
   if (!dbg.infGold){ S.gold -= it.price; statGold('Gear', it.price, true); }
-  E.boughtI.push(i); const old = equipItem(it, key && GEAR_SLOTS.includes(key) && typeOf(key) === it.slot ? key : null);
+  discoverGear(it); E.boughtI.push(i); const old = equipItem(it, key && GEAR_SLOTS.includes(key) && typeOf(key) === it.slot ? key : null);
   if (S.stats){ (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: it.slot, b: it.b, r: it.r, w: S.wave }); if (it.fx) S.stats.relicBuys.push({ k: it.fx, w: S.wave }); const ev = S.stats.events[S.stats.events.length - 1]; if (ev && ev.t === 'merchant') ev.a = true; }
   sfx('merge'); toast(old ? `${it.name} equipped · ${old.name} sold for ${itemSell(old)} gold` : `${it.name} equipped`);
   renderShop(); setInfo(describeItem(it, 'worn'));
@@ -4872,7 +4874,6 @@ function makeEvent(type){
     const pool = jewelPool(), offers = [];
     const items = shuffle(ARMS.slice()).slice(0, 3).map(sl => makeItem(sl, rollRarity(S.wave), S.wave));
     if (pool.length) items.push(makeJewel(pickRelic(pool), rollRarity(S.wave), S.wave));
-    items.forEach(discoverGear);
     return { type, offers, bought: [], items, boughtI: [] };
   }
   if (type === 'shrine') return { type, cost: Math.round(S.hero.maxHp * .2), gold: 8 + S.wave, done: false };
@@ -5114,7 +5115,7 @@ const TUT_STEPS = [
   { mode: 'shop', target: ['#formation .slot[data-i="0"]', '#formation .slot[data-i="2"]', '#formation .slot[data-i="4"]', '#formation .slot[data-i="6"]', '#bench'], anim: 'drag', h: 'Formation and bench', p: 'Only units on the glowing marks around your hero at the fire fight. The bench holds the rest. Drag a unit from the bench onto a mark, or right-click it to send it between bench and formation. Levelling up with XP opens more marks.' },
   { mode: 'shop', target: '#traits', h: 'Synergies', p: () => `Units in the formation build synergies. Two of the same class or element switch a bonus on. Four of a class, or three of an element, make it stronger. We added ${tut.gift || 'a unit'} so ${tut.giftEl || 'an element'} is active. Hover or click a synergy row to read exactly what it does.`, enter: tutSynergy },
   { mode: 'shop', target: '#event', wide: true, h: 'The Wandering Merchant', p: 'The Merchant waits at every campfire. He sells gear for your hero: helmets, chestplates, leggings and weapons, and a ring or necklace with a special power that twists a rule for the rest of the raid. You wear two rings and one necklace. The coloured strip on each card shows the slot it fits. Press C for your Character panel with your gear and abilities. Blood Shrines and Cursed Altars appear on the battlefield instead: stand in their circle to use them. Here is some gold to try.', enter: tutMerchant },
-  { mode: 'shop', target: '#btnBook', h: 'The Field Guide', p: 'This book is your Field Guide. It keeps a page for everything you meet on your raids: every beast and boss and how to dodge their attacks, every elite trait, every hero ability, and every type of gear, rings and necklaces. Entries unlock the first time you find them. Until then you see only a dark silhouette and a hint. Open it here in the shop with the book or J, and in battle from the pause menu.', enter: () => { tut.wantGuide = true; tut.guideOpened = false; }, wait: () => tut.guideOpened, hint: 'Click the book to open it' },
+  { mode: 'shop', target: '#btnBook', h: 'The Field Guide', p: 'This book is your Field Guide. It keeps a page for everything you meet on your raids: every beast and boss and how to dodge their attacks, every elite trait, every hero ability, and every type of gear, rings and necklaces. Entries unlock when you defeat, take or pick up something for the first time. Until then you see only a dark silhouette and a hint. Open it here in the shop with the book or J, and in battle from the pause menu.', enter: () => { tut.wantGuide = true; tut.guideOpened = false; }, wait: () => tut.guideOpened, hint: 'Click the book to open it' },
   { mode: 'shop', target: '#bestiary .fg-tabs', h: 'Beasts, abilities and gear', p: 'Beasts is sorted by land and by the waves where you meet each enemy, with the bosses and the elite traits below. Abilities shows every hero ability with all three levels, and Runes the power-ups you find on the battlefield. Gear has a page for every slot: helmets, chestplates, leggings, main hand, off hand, rings and necklaces. Each entry lights up the rarities you have found, and rare powers like the Amulet of Twin Souls are marked in gold. The numbers count your discoveries, and a banner pops up whenever you find something new. Try the Gear tab.', enter: () => { tut.fgTab0 = fgTab; }, wait: () => fgTab === 'gear', hint: 'Click the Gear tab' },
   { mode: 'shop', target: '#btnStart', h: 'Start the wave', enter: () => { tut.wantGuide = false; if (!$('#bestiary').hidden) showBestiary(false); }, p: 'When your warband is ready, start the wave. In a real raid you can also press Space.', unlock: true, wait: () => mode === 'combat', hint: 'Click Start wave' },
   { mode: 'combat', target: 'hero', r: 46, anim: 'keys', h: 'Move your hero', p: 'Walk with W A S D or the arrow keys. Your hero swings the weapon in the main hand at enemies in reach, but the warband does most of the work. Keep it close and stay out of reach of the enemies.', enter: () => { tut.x0 = S.hero.x; tut.y0 = S.hero.y; }, wait: () => Math.hypot(S.hero.x - tut.x0, S.hero.y - tut.y0) > 70, hint: 'Walk around a little' },
