@@ -386,8 +386,8 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #pause .best{width:min(820px,calc(100% - 24px));height:min(860px,calc(100% - 24px));grid-template-rows:auto auto minmax(0,1fr)!important;justify-items:stretch;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:14px 16px;grid-template-rows:auto minmax(0,1fr)}
 .best-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .fg-tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);flex-wrap:wrap}
-.fg-tab{background:none;border:1px solid transparent;border-bottom:0;padding:6px 14px 5px;font-size:20px;color:var(--muted);border-radius:2px 2px 0 0;margin-bottom:-1px}
-.fg-tab small{font-size:15px;color:var(--muted)}
+.fg-tab{background:none;border:1px solid transparent;border-bottom:0;padding:6px 9px 5px;font-size:18px;white-space:nowrap;color:var(--muted);border-radius:2px 2px 0 0;margin-bottom:-1px}
+.fg-tab small{font-size:13px;color:var(--muted)}
 .fg-tab:hover{color:var(--fg)}
 .fg-tab[aria-selected="true"]{color:var(--gold);background:var(--bg);border-color:var(--line)}
 .fg-tab:focus-visible{outline:2px solid var(--frost);outline-offset:-2px}
@@ -516,6 +516,14 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .fg-sub button{background:var(--bg);border:1px solid var(--line);border-radius:2px;padding:2px 10px;font:inherit;font-size:17px;color:var(--muted)}
 .fg-sub button.on{color:var(--fg);border-color:#c9cfdb;background:#2a3042}
 .fg-sub small{font-size:14px}
+#evTip{position:absolute;z-index:3;pointer-events:none;transform:translate(-50%,-100%);font-size:12px;line-height:1.35;color:var(--text);text-align:center;white-space:nowrap}
+#evTip .et-n{color:var(--ec);font-weight:700;text-shadow:0 1px 0 #000,0 0 4px #000}
+#evTip.full{white-space:normal;width:250px;text-align:left;padding:8px 10px;background:rgba(13,16,24,.94);border:1px solid var(--ec);border-radius:3px;box-shadow:0 4px 14px rgba(0,0,0,.5)}
+#evTip.full .et-n{text-shadow:none;margin-bottom:2px}
+#evTip .et-r b{color:var(--muted);font-weight:400;margin-right:4px}
+#evTip .et-u{color:var(--gold);margin-top:4px}
+#evTip .et-t{color:var(--gold);font-weight:700;text-shadow:0 1px 0 #000}
+#evTip.side{transform:translate(-100%,0)}
 #achv{position:absolute;left:50%;top:104px;transform:translateX(-50%);z-index:45;display:flex;gap:12px;align-items:center;min-width:300px;max-width:calc(100% - 32px);padding:10px 16px 10px 12px;background:linear-gradient(90deg,#1b2030,#141822);border:1px solid var(--ac);border-radius:3px;box-shadow:0 8px 24px rgba(0,0,0,.6),0 0 18px color-mix(in srgb,var(--ac) 35%,transparent);pointer-events:none;overflow:hidden;zoom:var(--ui,1)}
 #achv::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);transform:translateX(-100%)}
 #achv.go{animation:acIn 2.5s cubic-bezier(.2,.9,.3,1.1) forwards}
@@ -661,6 +669,7 @@ a.btn{text-decoration:none;display:inline-block}
   <canvas id="cv" aria-label="Battlefield"></canvas>
   <div id="tips" aria-hidden="true"></div>
   <div class="formation camp" id="formation" hidden aria-label="Formation around the campfire"></div>
+  <div id="evTip" hidden role="status"></div>
 
   <div id="hud" hidden>
     <div aria-hidden="true"></div>
@@ -918,7 +927,7 @@ a.btn{text-decoration:none;display:inline-block}
         <button class="fg-tab" role="tab" type="button" id="fgTabRelics" data-tab="relics" aria-controls="fgRelics" aria-selected="false" tabindex="-1" hidden>Relics <small id="bestRelicN"></small></button>
         <button class="fg-tab" role="tab" type="button" id="fgTabUnits" data-tab="units" aria-controls="fgUnits" aria-selected="false" tabindex="-1">Units <small id="bestUnitN"></small></button>
         <button class="fg-tab" role="tab" type="button" id="fgTabAbil" data-tab="abil" aria-controls="fgAbil" aria-selected="false" tabindex="-1">Abilities <small id="bestAbilN"></small></button>
-        <button class="fg-tab" role="tab" type="button" id="fgTabRunes" data-tab="runes" aria-controls="fgRunes" aria-selected="false" tabindex="-1">Runes <small id="bestRuneN"></small></button>
+        <button class="fg-tab" role="tab" type="button" id="fgTabRunes" data-tab="runes" aria-controls="fgRunes" aria-selected="false" tabindex="-1">Battlefield <small id="bestRuneN"></small></button>
         <button class="fg-tab" role="tab" type="button" id="fgTabGear" data-tab="gear" aria-controls="fgGear" aria-selected="false" tabindex="-1">Gear <small id="bestGearN"></small></button>
       </div>
       <div class="best-scroll" id="fgBeasts" role="tabpanel" aria-labelledby="fgTabBeasts" tabindex="0">
@@ -940,7 +949,8 @@ a.btn{text-decoration:none;display:inline-block}
         <div id="bestUnits"></div>
       </div>
       <div class="best-scroll" id="fgRunes" role="tabpanel" aria-labelledby="fgTabRunes" tabindex="0" hidden>
-        <p class="note best-intro">Runes and treasures that appear on the battlefield during a wave. They show on the minimap and wait about 35 seconds. Walk over one to take it. Each appears here the first time you pick one up.</p>
+        <div class="fg-sub" id="fgBfSub" role="group" aria-label="Battlefield pages"></div>
+        <p class="note best-intro" id="fgBfIntro"></p>
         <div class="best-grid best-relics" id="bestRunes"></div>
       </div>
       <div class="best-scroll" id="fgAbil" role="tabpanel" aria-labelledby="fgTabAbil" tabindex="0" hidden>
@@ -1032,6 +1042,7 @@ a.btn{text-decoration:none;display:inline-block}
     <fieldset><legend>Waves</legend>
       <div class="r"><label for="dbgWave">Wave</label><input type="number" id="dbgWave" min="1" max="99" value="20"><button type="button" id="dbgGo">Jump to wave</button></div>
       <div class="r"><label for="dbgNoSpawn"><input type="checkbox" id="dbgNoSpawn"> Stop enemy spawns</label></div>
+      <div class="r"><span>Battlefield event</span><button type="button" data-bf="shrine">Blood Shrine</button><button type="button" data-bf="altar">Cursed Altar</button><button type="button" data-bf="messenger">Odin's Messenger</button></div>
       <div class="r"><span>Shop event</span><button type="button" data-ev="merchant">Merchant</button><button type="button" data-ev="shrine">Shrine</button><button type="button" data-ev="altar">Altar</button></div>
       <div class="r"><button type="button" id="dbgKill">Kill all enemies</button><button type="button" id="dbgKillBoss">Kill boss</button><button type="button" id="dbgShopCd">Reset shop cooldown</button></div>
     </fieldset>
@@ -1126,6 +1137,7 @@ function migrateMeta(){
   if (!Array.isArray(meta.seen.e)) meta.seen.e = []; if (!Array.isArray(meta.seen.a)) meta.seen.a = []; if (!meta.seen.g || typeof meta.seen.g !== 'object') meta.seen.g = {};
   if (!Array.isArray(meta.seen.b)){ const home = { jarl: 5, giant: 10, herald: 15, fenrir: 20 }; meta.seen.b = Object.keys(home).filter(k => (meta.best || 0) >= home[k]); saveMeta(); }
   if (!Array.isArray(meta.seen.u)){ meta.seen.u = []; if ((meta.runs || 0) > 0) for (const c of ['warrior', 'archer', 'mage', 'priest']) for (const m of ['jern', 'frost', 'ild', 'blod', 'lyn', 'rune']) meta.seen.u.push(c + '_' + m); saveMeta(); }
+  if (!Array.isArray(meta.seen.ev)) meta.seen.ev = [];
   if (!Array.isArray(meta.seen.p)){ meta.seen.p = (meta.runs || 0) > 0 ? ['mead', 'fury', 'thor', 'raven', 'hoard', 'stride', 'frost'] : []; saveMeta(); }
   if (!Array.isArray(meta.seen.ab)){ meta.seen.ab = (meta.best || 0) >= 5 ? ['bash', 'spear', 'quake', 'cry', 'wall', 'ravens', 'horn', 'rage'] : []; saveMeta(); }
   if (old > 0) saveMeta();
@@ -1807,6 +1819,10 @@ function buildSprites(){
   for (const b of ['jarl', 'giant', 'herald']) for (const d of ['A', 'B']) for (const f of [0, 1]) SPR[b + d + f] = buildBossSprite(b, d, f);
   for (const t of Object.keys(ENEMY_ANIM)){ SPR[t] = buildEnemySprite(t, 0); SPR[t + '1'] = buildEnemySprite(t, 1); SPR[t + 'W'] = buildEnemySprite(t, 'W'); }
   SPR.ironhelm = makeSprite(['...s...', '..SSS..', '.SKKKS.', 'SSsSsSS'], { S: '#7d8494', s: '#aab2c2', K: '#0e1014' });
+  for (const [g, from] of [['graven', 'raven'], ['graven1', 'raven1']]){ // Odin's Messenger: the raven dipped in gold
+    const src = SPR[from], c = document.createElement('canvas'); c.width = src.width; c.height = src.height; const x = c.getContext('2d');
+    x.drawImage(src, 0, 0); x.globalCompositeOperation = 'source-atop'; x.fillStyle = 'rgba(236,190,80,.5)'; x.fillRect(0, 0, c.width, c.height); SPR[g] = c;
+  }
   for (const k of Object.keys(SPR)) { SPR[k + '_f'] = flip(SPR[k]); SPR[k + '_w'] = whiteOf(SPR[k]); SPR[k + '_wf'] = flip(SPR[k + '_w']); }
   for (const k in POWERUPS) SPR['pu_' + k] = makeSprite(GEM, { X: POWERUPS[k].col, w: '#ffffff' });
   // decor
@@ -2691,10 +2707,11 @@ function update(dt){
   S.haz = S.haz.filter(z => z.life > 0);
   updateBossFx(dt);
   // orbs
+  const pullR = 38 * (1 + gearStat('pull') / 100);
   for (const o of S.orbs){
     o.t += dt;
     const d2 = dist2(o.x, o.y, h.x, h.y);
-    if (S.magnet > 0 || d2 < 38 * 38){ const d = Math.sqrt(d2) || 1, sp = S.magnet > 0 ? 300 : 170; o.x += (h.x - o.x) / d * sp * dt; o.y += (h.y - o.y) / d * sp * dt; }
+    if (S.magnet > 0 || d2 < pullR * pullR){ const d = Math.sqrt(d2) || 1, sp = S.magnet > 0 ? 300 : 170; o.x += (h.x - o.x) / d * sp * dt; o.y += (h.y - o.y) / d * sp * dt; }
     if (d2 < 7 * 7){ o.got = true; gainSouls(o.v); }
   }
   S.orbs = S.orbs.filter(o => !o.got);
@@ -2995,6 +3012,7 @@ function render(dt){
   const camX = Math.round(h.x - VW / 2 + sx), camY = Math.round(h.y - camScreenY + sy);
   lastCamX = camX; lastCamY = camY;
   if (camp) positionCamp();
+  if (S) updateEvTip();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalCompositeOperation = 'source-over';
   // ground
@@ -3131,7 +3149,13 @@ function render(dt){
     }
     st.board.forEach((u, i) => { if (!u || i >= slotCount()) return; u.x = h.x + SLOT_OFF[i].x; u.y = h.y + SLOT_OFF[i].y; u.face = u.x < fireX ? 1 : u.x > fireX ? -1 : u.face; u.hz = 0; u.leap = null; });
   }
-  if (S && S.shrine && !S.shrine.done && !camp){ // a shrine or altar on the battlefield
+  if (S && S.shrine && !S.shrine.done && !camp && S.shrine.kind === 'messenger'){ // Odin's Messenger, a golden raven
+    const SH = S.shrine, tt = st.time || 0, fly = SH.st !== 'perch' && SH.rest >= 0, bob = fly ? Math.sin(tt * 10) * 2 - 5 : Math.sin(tt * 3);
+    ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(SH.x, SH.y - 3, 1, SH.x, SH.y - 3, 22); gr.addColorStop(0, 'rgba(226,178,76,.35)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(SH.x, SH.y - 3, 22, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+    if (SH.st !== 'gone') shadow(SH.x, SH.y + 6, 5);
+    drawSprite(fly && Math.floor(tt * 8) % 2 ? 'graven1' : 'graven', SH.x, SH.y + bob, 1, SH.face);
+  }
+  if (S && S.shrine && !S.shrine.done && !camp && S.shrine.kind !== 'messenger'){ // a shrine or altar on the battlefield
     const SH = S.shrine, sp = NPC[SH.kind], gc = SH.kind === 'shrine' ? '255,59,43' : '185,140,255', tt = st.time || 0;
     ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(SH.x, SH.y - 4, 2, SH.x, SH.y - 4, 30 + Math.sin(tt * 4) * 3); gr.addColorStop(0, `rgba(${gc},.3)`); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(SH.x, SH.y - 4, 34, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
     ctx.strokeStyle = `rgba(${gc},.55)`; ctx.lineWidth = 1; ctx.setLineDash([3, 2]); ctx.beginPath(); ctx.ellipse(SH.x, SH.y + 6, 18, 8, 0, 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
@@ -3407,7 +3431,7 @@ function drawMinimap(){
     mctx.strokeStyle = '#ffffff'; mctx.lineWidth = 1; mctx.strokeRect(-3, -3, 6, 6);
     mctx.restore();
   }
-  if (S.shrine && !S.shrine.done){ const [x, y, edge] = toMini(S.shrine.x, S.shrine.y, true); mctx.globalAlpha = edge ? pulse : 1; mctx.fillStyle = S.shrine.kind === 'shrine' ? '#ff3a5a' : '#b98cff'; mctx.beginPath(); mctx.arc(x, y, 3.5, 0, 6.283); mctx.fill(); mctx.strokeStyle = '#ffffff'; mctx.lineWidth = 1; mctx.stroke(); mctx.globalAlpha = 1; }
+  if (S.shrine && !S.shrine.done){ const [x, y, edge] = toMini(S.shrine.x, S.shrine.y, true); mctx.globalAlpha = edge ? pulse : 1; mctx.fillStyle = BF_EVENTS[S.shrine.kind].col; mctx.beginPath(); mctx.arc(x, y, 3.5, 0, 6.283); mctx.fill(); mctx.strokeStyle = '#ffffff'; mctx.lineWidth = 1; mctx.stroke(); mctx.globalAlpha = 1; }
   // bosses
   for (const e of S.enemies){
     if (!e.d.boss) continue;
@@ -3599,7 +3623,7 @@ function renderChar(){
   $('#doll').innerHTML = GEAR_SLOTS.map(slot).join('') + `<div class="hero-big"><img src="${ICON.hero}" alt="Your hero"></div>`;
   const ar = gearStat('armor'), wa = gearStat('ward'), w = S.gear.main;
   const pct = v => Math.round((1 - armorCut(v)) * 100);
-  $('#cpStats').innerHTML = `<dt>Health</dt><dd>${Math.ceil(S.hero.hp)} / ${S.hero.maxHp}</dd><dt>Physical armor</dt><dd>${ar} <small style="color:var(--muted)">−${pct(ar)}% damage</small></dd><dt>Magic armor</dt><dd>${wa} <small style="color:var(--muted)">−${pct(wa)}% damage</small></dd><dt>Weapon damage</dt><dd>${w ? Math.round((w.dmg + ((S.gear.off && S.gear.off.dmg) || 0)) * (1 + meta.physdmg * .08)) + ` <small style="color:var(--muted)">${w.as.toFixed(2)}/s</small>` : 'none'}</dd><dt>Ability damage</dt><dd>+${abilBonus()}%</dd>`;
+  $('#cpStats').innerHTML = `<dt>Health</dt><dd>${Math.ceil(S.hero.hp)} / ${S.hero.maxHp}</dd><dt>Physical armor</dt><dd>${ar} <small style="color:var(--muted)">−${pct(ar)}% damage</small></dd><dt>Magic armor</dt><dd>${wa} <small style="color:var(--muted)">−${pct(wa)}% damage</small></dd><dt>Weapon damage</dt><dd>${w ? Math.round((w.dmg + ((S.gear.off && S.gear.off.dmg) || 0)) * (1 + meta.physdmg * .08)) + ` <small style="color:var(--muted)">${w.as.toFixed(2)}/s</small>` : 'none'}</dd><dt>Ability damage</dt><dd>+${abilBonus()}%</dd><dt>Pickup range</dt><dd>+${gearStat('pull')}%</dd>`;
 }
 function renderCharSum(){
   if (!S) return;
@@ -3786,12 +3810,14 @@ const beastIcon = k => achIcons[k] || (achIcons[k] = SPR[k].toDataURL());
 function discover(kind, k){
   if (!meta.seen || (S && S.tutorial)) return;
   if (kind === 'u' && !ICON[k]) return;
-  if (kind === 'e' && !BEAST_HINT[k]) return; if (kind === 'b' && !BOSS_GUIDE[k]) return; if (kind === 'p' && !POWERUPS[k]) return;
+  if (kind === 'e' && !BEAST_HINT[k]) return; if (kind === 'b' && !BOSS_GUIDE[k]) return; if (kind === 'p' && !POWERUPS[k]) return; if (kind === 'ev' && !BF_EVENTS[k]) return;
+  if (!Array.isArray(meta.seen[kind])) meta.seen[kind] = [];
   const list = meta.seen[kind]; if (list.includes(k)) return;
   list.push(k); saveMeta(); cloudQueue && cloudQueue();
   if (kind === 'e') achieve('New beast', ENEMIES[k].name, beastIcon(k), '#e2b24c');
   else if (kind === 'b') achieve('New boss', ENEMIES[k].name, beastIcon(BOSS_GUIDE[k].spr), '#ff5b2e');
   else if (kind === 'ab') achieve('New ability', ABILITIES[k].name, ABIL_ICON[k], ABILITIES[k].col);
+  else if (kind === 'ev') achieve('New event', BF_EVENTS[k].name, evIcon(k), BF_EVENTS[k].col);
   else if (kind === 'p') achieve('New rune', POWERUPS[k].name, beastIcon('pu_' + k), POWERUPS[k].col);
   else if (kind === 'u') achieve('New unit', cardName({ cls: k.split('_')[0], mod: k.split('_')[1] }), ICON[k], MODS[k.split('_')[1]].col);
   else achieve('New elite trait', AFF_NAME[k] + ' elites', beastIcon('draugr'), AFF_COL[k]);
@@ -3840,9 +3866,19 @@ function renderBestUnits(){
   else h = '<div class="fg-empty"><h4>Clans are coming</h4><p>Units will belong to clans, and gathering 2, 4, 6 or 8 of the same clan in your formation will grant bigger bonuses. Their pages will appear here.</p></div>';
   $('#bestUnits').innerHTML = h;
 }
+let fgBfSub = 'runes';
 function renderBestRunes(){
-  const keys = Object.keys(POWERUPS);
-  $('#bestRuneN').textContent = `${keys.filter(seenP).length}/${keys.length}`;
+  const keys = Object.keys(POWERUPS), evs = Object.keys(BF_EVENTS), nR = keys.filter(seenP).length, nE = evs.filter(seenEv).length;
+  $('#bestRuneN').textContent = `${nR + nE}/${keys.length + evs.length}`;
+  $('#fgBfSub').innerHTML = [['runes', 'Runes', `${nR}/${keys.length}`], ['events', 'Events', `${nE}/${evs.length}`]].map(([k, l, c]) => `<button type="button" data-bsub="${k}" class="${fgBfSub === k ? 'on' : ''}" aria-pressed="${fgBfSub === k}">${l} <small>${c}</small></button>`).join('');
+  if (fgBfSub === 'events'){
+    $('#fgBfIntro').textContent = 'Events that appear on the battlefield during some waves, from wave 3. They show on the minimap, and a card tells you what they do when you come close. Each appears here the first time you use one.';
+    $('#bestRunes').innerHTML = evs.map(k => { const E = BF_EVENTS[k]; return seenEv(k)
+      ? `<div class="brl"><img src="${evIcon(k)}" alt=""><div><h4 style="color:${E.col}">${E.name}</h4><p>${E.does}</p><p><b style="color:var(--gold);font-weight:400">How:</b> ${E.use}</p><p><b style="color:var(--gold);font-weight:400">Risk:</b> ${E.riskG}</p><p><b style="color:var(--gold);font-weight:400">Reward:</b> ${E.rewardG}</p></div></div>`
+      : `<div class="brl locked"><img src="${evIcon(k)}" alt=""><div><h4>Undiscovered event</h4><p>${E.hint}</p></div></div>`; }).join('');
+    return;
+  }
+  $('#fgBfIntro').textContent = 'Runes and treasures that appear on the battlefield during a wave. They show on the minimap and wait about 35 seconds. Walk over one to take it. Each appears here the first time you pick one up.';
   $('#bestRunes').innerHTML = keys.map(k => { const P = POWERUPS[k], img = beastIcon('pu_' + k); return seenP(k)
     ? `<div class="brl"><img src="${img}" alt=""><div><h4 style="color:${P.col}">${P.name}</h4><p>${P.desc}.</p></div></div>`
     : `<div class="brl locked"><img src="${img}" alt=""><div><h4>Undiscovered rune</h4><p>${RUNE_HINT[k] || 'Not seen yet.'}</p></div></div>`; }).join('');
@@ -3866,7 +3902,7 @@ function renderBestGear(){
     const got = seenG(b), B = GEAR_BASES[sl][b], top = got.length ? Math.max(...got) : 0, it = { slot: sl, b, r: top, fx: B.fx };
     if (!got.length) return `<div class="brl locked"><img src="${itemIcon(it)}" alt=""><div><h4>Undiscovered ${SLOT_NAME[sl].toLowerCase()}</h4><p>${B.fx ? RELIC_HINT[B.fx] : 'Not found yet. The Merchant and the bosses carry gear.'}</p></div></div>`;
     const rars = B.fx && JEWEL[B.fx].epic ? [2] : [0, 1, 2];
-    return `<div class="brl"><img src="${itemIcon(it)}" alt=""><div><h4 style="color:${RARITY[top].col}">${B.name} <small style="color:var(--muted)">${SLOT_NAME[sl]}</small>${B.fx && JEWEL[B.fx].epic ? ' <span class="rare-tag">Epic only</span>' : ''}</h4><p>${B.fx ? RELICS[B.fx].desc : GEAR_DESC[B.fl || b] || ''}</p><p class="rar">${rars.map(r => { const R = RARITY[r]; return `<span style="color:${got.includes(r) ? R.col : '#3a4256'}">${got.includes(r) ? '◆' : '◇'} ${R.name}</span>`; }).join(' ')}</p></div></div>`;
+    return `<div class="brl"><img src="${itemIcon(it)}" alt=""><div><h4 style="color:${RARITY[top].col}">${B.name} <small style="color:var(--muted)">${SLOT_NAME[sl]}</small>${B.fx && JEWEL[B.fx].epic ? ' <span class="rare-tag">Epic only</span>' : ''}</h4><p>${B.fx ? RELICS[B.fx].desc : GEAR_DESC[B.fl || b] || ''}</p>${B.fx ? `<p style="color:var(--muted)">Pickup range for souls +${rars.map(r => PULL[r]).join(' / +')}%</p>` : ''}<p class="rar">${rars.map(r => { const R = RARITY[r]; return `<span style="color:${got.includes(r) ? R.col : '#3a4256'}">${got.includes(r) ? '◆' : '◇'} ${R.name}</span>`; }).join(' ')}</p></div></div>`;
   }).join('');
 }
 function discoverRelic(k){
@@ -3913,6 +3949,7 @@ $('#btnGuide').onclick = openGuideFromTitle;
 $('#fgUnitSub').addEventListener('click', e => { const b = e.target.closest('button[data-usub]'); if (!b) return; fgUnitSub = b.dataset.usub; renderBestUnits(); const nb = $(`#fgUnitSub [data-usub="${fgUnitSub}"]`); nb && nb.focus(); });
 $('#fgMapBar').addEventListener('click', e => { const b = e.target.closest('button[data-map]'); if (!b) return; fgMap = b.dataset.map; buildBestiary(); });
 $('#fgHeroBar').addEventListener('click', e => { const b = e.target.closest('button[data-hero]'); if (!b) return; fgHero = b.dataset.hero; renderBestAbil(); });
+$('#fgBfSub').addEventListener('click', e => { const b = e.target.closest('button[data-bsub]'); if (!b) return; fgBfSub = b.dataset.bsub; renderBestRunes(); const nb = $(`#fgBfSub [data-bsub="${fgBfSub}"]`); nb && nb.focus(); });
 $('#fgGearSub').addEventListener('click', e => { const b = e.target.closest('button[data-sub]'); if (!b) return; fgGearSub = b.dataset.sub; renderBestGear(); const nb = $(`#fgGearSub [data-sub="${fgGearSub}"]`); nb && nb.focus(); });
 const BOOK_ICON = makeSprite(['.XXXXXXX.', 'XYYYYYYKX', 'XYGGGYYKX', 'XYGYGYYKX', 'XYGGGYYKX', 'XYYYYYYKX', 'XYYYYYYKX', 'XXXXXXXKX', '.WWWWWWW.'], { X: '#5a3a2a', Y: '#8e1232', G: '#e2b24c', K: '#3a2418', W: '#e8e3d6' }).toDataURL();
 $('#bookImg').src = BOOK_ICON;
@@ -4243,8 +4280,8 @@ function dbgTick(dt){
   on('#dbgDropRare', () => dbgDrop(1)); on('#dbgDropEpic', () => dbgDrop(2));
   $('#dbgEpicBoss').onchange = e => { dbg.epicBoss = e.target.checked; };
   on('#dbgGiveGear', () => { if (!needRun()) return; const [sl, b] = $('#dbgGearBase').value.split(':'), it = makeItem(sl, +$('#dbgGearR').value, S.wave, b); if (it.fx && wornFx().includes(it.fx)) return toast('You already wear that power'); equipItem(it); discoverGear(it); if (mode === 'shop') renderShop(); toast(`${it.name} equipped`); });
-  on('#dbgUnlockFg', () => { meta.seen.e = BESTIARY.map(x => x[0]); meta.seen.a = BEST_AFF.map(x => x[0]); meta.seen.b = Object.keys(BOSS_GUIDE); meta.seen.ab = Object.keys(ABILITIES); meta.seen.p = Object.keys(POWERUPS); meta.seen.u = CLS_ORDER.flatMap(c => Object.keys(MODS).map(m => c + '_' + m)); for (const sl of ITEM_TYPES) for (const b of Object.keys(GEAR_BASES[sl])) meta.seen.g[b] = GEAR_BASES[sl][b].fx && JEWEL[GEAR_BASES[sl][b].fx].epic ? [2] : [0, 1, 2]; meta.relicsSeen = Object.keys(RELICS); saveMeta(); toast('Every Field Guide entry is unlocked'); });
-  on('#dbgLockFg', () => { meta.seen = { e: [], a: [], g: {}, b: [], ab: [], p: [], u: [] }; meta.relicsSeen = []; saveMeta(); toast('Every Field Guide entry is locked again'); });
+  on('#dbgUnlockFg', () => { meta.seen.e = BESTIARY.map(x => x[0]); meta.seen.a = BEST_AFF.map(x => x[0]); meta.seen.b = Object.keys(BOSS_GUIDE); meta.seen.ab = Object.keys(ABILITIES); meta.seen.p = Object.keys(POWERUPS); meta.seen.ev = Object.keys(BF_EVENTS); meta.seen.u = CLS_ORDER.flatMap(c => Object.keys(MODS).map(m => c + '_' + m)); for (const sl of ITEM_TYPES) for (const b of Object.keys(GEAR_BASES[sl])) meta.seen.g[b] = GEAR_BASES[sl][b].fx && JEWEL[GEAR_BASES[sl][b].fx].epic ? [2] : [0, 1, 2]; meta.relicsSeen = Object.keys(RELICS); saveMeta(); toast('Every Field Guide entry is unlocked'); });
+  on('#dbgLockFg', () => { meta.seen = { e: [], a: [], g: {}, b: [], ab: [], p: [], u: [], ev: [] }; meta.relicsSeen = []; saveMeta(); toast('Every Field Guide entry is locked again'); });
   on('#dbgMana', () => { if (needRun()) S.board.forEach(u => { if (u) u.mana = 100; }); });
   $('#dbgSpeed').addEventListener('click', e => { const b = e.target.closest('button[data-sp]'); if (!b) return; dbg.speed = +b.dataset.sp; $('#dbgSpeed').querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); b.blur(); });
   on('#dbgRunes', () => { meta.runes += 100; saveMeta(); if (mode === 'title') renderTitle(); if (mode === 'meta') renderMeta(); toast('+100 runes'); });
@@ -4405,7 +4442,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.20.0', 'Gear and the campfire', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat', 'Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a ring or necklace', 'Bosses no longer heal you to full', 'Relics are now jewelry: you wear two rings and a necklace, and each carries one of the old relic powers. Rarer jewelry adds health and ability damage', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces, so they are rare', 'Merchant cards show the slot a piece fits in, and hovering one lights up that slot on the Character button', 'The Field Guide has a Gear tab with a page for each slot, and beasts, elite traits and gear stay hidden until you find them. Each new find pops up a Field Guide banner. Open it from the book in the shop (J)', 'The Field Guide also has the bosses and every hero ability with all three levels. Beasts are sorted by land and by the waves where you meet them, ready for new lands and heroes', 'The tutorial shows the Field Guide and the damage meter', 'A Units tab in the Field Guide: every unit with its stats at one, two and three stars, its ability and its synergies, plus pages for the class and element synergies', 'The runes you find on the battlefield have their own Runes tab in the Field Guide. The pause menu is cleaner: Resume, then the Field Guide, Settings, feedback and Save and quit, and Give up on its own', 'A new enemy, the Draugr Spearman, joins the Barrows from wave 7. It throws spears along a red line, aimed where you are running, and a hit slows you for a moment. Spearmen close together throw a fan of spears with gaps to slip through', 'Slot strips on Merchant cards are plain grey with a slot icon, so colour on gear always means rarity', 'Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow']],
+  ['0.20.0', 'Gear and the campfire', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat', 'Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a ring or necklace', 'Bosses no longer heal you to full', 'Relics are now jewelry: you wear two rings and a necklace, and each carries one of the old relic powers. Rarer jewelry adds health and ability damage', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces, so they are rare', 'Merchant cards show the slot a piece fits in, and hovering one lights up that slot on the Character button', 'The Field Guide has a Gear tab with a page for each slot, and beasts, elite traits and gear stay hidden until you find them. Each new find pops up a Field Guide banner. Open it from the book in the shop (J)', 'The Field Guide also has the bosses and every hero ability with all three levels. Beasts are sorted by land and by the waves where you meet them, ready for new lands and heroes', 'The tutorial shows the Field Guide and the damage meter', 'A Units tab in the Field Guide: every unit with its stats at one, two and three stars, its ability and its synergies, plus pages for the class and element synergies', 'The runes you find on the battlefield have their own Runes tab in the Field Guide. The pause menu is cleaner: Resume, then the Field Guide, Settings, feedback and Save and quit, and Give up on its own', 'A new enemy, the Draugr Spearman, joins the Barrows from wave 7. It throws spears along a red line, aimed where you are running, and a hit slows you for a moment. Spearmen close together throw a fan of spears with gaps to slip through', 'Odin\'s Messenger, a new battlefield event: a golden raven that flees when you come close. Catch it within 12 seconds for a free ability level', 'Battlefield events show their name above them, and a card with what they do, the risk and the reward when you come close or hover them, also on the minimap', 'The Field Guide\'s Runes tab is now Battlefield, with pages for runes and for events', 'Rings and necklaces widen the pickup range for souls: +15% Common, +25% Rare, +40% Epic, and they add up', 'The rings and necklace no longer show beside the ability bar in battle. You find them in the Character panel', 'Slot strips on Merchant cards are plain grey with a slot icon, so colour on gear always means rarity', 'Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
   ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
   ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
@@ -4732,8 +4769,8 @@ function describeRelic(k, owned){
 }
 function renderRelicBar(){
   const bar = $('#relicBar'); if (!bar) return;
-  const list = mode === 'combat' && S && S.relics ? S.relics : [];
-  bar.hidden = !list.length;
+  const list = []; // jewelry powers live in the Character panel now, so the battlefield bar stays empty
+  bar.hidden = true;
   bar.innerHTML = list.map(k => `<img src="${RELIC_ICON[k]}" alt="${JEWEL[k].name}" title="${JEWEL[k].name}: ${RELICS[k].desc}">`).join('');
 }
 
@@ -4769,13 +4806,14 @@ GEAR_BASES.ring = {}; GEAR_BASES.neck = {};
 for (const k in JEWEL) GEAR_BASES[JEWEL[k].t][k] = { name: JEWEL[k].name, fx: k };
 const GEAR_PREFIX = [['Worn', 'Plain', 'Rough'], ['Fine', 'Runed', 'Keen'], ['Jarl-Forged', 'Valkyrie', 'Dwarf-Made']];
 let itemUid = 0;
+const PULL = [15, 25, 40]; // jewelry: % wider soul pickup range by rarity
 function makeItem(slot, r, wave, bk){
   const bases = GEAR_BASES[slot]; bk = bk && bases[bk] ? bk : pick(Object.keys(bases));
   const B = bases[bk];
   if (B.fx){ // jewelry: the power is fixed, rarity adds health and ability damage
     if (JEWEL[B.fx].epic) r = 2;
     const Pj = 4 + .8 * wave;
-    return { id: ++itemUid, slot, b: bk, fx: B.fx, r, w: wave, name: B.name, hp: [0, Math.round(Pj * 1.5), Math.round(Pj * 2.4)][r], armor: 0, ward: 0, dmg: 0, as: 0, range: 0, pow: r === 2 ? 5 : 0, price: Math.round(RELICS[B.fx].price * [1, 1.25, 1.5][r] * (1 + wave * .02)) };
+    return { id: ++itemUid, slot, b: bk, fx: B.fx, r, w: wave, name: B.name, hp: [0, Math.round(Pj * 1.5), Math.round(Pj * 2.4)][r], pull: PULL[r], armor: 0, ward: 0, dmg: 0, as: 0, range: 0, pow: r === 2 ? 5 : 0, price: Math.round(RELICS[B.fx].price * [1, 1.25, 1.5][r] * (1 + wave * .02)) };
   }
   const R = RARITY[r];
   const it = { id: ++itemUid, slot, b: bk, r, w: wave, name: `${pick(GEAR_PREFIX[r])} ${B.name}`, hp: 0, armor: 0, ward: 0, dmg: 0, as: 0, range: 0, pow: 0, price: 0 };
@@ -4798,7 +4836,7 @@ function validItem(it, slot){
   if (!it || typeof it !== 'object') return null;
   slot = slot || it.slot; if (it.slot !== slot || !GEAR_BASES[slot] || !GEAR_BASES[slot][it.b]) return null;
   const n = (v, hi) => Number.isFinite(v) ? clamp(v, 0, hi) : 0;
-  return { id: ++itemUid, slot, b: it.b, fx: GEAR_BASES[slot][it.b].fx, r: clamp(it.r | 0, 0, 2), w: n(it.w, 999), name: String(it.name || GEAR_BASES[slot][it.b].name).slice(0, 40), hp: n(it.hp, 9999), armor: n(it.armor, 9999), ward: n(it.ward, 9999), dmg: n(it.dmg, 9999), as: n(it.as, 5), range: n(it.range, 80), pow: n(it.pow, 9999), price: n(it.price, 9999) };
+  return { id: ++itemUid, slot, b: it.b, fx: GEAR_BASES[slot][it.b].fx, r: clamp(it.r | 0, 0, 2), w: n(it.w, 999), name: String(it.name || GEAR_BASES[slot][it.b].name).slice(0, 40), hp: n(it.hp, 9999), armor: n(it.armor, 9999), ward: n(it.ward, 9999), dmg: n(it.dmg, 9999), as: n(it.as, 5), range: n(it.range, 80), pow: n(it.pow, 9999), pull: GEAR_BASES[slot][it.b].fx ? (n(it.pull, 100) || PULL[clamp(it.r | 0, 0, 2)]) : 0, price: n(it.price, 9999) };
 }
 function validGear(G){ if (!G || typeof G !== 'object') return null; const out = {}; for (const s of GEAR_SLOTS){ out[s] = validItem(G[s], typeOf(s)); if (out[s]) out[s].at = s; } return out; }
 // which worn slot a piece goes into: rings take a free ring slot, otherwise they replace the cheaper ring
@@ -4833,6 +4871,7 @@ function itemStats(it){
   if (it.hp) a.push(`+${it.hp} max health`);
   if (it.armor) a.push(`${it.armor} physical armor`);
   if (it.ward) a.push(`${it.ward} magic armor`);
+  if (it.pull) a.push(`+${it.pull}% pickup range for souls`);
   return a;
 }
 function describeItem(it, how){
@@ -4845,7 +4884,7 @@ function describeItem(it, how){
   if (how === 'worn') h += `<br><button class="btn sm" id="btnGearSell" type="button" data-gs="${it.at || it.slot}">Sell for ${itemSell(it)} gold</button>`;
   return h;
 }
-const CMP_ROWS = [['dmg', 'Damage'], ['as', 'Attacks per second'], ['range', 'Reach'], ['abil', 'Ability damage %'], ['hp', 'Max health'], ['armor', 'Physical armor'], ['ward', 'Magic armor']];
+const CMP_ROWS = [['dmg', 'Damage'], ['as', 'Attacks per second'], ['range', 'Reach'], ['abil', 'Ability damage %'], ['hp', 'Max health'], ['armor', 'Physical armor'], ['ward', 'Magic armor'], ['pull', 'Pickup range %']];
 const cmpVal = (it, k) => !it ? 0 : k === 'abil' ? (it.dmg || 0) + (it.pow || 0) : (it[k] || 0);
 function gearDiff(it, cur){
   let up = 0, down = 0; const rows = [];
@@ -4944,22 +4983,83 @@ function lootReveal(it, note){
   lootReveal.t1 = setTimeout(done, 2600);
 }
 /* ---------- battlefield shrines: walk up and stand in the circle to use them ---------- */
+const BF_EVENTS = {
+  shrine: { name: 'Blood Shrine', col: '#ff3a5a', rise: 'A Blood Shrine rises nearby', does: 'Trades your blood for gold.', use: 'Stand in the circle for 1.5 seconds.', risk: SH => `Costs ${Math.round(S.hero.maxHp * .2)} health (20% of max health). It never kills you.`, riskG: 'Costs 20% of your max health. It never kills you.', reward: SH => `+${SH.gold} gold`, rewardG: 'Gold, more in later waves.', hint: 'A stone that smells of iron.' },
+  altar: { name: 'Cursed Altar', col: '#b98cff', rise: 'A Cursed Altar rises nearby', does: 'Summons elite champions around it.', use: 'Stand in the circle for 1.5 seconds, then kill every champion within 30 seconds.', risk: () => `${3 + Math.floor(S.wave / 6)} elite champions attack you.`, riskG: 'Three or more elite champions, more in later waves.', reward: () => 'A ring or necklace, or 15 gold if both are worn', rewardG: 'A ring or necklace. If yours are all worn, 15 gold.', hint: 'Purple fire burns on a black stone.' },
+  messenger: { name: "Odin's Messenger", col: '#e2b24c', rise: "Odin's Messenger lands nearby", does: 'A golden raven of Odin. It flees when you come close.', use: 'Touch it within 12 seconds. It rests now and then, and dashing helps.', risk: () => 'No risk, but the chase can lead you into enemies.', riskG: 'No risk, but the chase can lead you into enemies.', reward: () => 'A free level for one of your abilities, or 25 gold', rewardG: 'A free level for one of your abilities. If all are at level III, 25 gold.', hint: 'A glint of gold in the sky.' },
+};
+const seenEv = k => meta.seen && Array.isArray(meta.seen.ev) && meta.seen.ev.includes(k);
+const evIcon = k => k === 'messenger' ? beastIcon('graven') : NPC_ICON[k];
+// the tooltip above a battlefield event: a name plate when it is on screen, the full card when you are close or hover it
+let evTipKey = '', miniHover = null;
+function updateEvTip(){
+  const el = $('#evTip'); if (!el) return;
+  const SH = S && S.shrine;
+  if (!SH || SH.done || mode !== 'combat' || paused || SH.st === 'gone'){ if (!el.hidden){ el.hidden = true; evTipKey = ''; } return; }
+  const E = BF_EVENTS[SH.kind], h = S.hero, sx = cv.clientWidth / VW, sy = cv.clientHeight / VH;
+  const px = (SH.x - lastCamX) * sx, py = (SH.y - 14 - lastCamY) * sy, on = px > -40 && px < cv.clientWidth + 40 && py > -40 && py < cv.clientHeight + 40;
+  const mx = lastCamX + mouseX / SCALE, my = lastCamY + mouseY / SCALE;
+  const near = dist2(h.x, h.y, SH.x, SH.y) < 80 * 80 || (mouseSeen && !dbg.bot && dist2(mx, my, SH.x, SH.y) < 22 * 22);
+  let mini = false;
+  if (miniHover){ const k = 75 / 420, ex = 75 + (SH.x - h.x) * k, ey = 75 + (SH.y - h.y) * k, m = Math.max(Math.abs(ex - 75), Math.abs(ey - 75)), f = m > 70 ? 70 / m : 1; mini = Math.hypot(75 + (ex - 75) * f - miniHover.x, 75 + (ey - 75) * f - miniHover.y) < 9; }
+  if (!on && !mini){ if (!el.hidden){ el.hidden = true; evTipKey = ''; } return; }
+  const full = near || mini, timer = SH.kind === 'messenger' && SH.st === 'flee' ? `<div class="et-t">${Math.ceil(SH.left)} s left</div>` : '';
+  const key = SH.kind + full + timer + (SH.kind === 'shrine' ? h.maxHp : '');
+  if (key !== evTipKey){
+    evTipKey = key; el.style.setProperty('--ec', E.col);
+    el.innerHTML = full ? `<div class="et-n">${E.name}</div><div>${E.does}</div><div class="et-r"><b>Risk</b> ${E.risk(SH)}</div><div class="et-r"><b>Reward</b> ${E.reward(SH)}</div><div class="et-u">${E.use}</div>${timer}` : `<div class="et-n">${E.name}</div>${timer}`;
+    el.classList.toggle('full', full);
+  }
+  if (mini && !on){ const mr = $('#mini').getBoundingClientRect(), ar = $('#app').getBoundingClientRect(); el.style.left = (mr.left - ar.left - 8) + 'px'; el.style.top = (mr.top - ar.top + 40) + 'px'; el.classList.add('side'); }
+  else { el.style.left = Math.round(px) + 'px'; el.style.top = Math.round(py) + 'px'; el.classList.remove('side'); }
+  el.hidden = false;
+}
+$('#mini').addEventListener('mousemove', e => { const r = e.currentTarget.getBoundingClientRect(); miniHover = { x: (e.clientX - r.left) * 150 / r.width, y: (e.clientY - r.top) * 150 / r.height }; });
+$('#mini').addEventListener('mouseleave', () => { miniHover = null; });
 function rollShrine(){
   S.shrine = null; S.altarCh = null;
   const W = waveDef(S.wave);
   if (S.tutorial || S.wave < 3 || W.boss) return;
-  const r = Math.random(), kind = r < .25 ? 'shrine' : r < .4 && !S.endless ? 'altar' : null;
-  if (!kind) return;
+  const r = Math.random(), kind = r < .25 ? 'shrine' : r < .4 && !S.endless ? 'altar' : r >= .4 && r < .55 ? 'messenger' : null;
+  if (kind) placeShrine(kind);
+}
+function placeShrine(kind){
+  S.altarCh = null;
   const a = rand(0, 6.283), d = rand(110, 170);
-  S.shrine = { kind, x: S.hero.x + Math.cos(a) * d, y: S.hero.y + Math.sin(a) * d * .8, prog: 0, done: false, hinted: false, gold: 8 + S.wave };
+  S.shrine = { kind, x: S.hero.x + Math.cos(a) * d, y: S.hero.y + Math.sin(a) * d * .8, prog: 0, done: false, gold: 8 + S.wave, st: 'perch', t: 0, left: 12, rest: 0, face: 1 };
   if (S.stats) S.stats.events.push({ t: kind, w: S.wave, a: false });
-  setTimeout(() => { if (S && S.shrine && !S.shrine.done) toast(kind === 'shrine' ? 'A Blood Shrine rises nearby. Look for it on the minimap' : 'A Cursed Altar rises nearby. Look for it on the minimap'); }, 1600);
+  setTimeout(() => { if (S && S.shrine && !S.shrine.done) toast(`${BF_EVENTS[kind].rise}. Look for it on the minimap`); }, 1600);
+}
+// Odin's Messenger: a golden raven that waits, then flees when you come close. Touch it in time
+function tickMessenger(SH, dt){
+  const h = S.hero, dx = SH.x - h.x, dy = SH.y - h.y, d = Math.hypot(dx, dy) || 1;
+  SH.t += dt;
+  if (SH.st === 'perch'){ if (d < 70){ SH.st = 'flee'; SH.left = 12; SH.rest = 2.4; sfx('caw'); addText(SH.x, SH.y - 12, 'It flees!', '#e2b24c', false); } return; }
+  if (SH.st === 'gone'){ SH.y -= 90 * dt; SH.x += 40 * SH.face * dt; if (SH.t > 1.2) SH.done = true; return; }
+  if (d < 10){ catchMessenger(SH); return; }
+  SH.left -= dt;
+  if (SH.left <= 0){ SH.st = 'gone'; SH.t = 0; discover('ev', 'messenger'); toast("Odin's Messenger escaped"); sfx('caw'); return; }
+  SH.rest -= dt; if (SH.rest < -.7) SH.rest = rand(2.2, 3);         // it lands for a breath every few seconds
+  const sp = SH.rest < 0 ? 12 : d > 240 ? 38 : 66, w = Math.sin(SH.t * 2.3) * .7;
+  const mx = dx / d - dy / d * w, my = dy / d + dx / d * w, ml = Math.hypot(mx, my) || 1;
+  SH.x += mx / ml * sp * dt; SH.y += my / ml * sp * dt; SH.face = mx < 0 ? -1 : 1;
+  if (Math.random() < .25) S.parts.push({ x: SH.x + rand(-3, 3), y: SH.y + rand(-2, 2), vx: rand(-6, 6), vy: rand(-4, 8), life: .5, max: .5, col: pick(['#ffe08a', '#e2b24c']), s: 1, add: true });
+}
+function catchMessenger(SH){
+  SH.done = true; const h = S.hero;
+  const ev = S.stats && S.stats.events.slice().reverse().find(x => x.t === 'messenger'); if (ev) ev.a = true;
+  discover('ev', 'messenger');
+  const up = S.abil.filter(x => x && x.lvl < 3);
+  if (up.length){ const sl = pick(up); sl.lvl++; renderAbilBar(); toast(`Odin's Messenger: ${ABILITIES[sl.key].name} rises to level ${LV[sl.lvl - 1]}`); addText(h.x, h.y - 16, `${ABILITIES[sl.key].name} ${LV[sl.lvl - 1]}`, '#e2b24c', true); }
+  else { S.gold += 25; statGold('Events', 25); toast("Odin's Messenger: +25 gold"); addText(h.x, h.y - 16, '+25 gold', '#e2b24c', true); }
+  sfx('level'); burst(SH.x, SH.y, 26, ['#ffe08a', '#e2b24c', '#ffffff'], 90);
+  S.rings.push({ x: SH.x, y: SH.y, r: 26, life: .4, max: .4, col: '#e2b24c' });
 }
 function tickShrine(dt){
   const SH = S.shrine, h = S.hero;
-  if (SH && !SH.done){
+  if (SH && !SH.done && SH.kind === 'messenger') tickMessenger(SH, dt);
+  else if (SH && !SH.done){
     const d2 = dist2(h.x, h.y, SH.x, SH.y);
-    if (!SH.hinted && d2 < 50 * 50){ SH.hinted = true; toast(SH.kind === 'shrine' ? `Blood Shrine: stand in the circle to trade ${Math.round(h.maxHp * .2)} health for ${SH.gold} gold` : 'Cursed Altar: stand in the circle to summon its champions. Kill them in 30 seconds for a ring or necklace'); }
     SH.prog = d2 < 18 * 18 ? SH.prog + dt : Math.max(0, SH.prog - dt * 2);
     if (SH.prog >= 1.5) activateShrine(SH);
   }
@@ -4973,6 +5073,7 @@ function tickShrine(dt){
 function activateShrine(SH){
   SH.done = true; const h = S.hero;
   const ev = S.stats && S.stats.events.slice().reverse().find(x => x.t === SH.kind); if (ev) ev.a = true;
+  discover('ev', SH.kind);
   if (SH.kind === 'shrine'){
     const cost = Math.min(Math.round(h.maxHp * .2), Math.max(0, Math.ceil(h.hp) - 1));
     h.hp -= cost; S.gold += SH.gold; statGold('Events', SH.gold); sfx('hurt'); sfx('coin');
@@ -5241,7 +5342,7 @@ const TUT_STEPS = [
   { mode: 'shop', target: '#traits', h: 'Synergies', p: () => `Units in the formation build synergies. Two of the same class or element switch a bonus on. Four of a class, or three of an element, make it stronger. We added ${tut.gift || 'a unit'} so ${tut.giftEl || 'an element'} is active. Hover or click a synergy row to read exactly what it does.`, enter: tutSynergy },
   { mode: 'shop', target: '#event', wide: true, h: 'The Wandering Merchant', p: 'The Merchant waits at every campfire. He sells gear for your hero: helmets, chestplates, leggings and weapons, and a ring or necklace with a special power that twists a rule for the rest of the raid. You wear two rings and one necklace. The coloured strip on each card shows the slot it fits. Press C for your Character panel with your gear and abilities. Blood Shrines and Cursed Altars appear on the battlefield instead: stand in their circle to use them. Here is some gold to try.', enter: tutMerchant },
   { mode: 'shop', target: '#btnBook', h: 'The Field Guide', p: 'This book is your Field Guide. It keeps a page for everything you meet on your raids: every beast and boss and how to dodge their attacks, every elite trait, every hero ability, and every type of gear, rings and necklaces. Entries unlock when you defeat, take or pick up something for the first time. Until then you see only a dark silhouette and a hint. Open it here in the shop with the book or J, and in battle from the pause menu.', enter: () => { tut.wantGuide = true; tut.guideOpened = false; }, wait: () => tut.guideOpened, hint: 'Click the book to open it' },
-  { mode: 'shop', target: '#bestiary .fg-tabs', h: 'Beasts, abilities and gear', p: 'Beasts is sorted by land and by the waves where you meet each enemy, with the bosses and the elite traits below. Units shows every unit you have bought and how the class and element synergies work. Abilities shows every hero ability with all three levels, and Runes the power-ups you find on the battlefield. Gear has a page for every slot: helmets, chestplates, leggings, main hand, off hand, rings and necklaces. Each entry lights up the rarities you have found, and rare powers like the Amulet of Twin Souls are marked in gold. The numbers count your discoveries, and a banner pops up whenever you find something new. Try the Gear tab.', enter: () => { tut.fgTab0 = fgTab; }, wait: () => fgTab === 'gear', hint: 'Click the Gear tab' },
+  { mode: 'shop', target: '#bestiary .fg-tabs', h: 'Beasts, abilities and gear', p: 'Beasts is sorted by land and by the waves where you meet each enemy, with the bosses and the elite traits below. Units shows every unit you have bought and how the class and element synergies work. Abilities shows every hero ability with all three levels, and Battlefield the runes and events you meet during a wave. Gear has a page for every slot: helmets, chestplates, leggings, main hand, off hand, rings and necklaces. Each entry lights up the rarities you have found, and rare powers like the Amulet of Twin Souls are marked in gold. The numbers count your discoveries, and a banner pops up whenever you find something new. Try the Gear tab.', enter: () => { tut.fgTab0 = fgTab; }, wait: () => fgTab === 'gear', hint: 'Click the Gear tab' },
   { mode: 'shop', target: '#btnStart', h: 'Start the wave', enter: () => { tut.wantGuide = false; if (!$('#bestiary').hidden) showBestiary(false); }, p: 'When your warband is ready, start the wave. In a real raid you can also press Space.', unlock: true, wait: () => mode === 'combat', hint: 'Click Start wave' },
   { mode: 'combat', target: 'hero', r: 46, anim: 'keys', h: 'Move your hero', p: 'Walk with W A S D or the arrow keys. Your hero swings the weapon in the main hand at enemies in reach, but the warband does most of the work. Keep it close and stay out of reach of the enemies.', enter: () => { tut.x0 = S.hero.x; tut.y0 = S.hero.y; }, wait: () => Math.hypot(S.hero.x - tut.x0, S.hero.y - tut.y0) > 70, hint: 'Walk around a little' },
   { mode: 'combat', target: 'hero', r: 150, h: 'Your warband fights', p: 'Units attack the nearest enemies on their own. Here come some draugr. Some of them climb out of the ground. Keep moving while your warband deals with them.', enter: tutSpawn, wait: () => S.kills - tut.k0 >= 4, hint: 'Defeat 4 draugr' },
@@ -5512,6 +5613,7 @@ function botMeta(dt){
   if (mode === 'victory'){ enterEndless(); return; }
   if (mode === 'over' && $('#dbgBotLoop').checked){ botT = 2.5; newRun(); return; }
 }
+$('#dbg').addEventListener('click', e => { const f = e.target.closest('button[data-bf]'); if (!f || !S) return; if (mode !== 'combat') return toast('Start a wave first'); placeShrine(f.dataset.bf); });
 $('#dbg').addEventListener('click', e => { const b = e.target.closest('button[data-ev]'); if (!b || !S) return; if (mode !== 'shop') return toast('Open the shop first'); S.event = makeEvent(b.dataset.ev); renderShop(); });
 $('#dbgBot').addEventListener('change', e => { setBot(e.target.checked); toast(dbg.bot ? 'Autoplay on' : 'Autoplay off'); });
 
