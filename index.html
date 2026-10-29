@@ -113,6 +113,8 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .dpips i.empty{background:#1d2a42}
 .dpips i.locked{background:transparent;border:1px dashed #3a4256}
 .dash.ready{color:var(--frost)}
+.focus{font-size:16px;color:var(--muted);margin-top:2px}
+.focus.on{color:var(--gold)}
 .buff{font-size:17px;color:var(--ember)}
 .hud-mid{display:grid;gap:6px;justify-items:center;min-width:0}
 #bossbar{width:min(420px,40vw);text-align:center}
@@ -523,6 +525,7 @@ a.btn{text-decoration:none;display:inline-block}
       <div class="lbl"><span>Health</span><span id="hpTxt">100/100</span></div>
       <div class="bar"><i id="hpBar"></i></div>
       <div class="dock-row"><div class="dash" id="dashTxt">Dash ready</div><div class="buff" id="buffTxt" hidden></div></div>
+      <div class="focus" id="focusTxt"></div>
     </div>
   </div>
   <section id="pick" class="screen" hidden aria-labelledby="pickTitle">
@@ -600,6 +603,7 @@ a.btn{text-decoration:none;display:inline-block}
         <dt><kbd>M</kbd></dt><dd>Mute or unmute all sound</dd>
         <dt><kbd>Tab</kbd></dt><dd>Show or hide the damage meter</dd>
         <dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Hero abilities, aimed at the mouse cursor</dd>
+        <dt><kbd>F</kbd></dt><dd>In battle: switch between targeting the nearest enemy and bosses and elites first</dd>
         <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 2 minutes)</dd>
         <dt>Shop</dt><dd><kbd>R</kbd> reroll · <kbd>F</kbd> buy XP · <kbd>E</kbd> sell · <kbd>Q</kbd> sort bench · <kbd>G</kbd> heal</dd>
         <dt>Units</dt><dd>Drag to move · right-click to swap between bench and formation</dd>
@@ -867,7 +871,7 @@ const meta = { runes: 0, atkspd: 0, crit: 0, critdmg: 0, dmg: 0, physdmg: 0, mag
 try { const s = localStorage.getItem(META_KEY); if (s) Object.assign(meta, JSON.parse(s)); } catch (e) {}
 /* ================= SETTINGS ================= */
 const SET_KEY = 'valhalla.settings';
-const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true, ui: 'auto', quality: 'high', calm: false, fps: false, meter: false, share: null }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
+const settings = Object.assign({ master: 70, music: 50, sfx: 75, muted: false, shake: true, dmgNum: true, ui: 'auto', quality: 'high', calm: false, fps: false, meter: false, share: null, focus: false }, (() => { try { return JSON.parse(localStorage.getItem(SET_KEY) || '{}') || {}; } catch (e) { return {}; } })());
 function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(settings)); } catch (e) {} }
 const RUN_KEY = 'valhalla.run', STAMP_KEY = 'valhalla.stamp';
 function bumpStamp(){ try { localStorage.setItem(STAMP_KEY, String(Date.now())); } catch (e) {} try { cloudQueue(); } catch (e) {} }
@@ -913,7 +917,7 @@ const MODS = {
   jern:  { name: 'Iron',      tier: 1, col: '#a9aeb8', desc: '+40% damage' },
   frost: { name: 'Frost',     tier: 1, col: '#86d4ff', desc: 'attacks slow enemies' },
   ild:   { name: 'Fire',      tier: 2, col: '#ff8a1e', desc: 'attacks set enemies ablaze' },
-  blod:  { name: 'Blood',     tier: 2, col: '#c2185b', desc: 'damage heals the hero, +15% attack speed' },
+  blod:  { name: 'Blood',     tier: 2, col: '#c2185b', desc: 'damage heals the hero, +10% attack speed' },
   lyn:   { name: 'Lightning', tier: 3, col: '#f4e04d', desc: 'chance to chain lightning to two enemies' },
   rune:  { name: 'Rune',      tier: 3, col: '#b98cff', desc: '+50% mana, so the ability fires more often' },
 };
@@ -1682,7 +1686,7 @@ function calcStats(u){
   let mana = 1 + meta.mana * .1;
   if (u.mod === 'jern') dmg *= 1 + .4 * modPow('jern');
   if (u.mod === 'rune') mana *= 1 + .5 * modPow('rune');
-  if (u.mod === 'blod') as *= 1.15;
+  if (u.mod === 'blod') as *= 1.1;
   if (u.cls === 'warrior') dmg *= t.warrior >= 4 ? 1.4 : t.warrior >= 2 ? 1.15 : 1;
   if (u.cls === 'archer') dmg *= t.archer >= 4 ? 1.3 : t.archer >= 2 ? 1.15 : 1;
   as *= t.archer >= 4 ? 1.35 : t.archer >= 2 ? 1.15 : 1;
@@ -1911,8 +1915,8 @@ function waveRate(){ const W = waveDef(S.wave); return (S.cursed ? 1.25 : 1) * (
 function spawnFromWave(){
   const W = waveDef(S.wave);
   const type = weighted(W.mix);
-  const a = rand(0, Math.PI * 2), d = Math.hypot(FW, VH) / 2 + 24;
-  const elite = Math.random() < (W.elite || 0) + 0.015 + S.wave * 0.005;
+  const mv = Math.hypot(S.hvx || 0, S.hvy || 0), a = mv > 40 && Math.random() < .6 ? Math.atan2(S.hvy, S.hvx) + rand(-.8, .8) : rand(0, Math.PI * 2), d = Math.hypot(FW, VH) / 2 + 24;
+  const elite = Math.random() < ((W.elite || 0) + 0.015 + S.wave * 0.005) * (type === 'wolf' ? .5 : 1);
   if (type === 'draugr' && !W.boss && Math.random() < .35){ // some draugr claw their way up out of the ground nearby
     const rd = rand(95, 150), z = spawnEnemy(type, S.hero.x + Math.cos(a) * rd, S.hero.y + Math.sin(a) * rd, elite); z.rise = z.riseM = .9; return;
   }
@@ -1973,9 +1977,9 @@ function takePowerup(p){
 }
 
 /* ================= COMBAT ================= */
-function nearest(x, y, range){
+function nearest(x, y, range, eliteOnly){
   let best = null, bd = range * range;
-  for (const e of S.enemies){ if (e.dead) continue; let d = dist2(x, y, e.x, e.y) - e.r * e.r; if (d > range * range) continue; if (e.d.boss) d *= .3; if (d < bd){ bd = d; best = e; } }
+  for (const e of S.enemies){ if (e.dead || (eliteOnly && !e.elite && !e.d.boss)) continue; let d = dist2(x, y, e.x, e.y) - e.r * e.r; if (d > range * range) continue; if (e.d.boss) d *= .3; if (d < bd){ bd = d; best = e; } }
   return best;
 }
 function hit(e, raw, dtype, u, opt){
@@ -1999,7 +2003,7 @@ function hit(e, raw, dtype, u, opt){
     if (m === 'ild' || opt.burn){ e.burn = 3; e.burnD = Math.max(e.burnD, raw * .35 * (m === 'ild' ? p : 1) / 3); e.burnSrc = ukey(u); }
     if (m === 'frost'){ e.slowT = 1.6; e.slow = Math.min(.6, .3 * p); }
     if (m === 'lyn' && Math.random() < .2 * p) chain(e, raw * .6, u);
-    if (m === 'blod') healHero(d * .02 * p, ukey(u));
+    if (m === 'blod') healHero(d * .015 * p, ukey(u));
   }
   if (opt.kx){ e.kx += opt.kx; e.ky += opt.ky; }
   if (e.hp <= 0) kill(e);
@@ -2245,6 +2249,7 @@ function update(dt){
     }
     h.x += mx * spd * dt; h.y += my * spd * dt;
   }
+  { const k = Math.min(1, dt * 1.5), px = S.hpx == null ? h.x : S.hpx, py = S.hpy == null ? h.y : S.hpy; S.hvx = (S.hvx || 0) + (clamp((h.x - px) / dt, -120, 120) - (S.hvx || 0)) * k; S.hvy = (S.hvy || 0) + (clamp((h.y - py) / dt, -120, 120) - (S.hvy || 0)) * k; S.hpx = h.x; S.hpy = h.y; }
   if (S.regen){ const pr = S.regen - (hasR('mead_hall') ? 1.5 : 0); if (pr > 0) healHero(pr * dt, 'syn_priest'); if (hasR('mead_hall')) healHero(1.5 * dt, 'relic_mead_hall'); }
   S.hurt = Math.max(0, S.hurt - dt);
   S.fury = Math.max(0, S.fury - dt); S.magnet = Math.max(0, S.magnet - dt);
@@ -2294,6 +2299,7 @@ function update(dt){
     u.cd -= dt * furyM; if (u.cd > 0) return;
     let t = null;
     if (S.boss && !S.boss.dead && !S.boss.immune && dist2(u.x, u.y, S.boss.x, S.boss.y) < (u.st.range + S.boss.r) ** 2) t = S.boss;
+    if (!t && settings.focus) t = nearest(u.x, u.y, u.st.range, true);
     if (!t) t = nearest(u.x, u.y, u.st.range);
     if (!t){ u.cd = .08; return; }
     u.cd = 1 / u.st.as;
@@ -2346,8 +2352,14 @@ function update(dt){
     }
     if (e.aff === 'frozen'){ e.trT -= dt; if (e.trT <= 0){ e.trT = .3; if (S.haz.length < 90) S.haz.push({ kind: 'ice', x: e.x, y: e.y + e.h / 2 - 2, r: 7, ry: 3.2, t: 0, arm: 0, life: 2.6, max: 2.6 }); } }
     if (e.aff === 'swift'){ const k = Math.min(1, dt * 9); e.gx += (e.x - e.gx) * k; e.gy += (e.y - e.gy) * k; }
-    const sp = e.spd * (e.slowT > 0 ? 1 - e.slow : 1);
-    const dx = h.x - e.x, dy = h.y - e.y, d = Math.hypot(dx, dy) || 1;
+    let dx = h.x - e.x, dy = h.y - e.y, d = Math.hypot(dx, dy) || 1;
+    const far = Math.hypot(FW, VH) / 2 + 24;
+    if (!e.d.boss && d > far + 90 && !e.mst){ // left far behind: come back in ahead of the hero, off screen
+      const mv = Math.hypot(S.hvx || 0, S.hvy || 0), a = mv > 20 ? Math.atan2(S.hvy, S.hvx) + rand(-.9, .9) : rand(0, Math.PI * 2);
+      e.x = h.x + Math.cos(a) * far; e.y = h.y + Math.sin(a) * far; if (e.gx != null){ e.gx = e.x; e.gy = e.y; }
+      dx = h.x - e.x; dy = h.y - e.y; d = Math.hypot(dx, dy) || 1;
+    }
+    const sp = e.spd * (e.slowT > 0 ? 1 - e.slow : 1) * (e.d.boss && d > 170 ? 2.2 : 1);
     if (e.d.boss) bossAI(e, dt, dx, dy, d, sp);
     else enemyAI(e, dt, dx, dy, d, sp);
     e.x += e.kx * dt * 6; e.y += e.ky * dt * 6; e.kx *= .82; e.ky *= .82;
@@ -3107,7 +3119,7 @@ const ELEM_STEPS = {
   jern:  ['+40% damage', '+60% damage', '+80% damage'],
   frost: ['attacks slow enemies by 30%', 'slow 45%', 'slow 60%'],
   ild:   ['attacks burn for 35% of the hit over 3 s', 'burn 53%', 'burn 70%'],
-  blod:  ['damage heals the hero for 2% · +15% attack speed', 'heal 3%', 'heal 4%'],
+  blod:  ['damage heals the hero for 1.5% · +10% attack speed', 'heal 2.25%', 'heal 3%'],
   lyn:   ['20% chance to chain lightning to two more enemies', 'chain chance 30%', 'chain chance 40%'],
   rune:  ['+50% mana, so the unit ability fires more often', '+75% mana', '+100% mana'],
 };
@@ -3568,13 +3580,14 @@ function renderPick(){
     $('#pickTitle').textContent = P.kind === 'start' ? 'Choose your first ability' : 'Choose a reward';
     $('#pickSub').innerHTML = `Abilities go on <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> and fire toward your mouse cursor.`;
     $('#pickCards').innerHTML = P.opts.map(pickCardHTML).join('');
-    $('#pickSkip').hidden = true;
+    const canSkip = P.kind !== 'start' && !(P.opts.length === 1 && P.opts[0].type === 'gold');
+    $('#pickSkip').hidden = !canSkip; $('#pickSkip').innerHTML = 'Skip, take 10 gold <kbd>Esc</kbd>';
   } else {
     $('#pickEye').textContent = 'All three slots are full';
     $('#pickTitle').textContent = `Replace an ability with ${ABILITIES[P.chosen].name}?`;
     $('#pickSub').textContent = 'The new ability starts at level I.';
     $('#pickCards').innerHTML = S.abil.map((sl, i) => { const A = ABILITIES[sl.key]; return `<button class="pcard" type="button" data-r="${i}" style="--c:${A.col}"><span class="pk">${i + 1}</span><img class="pi px" src="${ABIL_ICON[sl.key]}" alt=""><span class="pn">${A.name} ${LV[sl.lvl - 1]}</span><span class="pt">Replace this one</span></button>`; }).join('');
-    $('#pickSkip').hidden = false;
+    $('#pickSkip').hidden = false; $('#pickSkip').innerHTML = 'Keep my abilities <kbd>Esc</kbd>';
   }
 }
 function choosePick(i){
@@ -3588,6 +3601,8 @@ function choosePick(i){
   P.step = 'replace'; P.chosen = o.key; renderPick();
 }
 function closePick(){ picking = null; renderPick(); renderAbilBar(); if (mode === 'shop') renderShop(); }
+function renderFocus(){ const el = $('#focusTxt'); if (!el) return; const on = !!settings.focus; el.classList.toggle('on', on); const t = `Target: ${on ? 'bosses and elites first' : 'nearest'} · F`; if (el.textContent !== t) el.textContent = t; }
+function toggleFocus(){ settings.focus = !settings.focus; saveSettings(); renderFocus(); toast(settings.focus ? 'Units target bosses and elites first' : 'Units target the nearest enemy'); }
 function renderAbilBar(){
   renderRelicBar();
   const bar = $('#abil'); if (!bar) return;
@@ -3605,7 +3620,8 @@ function tickAbilBar(){
   document.querySelectorAll('#abil .cdt').forEach(el => { const sl = S.abil[+el.dataset.i]; el.textContent = sl && sl.cd > 0 ? Math.ceil(sl.cd) : ''; });
 }
 document.getElementById('pickCards').addEventListener('click', e => { const b = e.target.closest('.pcard'); if (!b) return; if (b.dataset.r != null) choosePick(+b.dataset.r); else choosePick(+b.dataset.p); });
-document.getElementById('pickSkip').addEventListener('click', () => closePick());
+function skipPick(){ const P = picking; if (!P || $('#pickSkip').hidden) return; if (P.step === 'choose'){ S.gold += 10; statGold('Skipped reward', 10); toast('+10 gold'); } sfx('level'); closePick(); }
+document.getElementById('pickSkip').addEventListener('click', skipPick);
 
 /* ================= DEBUG MENU (hidden: Ctrl+Shift+D, or type "odin" on the title screen) ================= */
 const dbg = { open: false, god: false, noSpawn: false, infGold: false, hitbox: false, speed: 1, fenrir: 'auto', fps: 0, fpsAcc: 0, fpsN: 0, statT: 0, resetArm: 0 };
@@ -3826,7 +3842,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.17.0', 'Balance pass', ['Blood heals the hero less: 2%, 3% and 4% of damage dealt (was 3%, 4.5% and 6%)', 'Twin Souls now only doubles class synergies, not elements, and costs 36 gold', 'Warriors deal a little less: +15% and +40% damage (was +20% and +50%)', 'Archers also give archers +15% and +30% damage', 'Mages are stronger: magic damage +30% and +75% (was +25% and +60%)', 'Priests hit harder', 'Elite wolves crouch longer before they pounce and hit a little softer', 'Bosses that return in Endless hit less hard and have a bit less health', 'Iron is stronger: +40%, +60% and +80% damage', 'Pact of the Dead: +50% damage and only 20% less maximum health', 'Ghost Ship Chest gives 5 gold every shop', 'The damage meter can also show healing: click Healing to see who keeps the hero alive. The run summary shows it too']],
+  ['0.17.0', 'Balance pass', ['Blood heals the hero less: 1.5%, 2.25% and 3% of damage dealt (was 3%, 4.5% and 6%), and gives +10% attack speed (was +15%)', 'Twin Souls now only doubles class synergies, not elements, and costs 36 gold', 'Warriors deal a little less: +15% and +40% damage (was +20% and +50%)', 'Archers also give archers +15% and +30% damage', 'Mages are stronger: magic damage +30% and +75% (was +25% and +60%)', 'Priests hit harder', 'Elite wolves are half as common, crouch longer before they pounce and hit a little softer', 'Bosses that return in Endless hit less hard and have a bit less health', 'Iron is stronger: +40%, +60% and +80% damage', 'Pact of the Dead: +50% damage and only 20% less maximum health', 'Ghost Ship Chest gives 5 gold every shop', 'Press F in battle to make your units target bosses and elites first. Press it again to go back to the nearest enemy', 'You can skip the reward after a boss and take 10 gold instead', 'No more running away forever: enemies left far behind come back in ahead of you, more enemies appear in the direction you run, and bosses speed up to catch you', 'The damage meter can also show healing: click Healing to see who keeps the hero alive. The run summary shows it too']],
   ['0.16.0', 'Damage meter and run summary', ['A damage meter: press Tab to see how much each unit deals this wave, or for the whole raid. In the shop it shows the last wave', 'A run summary on the result screen: damage by unit, class and element, what hit you hardest, where your gold went, and your health after each wave', 'Anonymous run stats help us balance the game. They are on by default, you are told once, and you can turn them off in Settings', 'The campfire music in the shop is softer and no longer buzzes']],
   ['0.15.0', 'Physical and magic damage', ['The Rune Forge upgrade Raw Damage is split into Physical Damage (warriors and archers) and Magic Damage (mages and priests), +8% per level each', 'Runes spent on Raw Damage are refunded, so you can choose again', 'Fixed: cloud saves now keep the relics you have found']],
   ['0.14.0', 'The Field Guide', ['The Bestiary is now the Field Guide, with tabs for Beasts and Relics. Open it from the main menu or the pause menu', 'Each relic unlocks in the guide the first time the Merchant offers it or the Altar grants it. Until then you only get a hint', 'Relics cost more: 18 to 35 gold, so buying one is a real decision', 'The tutorial now shows the Wandering Merchant and the other campfire visitors', 'Simpler names: the Seiðkona is now the Witch, the Draugr Jarl is the Draugr King, and other Old Norse names became plain English, such as Odin\'s Spear, Great Fireball, Swift Stride and Ghost Ship Chest']],
@@ -3976,7 +3992,7 @@ addEventListener('keydown', e => {
   if (dbg.bot && e.isTrusted && !e.ctrlKey && !e.metaKey && !e.altKey && MOVE_KEYS.includes(e.code) && !(e.target && e.target.closest && e.target.closest('input, textarea, select'))){ setBot(false); toast('Autoplay off. You have control.'); }
   if (e.ctrlKey && e.shiftKey && e.code === 'KeyD'){ e.preventDefault(); toggleDbg(); return; }
   const digit = { Digit1: 0, Digit2: 1, Digit3: 2, Numpad1: 0, Numpad2: 1, Numpad3: 2 }[e.code];
-  if (picking){ if (digit != null && !e.repeat){ e.preventDefault(); choosePick(digit); } else if (e.code === 'Space') e.preventDefault(); return; }
+  if (picking){ if (digit != null && !e.repeat){ e.preventDefault(); choosePick(digit); } else if (e.code === 'Escape' && !e.repeat){ e.preventDefault(); skipPick(); } else if (e.code === 'Space') e.preventDefault(); return; }
   if (digit != null && mode === 'combat' && !e.repeat && !(e.target && e.target.closest && e.target.closest('input, textarea, select'))){ castAbility(digit); return; }
   if (mode === 'title' && /^[a-z]$/i.test(e.key)){ titleBuf = (titleBuf + e.key.toLowerCase()).slice(-4); if (titleBuf === 'odin'){ titleBuf = ''; toggleDbg(true); return; } }
   if (e.target && e.target.closest && e.target.closest('input, textarea, select')) return; // typing in a form
@@ -3990,6 +4006,7 @@ addEventListener('keydown', e => {
     if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
     if (e.code === 'KeyT' && !e.repeat) toggleTips();
     if (e.code === 'KeyB' && !e.repeat) openEndlessShop();
+    if (e.code === 'KeyF' && !e.repeat && !paused) toggleFocus();
   } else if (mode === 'shop' && !e.repeat && (e.code === 'KeyP' || e.code === 'Escape')){
     togglePause();
   } else if (mode === 'shop' && !e.repeat && !paused && performance.now() >= shopReadyAt){
@@ -4041,6 +4058,7 @@ function updateHud(dt){
   if (S.fury > 0) buffs.push(`Fury ${Math.ceil(S.fury)} s`);
   if (S.magnet > 0) buffs.push("Raven's Call");
   $('#buffTxt').hidden = !buffs.length; $('#buffTxt').textContent = buffs.join(' · ');
+  renderFocus();
   $('#waveTxt').textContent = S.endless ? `Endless · wave ${S.wave} · ${W.name}` : `Wave ${S.wave}/20 · ${W.name}`;
   const sb = $('#btnShopOpen');
   sb.hidden = !S.endless;
@@ -4695,7 +4713,7 @@ requestAnimationFrame(frame);
 cloudStartup();
 
 // small hook for automated playtesting
-window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup, runRecord, buyRelic, RELICS, gainRelic, sellAt, MODS, renderShop };
+window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup, runRecord, buyRelic, RELICS, gainRelic, sellAt, MODS, renderShop, showPick };
 })();
 </script>
 
