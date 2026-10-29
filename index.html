@@ -404,6 +404,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #app.wide #meter{left:calc(var(--dockX,0px) - 125px)}
 .mt-head{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
 .mt-head .btn{font-size:13px;padding:1px 6px;letter-spacing:0;text-transform:none}
+.mt-btns{display:flex;gap:4px}
 .mt-row img{width:16px;height:19px;image-rendering:pixelated;image-rendering:crisp-edges}
 .mt-row .nm{min-width:0;display:grid;gap:2px}
 .mt-row .nm span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c9cfdb}
@@ -700,7 +701,7 @@ a.btn{text-decoration:none;display:inline-block}
   </section>
 
   <div id="fps" hidden></div>
-  <aside id="meter" hidden aria-label="Damage meter"><div class="mt-head"><span id="meterTitle">Damage this wave</span><button type="button" id="meterMode" class="btn sm">Raid</button></div><div id="meterRows"></div><div class="mt-foot"><kbd>Tab</kbd> hide</div></aside>
+  <aside id="meter" hidden aria-label="Damage meter"><div class="mt-head"><span id="meterTitle">Damage this wave</span><span class="mt-btns"><button type="button" id="meterKind" class="btn sm">Healing</button><button type="button" id="meterMode" class="btn sm">Raid</button></span></div><div id="meterRows"></div><div class="mt-foot"><kbd>Tab</kbd> hide</div></aside>
   <div id="perfTip" hidden role="status"><span>The game is running slowly. Switch to Low graphics?</span><button class="btn sm primary" id="perfYes" type="button">Switch to Low</button><button class="btn sm" id="perfNo" type="button">No thanks</button></div>
   <div id="tut" hidden>
     <div class="tut-spot" id="tutSpot"></div>
@@ -1858,7 +1859,7 @@ function endlessNext(){
   const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
   const reward = 5 + interest + (W.boss ? 5 : 0);
   S.gold += reward; statGold('Wave rewards', reward - interest); statGold('Interest', interest); addXp(WAVE_XP);
-  if (S.stats){ S.stats.hp.push(Math.max(0, Math.round(100 * S.hero.hp / S.hero.maxHp))); S.stats.lastW = S.stats.wdmg; S.stats.wdmg = {}; }
+  if (S.stats){ S.stats.hp.push(Math.max(0, Math.round(100 * S.hero.hp / S.hero.maxHp))); S.stats.lastW = S.stats.wdmg; S.stats.wdmg = {}; S.stats.lastWH = S.stats.wheal || {}; S.stats.wheal = {}; }
   if (W.boss) S.hero.hp = S.hero.maxHp;
   S.wave++; S.waveT = 0; S.endDelay = 0; S.boss = null;
   const N = waveDef(S.wave);
@@ -1897,7 +1898,7 @@ function endWave(){
   const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
   const reward = 5 + interest + (W.boss ? 5 : 0);
   S.gold += reward; statGold('Wave rewards', reward - interest); statGold('Interest', interest);
-  if (S.stats){ S.stats.hp.push(Math.max(0, Math.round(100 * S.hero.hp / S.hero.maxHp))); S.stats.lastW = S.stats.wdmg; S.stats.wdmg = {}; }
+  if (S.stats){ S.stats.hp.push(Math.max(0, Math.round(100 * S.hero.hp / S.hero.maxHp))); S.stats.lastW = S.stats.wdmg; S.stats.wdmg = {}; S.stats.lastWH = S.stats.wheal || {}; S.stats.wheal = {}; }
   addXp(WAVE_XP);
   if (W.boss) S.hero.hp = S.hero.maxHp; // only bosses restore health; otherwise healing is bought in the shop
   S.wave++;
@@ -1952,7 +1953,7 @@ function takePowerup(p){
   addText(h.x, h.y - 16, P.name, P.col, true);
   burst(p.x, p.y, 26, [P.col, '#ffffff'], 90);
   S.rings.push({ x: p.x, y: p.y, r: 28, life: .4, max: .4, col: P.col });
-  if (p.type === 'mead') healHero(h.maxHp * .35);
+  if (p.type === 'mead') healHero(h.maxHp * .35, 'pu_mead');
   else if (p.type === 'fury') S.fury = 10;
   else if (p.type === 'raven') S.magnet = 4;
   else if (p.type === 'stride'){
@@ -1998,7 +1999,7 @@ function hit(e, raw, dtype, u, opt){
     if (m === 'ild' || opt.burn){ e.burn = 3; e.burnD = Math.max(e.burnD, raw * .35 * (m === 'ild' ? p : 1) / 3); e.burnSrc = ukey(u); }
     if (m === 'frost'){ e.slowT = 1.6; e.slow = Math.min(.6, .3 * p); }
     if (m === 'lyn' && Math.random() < .2 * p) chain(e, raw * .6, u);
-    if (m === 'blod') healHero(d * .02 * p);
+    if (m === 'blod') healHero(d * .02 * p, ukey(u));
   }
   if (opt.kx){ e.kx += opt.kx; e.ky += opt.ky; }
   if (e.hp <= 0) kill(e);
@@ -2027,7 +2028,7 @@ function kill(e){
   if (e.d.boss){ sfx('bossdie'); slowMo = 1.2; flash('255,214,122', .5); S.bosses++; S.shake = 10; S.endDelay = 1.6; S.boss = null; clearBossFx(); S.enemies.forEach(o => { if (!o.d.boss && !o.dead){ o.dead = true; burst(o.x, o.y, 5, ['#6f9479', '#bfe9ff'], 40); } }); }
 }
 function gainSouls(v){ S.souls += v; sfx('soul'); while (S.souls >= 10){ S.souls -= 10; S.gold++; statGold('Souls', 1); sfx('coin'); } }
-function healHero(n){ const h = S.hero; h.hp = Math.min(h.maxHp, h.hp + n); }
+function healHero(n, src){ const h = S.hero, b = h.hp; h.hp = Math.min(h.maxHp, h.hp + n); if (src && mode === 'combat') statHeal(src, h.hp - b); }
 function heroDamage(d, src){
   const h = S.hero;
   if (dbg.god || S.tutorial || h.inv > 0 || h.dashT > 0 || S.wall > 0 || mode !== 'combat') return;
@@ -2048,7 +2049,7 @@ function attack(u, t){
     const kind = c === 'archer' ? 'arrow' : c === 'mage' ? 'fire' : 'holy';
     const sp = kind === 'arrow' ? 290 : kind === 'fire' ? 175 : 215; sfx(kind);
     S.projs.push({ x: u.x, y: u.y - 3, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, dmg: st.dmg, dtype: st.dtype, u, kind, r: kind === 'fire' ? 3 : 2.5, life: 1.1, aoe: kind === 'fire' ? 16 : 0, pierce: 0, hits: null });
-    if (kind === 'holy') healHero(.35 * u.star);
+    if (kind === 'holy') healHero(.35 * u.star, ukey(u));
   }
 }
 function ability(u, t){
@@ -2072,7 +2073,7 @@ function ability(u, t){
     addText(u.x, u.y - 14, "Great Fireball", '#ff8a5c', true); sfx('fire');
   } else {
     const h = S.hero;
-    healHero(6 + 5 * u.star + h.maxHp * .06); sfx('heal');
+    healHero(6 + 5 * u.star + h.maxHp * .06, ukey(u)); sfx('heal');
     for (const e of S.enemies) if (!e.dead && dist2(e.x, e.y, h.x, h.y) < 56 * 56) hit(e, st.dmg * 2.2, 'magic', u);
     S.rings.push({ x: h.x, y: h.y, r: 56, life: .45, max: .45, col: '#ffe9a0' });
     burst(h.x, h.y, 22, ['#fff2b0', '#ffd27a'], 70);
@@ -2244,7 +2245,7 @@ function update(dt){
     }
     h.x += mx * spd * dt; h.y += my * spd * dt;
   }
-  if (S.regen) healHero(S.regen * dt);
+  if (S.regen){ const pr = S.regen - (hasR('mead_hall') ? 1.5 : 0); if (pr > 0) healHero(pr * dt, 'syn_priest'); if (hasR('mead_hall')) healHero(1.5 * dt, 'relic_mead_hall'); }
   S.hurt = Math.max(0, S.hurt - dt);
   S.fury = Math.max(0, S.fury - dt); S.magnet = Math.max(0, S.magnet - dt);
   updateAbilities(dt);
@@ -3520,7 +3521,7 @@ function updateAbilities(dt){
   const h = S.hero;
   for (const sl of S.abil) if (sl && sl.cd > 0) sl.cd = Math.max(0, sl.cd - dt);
   S.cry = Math.max(0, S.cry - dt); S.wall = Math.max(0, S.wall - dt); S.rage = Math.max(0, S.rage - dt);
-  if (S.hornT > 0){ S.hornT -= dt; healHero(S.hornRate * dt); }
+  if (S.hornT > 0){ S.hornT -= dt; healHero(S.hornRate * dt, 'abil_horn'); }
   for (const q of S.quakes){ q.t -= dt; if (q.t <= 0){ q.done = true; quake(h.x, h.y, q.r, q.dmg); } }
   S.quakes = S.quakes.filter(q => !q.done);
   if (S.ravens){
@@ -3825,7 +3826,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.17.0', 'Balance pass', ['Blood heals the hero less: 2%, 3% and 4% of damage dealt (was 3%, 4.5% and 6%)', 'Twin Souls now only doubles class synergies, not elements, and costs 36 gold', 'Warriors deal a little less: +15% and +40% damage (was +20% and +50%)', 'Archers also give archers +15% and +30% damage', 'Mages are stronger: magic damage +30% and +75% (was +25% and +60%)', 'Priests hit harder', 'Elite wolves crouch longer before they pounce and hit a little softer', 'Bosses that return in Endless hit less hard and have a bit less health', 'Iron is stronger: +40%, +60% and +80% damage', 'Pact of the Dead: +50% damage and only 20% less maximum health', 'Ghost Ship Chest gives 5 gold every shop']],
+  ['0.17.0', 'Balance pass', ['Blood heals the hero less: 2%, 3% and 4% of damage dealt (was 3%, 4.5% and 6%)', 'Twin Souls now only doubles class synergies, not elements, and costs 36 gold', 'Warriors deal a little less: +15% and +40% damage (was +20% and +50%)', 'Archers also give archers +15% and +30% damage', 'Mages are stronger: magic damage +30% and +75% (was +25% and +60%)', 'Priests hit harder', 'Elite wolves crouch longer before they pounce and hit a little softer', 'Bosses that return in Endless hit less hard and have a bit less health', 'Iron is stronger: +40%, +60% and +80% damage', 'Pact of the Dead: +50% damage and only 20% less maximum health', 'Ghost Ship Chest gives 5 gold every shop', 'The damage meter can also show healing: click Healing to see who keeps the hero alive. The run summary shows it too']],
   ['0.16.0', 'Damage meter and run summary', ['A damage meter: press Tab to see how much each unit deals this wave, or for the whole raid. In the shop it shows the last wave', 'A run summary on the result screen: damage by unit, class and element, what hit you hardest, where your gold went, and your health after each wave', 'Anonymous run stats help us balance the game. They are on by default, you are told once, and you can turn them off in Settings', 'The campfire music in the shop is softer and no longer buzzes']],
   ['0.15.0', 'Physical and magic damage', ['The Rune Forge upgrade Raw Damage is split into Physical Damage (warriors and archers) and Magic Damage (mages and priests), +8% per level each', 'Runes spent on Raw Damage are refunded, so you can choose again', 'Fixed: cloud saves now keep the relics you have found']],
   ['0.14.0', 'The Field Guide', ['The Bestiary is now the Field Guide, with tabs for Beasts and Relics. Open it from the main menu or the pause menu', 'Each relic unlocks in the guide the first time the Merchant offers it or the Altar grants it. Until then you only get a hint', 'Relics cost more: 18 to 35 gold, so buying one is a real decision', 'The tutorial now shows the Wandering Merchant and the other campfire visitors', 'Simpler names: the Seiðkona is now the Witch, the Draugr Jarl is the Draugr King, and other Old Norse names became plain English, such as Odin\'s Spear, Great Fireball, Swift Stride and Ghost Ship Chest']],
@@ -3885,7 +3886,7 @@ $('#ups').addEventListener('click', e => {
 
 /* ---------- run summary on the result screen ---------- */
 function sumBars(obj, n, label, icon){
-  const list = Object.entries(obj).filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, n);
+  const list = Object.entries(obj).filter(x => x[1] >= .5).sort((a, b) => b[1] - a[1]).slice(0, n);
   if (!list.length) return '<div class="mt-empty">Nothing yet</div>';
   const top = list[0][1], tot = Object.values(obj).reduce((a, b) => a + b, 0) || 1;
   return list.map(([k, v]) => `<div class="mt-row">${icon ? `<img src="${icon(k)}" alt="">` : '<span></span>'}<div class="nm"><span>${label(k)}</span><div class="bar"><i style="width:${Math.max(2, 100 * v / top)}%;background:${meterColor(k)}"></i></div></div><b>${fmtN(v)} <small style="color:var(--muted)">${Math.round(100 * v / tot)}%</small></b></div>`).join('');
@@ -3902,6 +3903,7 @@ function renderRunSummary(){
   $('#runSum').innerHTML = `
     <section><h3>Damage dealt</h3>${sumBars(st.dmg, 8, srcLabel, srcIcon)}</section>
     <section><h3>By class</h3>${sumBars(byCls, 4, k => CLASSES[k].name + 's', k => ICON[k])}<h3 style="margin-top:6px">By element</h3>${sumBars(byEl, 6, k => MODS[k].name, null)}</section>
+    <section><h3>Healing</h3>${sumBars(st.heal || {}, 6, srcLabel, srcIcon)}</section>
     <section><h3>Damage taken</h3>${taken.length ? taken.map(([k, v]) => `<div class="line${k === st.killer ? ' kill' : ''}"><span>${k}${k === st.killer ? ' · final blow' : ''}</span><b>${Math.round(v)}</b></div>`).join('') : '<div class="mt-empty">No damage taken</div>'}</section>
     <section><h3>Gold</h3><div class="line"><span>Earned</span><b>${sumO(st.earned)}</b></div>${Object.entries(st.earned).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="line"><span>· ${k}</span><b>${v}</b></div>`).join('')}<div class="line" style="margin-top:4px"><span>Spent</span><b>${sumO(st.spent)}</b></div>${Object.entries(st.spent).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="line"><span>· ${k}</span><b>${v}</b></div>`).join('')}</section>
     <section><h3>Health after each wave</h3>${spark}</section>
@@ -3916,13 +3918,14 @@ function runRecord(result){
   const forge = {}; for (const u of UPGRADES) forge[u.k] = meta[u.k] || 0;
   const dmg = {}; for (const [k, v] of Object.entries(st.dmg)) dmg[k] = r(v);
   const taken = {}; for (const [k, v] of Object.entries(st.taken)) taken[k] = r(v);
+  const heal = {}; for (const [k, v] of Object.entries(st.heal || {})) if (v >= .5) heal[k] = r(v);
   return {
     version: VERSION, build: BUILD, hero: HERO_ID, map: MAP_ID, result, wave: S.wave,
     endless_wave: S.endless ? Math.max(0, S.wave - WAVES.length - 1) : 0, minutes: Math.round((Date.now() - st.t0) / 6000) / 10, debug: !!S.debugUsed,
     data: { level: S.level, kills: S.kills, bosses: S.bosses, partial: st.partial, board: S.board.filter(Boolean).map(u => ({ c: u.cls, m: u.mod, s: u.star })),
       bench: S.bench.filter(Boolean).map(u => ({ c: u.cls, m: u.mod, s: u.star })), abilities: S.abil.filter(Boolean).map(a => ({ k: a.key, l: a.lvl })),
       relics: (S.relics || []).slice(), relicBuys: st.relicBuys, events: st.events, forge, dash: S.hero.dashSlots,
-      dmg, kills: st.kills, taken, killer: st.killer, earned: st.earned, spent: st.spent, hp: st.hp },
+      dmg, heal, kills: st.kills, taken, killer: st.killer, earned: st.earned, spent: st.spent, hp: st.hp },
   };
 }
 async function sendRun(rec){
@@ -4061,16 +4064,21 @@ let last = performance.now(), acc = 0;
 const STEP = 1 / 60;
 /* ================= RUN STATS: what happened in a raid, for the damage meter, the summary and balancing ================= */
 const HERO_ID = 'viking', MAP_ID = 'barrows'; // fields for future heroes and maps
-const newStats = () => ({ t0: Date.now(), dmg: {}, wdmg: {}, lastW: {}, kills: {}, taken: {}, killer: null, earned: {}, spent: {}, hp: [], relicBuys: [], events: [], botUsed: !!dbg.bot, partial: false });
+const newStats = () => ({ t0: Date.now(), dmg: {}, wdmg: {}, lastW: {}, heal: {}, wheal: {}, lastWH: {}, kills: {}, taken: {}, killer: null, earned: {}, spent: {}, hp: [], relicBuys: [], events: [], botUsed: !!dbg.bot, partial: false });
 const ukey = u => u.cls + '_' + u.mod;
 function statDmg(src, n){ const st = S && S.stats; if (!st || !(n > 0)) return; st.dmg[src] = (st.dmg[src] || 0) + n; st.wdmg[src] = (st.wdmg[src] || 0) + n; }
+function statHeal(src, n){ const st = S && S.stats; if (!st || !(n > 0) || S.tutorial) return; st.heal = st.heal || {}; st.wheal = st.wheal || {}; st.heal[src] = (st.heal[src] || 0) + n; st.wheal[src] = (st.wheal[src] || 0) + n; }
 function statGold(kind, n, spend){ const st = S && S.stats; if (!st || !(n > 0) || S.tutorial) return; const o = spend ? st.spent : st.earned; o[kind] = (o[kind] || 0) + n; }
 function srcLabel(k){
   if (k === 'hero') return 'Hero and power-ups';
   if (k === 'ember') return 'Ember Boots';
+  if (k === 'syn_priest') return 'Priests synergy';
+  if (k === 'pu_mead') return POWERUPS.mead.name;
+  if (k.startsWith('relic_')) return RELICS[k.slice(6)] ? RELICS[k.slice(6)].name : k;
+  if (k.startsWith('abil_')) return ABILITIES[k.slice(5)] ? ABILITIES[k.slice(5)].name : k;
   const [c, m] = k.split('_'); return CLASSES[c] && MODS[m] ? `${MODS[m].name} ${CLASSES[c].name}` : k;
 }
-const srcIcon = k => k === 'hero' || k === 'ember' ? ICON.hero : ICON[k] || ICON.hero;
+const srcIcon = k => k === 'syn_priest' ? ICON.priest : k.startsWith('relic_') ? RELIC_ICON[k.slice(6)] || ICON.hero : k.startsWith('abil_') ? ABIL_ICON[k.slice(5)] || ICON.hero : k === 'pu_mead' ? (ICON.pu_mead = ICON.pu_mead || SPR.pu_mead.toDataURL()) : k === 'hero' || k === 'ember' ? ICON.hero : ICON[k] || ICON.hero;
 const fmtN = n => n >= 10000 ? Math.round(n / 1000) + 'k' : n >= 1000 ? (n / 1000).toFixed(1) + 'k' : String(Math.round(n));
 
 /* ================= RELICS: items that twist a rule for the rest of the raid ================= */
@@ -4632,24 +4640,28 @@ $('#dbg').addEventListener('click', e => { const b = e.target.closest('button[da
 $('#dbgBot').addEventListener('change', e => { setBot(e.target.checked); toast(dbg.bot ? 'Autoplay on' : 'Autoplay off'); });
 
 /* ---------- damage meter ---------- */
-let meterRaid = false, meterAcc = 0;
-function meterColor(k){ if (MODS[k]) return MODS[k].col; const m = k.split('_')[1]; return MODS[m] ? MODS[m].col : '#e2b24c'; }
-function meterRows(obj, max){
-  const list = Object.entries(obj).sort((a, b) => b[1] - a[1]).slice(0, max);
-  if (!list.length) return '<div class="mt-empty">No damage yet</div>';
+let meterRaid = false, meterHeal = false, meterAcc = 0;
+function meterColor(k){ if (MODS[k]) return MODS[k].col; if (/^(syn|relic|abil|pu)_/.test(k)) return '#7dc46a'; const m = k.split('_')[1]; return MODS[m] ? MODS[m].col : '#e2b24c'; }
+function meterRows(obj, max, empty){
+  const list = Object.entries(obj).filter(x => x[1] >= .5).sort((a, b) => b[1] - a[1]).slice(0, max);
+  if (!list.length) return `<div class="mt-empty">${empty || 'No damage yet'}</div>`;
   const top = list[0][1], tot = Object.values(obj).reduce((a, b) => a + b, 0) || 1;
   return list.map(([k, v]) => `<div class="mt-row"><img src="${srcIcon(k)}" alt=""><div class="nm"><span>${srcLabel(k)}</span><div class="bar"><i style="width:${Math.max(2, 100 * v / top)}%;background:${meterColor(k)}"></i></div></div><b>${fmtN(v)} <small style="color:var(--muted)">${Math.round(100 * v / tot)}%</small></b></div>`).join('');
 }
 function renderMeter(){
   const el = $('#meter'), show = settings.meter && S && S.stats && (mode === 'combat' || mode === 'shop') && !S.tutorial;
   el.hidden = !show; if (!show) return;
-  const st = S.stats, raid = meterRaid, obj = raid ? st.dmg : mode === 'shop' ? st.lastW : st.wdmg;
-  $('#meterTitle').textContent = raid ? 'Damage this raid' : mode === 'shop' ? 'Damage last wave' : 'Damage this wave';
+  const st = S.stats, raid = meterRaid, hl = meterHeal;
+  const obj = hl ? (raid ? st.heal : mode === 'shop' ? st.lastWH : st.wheal) || {} : raid ? st.dmg : mode === 'shop' ? st.lastW : st.wdmg;
+  $('#meterTitle').textContent = (hl ? 'Healing' : 'Damage') + (raid ? ' this raid' : mode === 'shop' ? ' last wave' : ' this wave');
   $('#meterMode').textContent = raid ? 'Wave' : 'Raid';
-  $('#meterRows').innerHTML = meterRows(obj, 8);
+  $('#meterKind').textContent = hl ? 'Damage' : 'Healing';
+  $('#meter').setAttribute('aria-label', hl ? 'Healing meter' : 'Damage meter');
+  $('#meterRows').innerHTML = meterRows(obj, 8, hl ? 'No healing yet' : 'No damage yet');
 }
 function toggleMeter(){ settings.meter = !settings.meter; saveSettings(); renderMeter(); if (!$('#settings').hidden) syncSettings(); }
 $('#meterMode').onclick = e => { meterRaid = !meterRaid; e.currentTarget.blur(); renderMeter(); };
+$('#meterKind').onclick = e => { meterHeal = !meterHeal; e.currentTarget.blur(); renderMeter(); };
 // frame-rate counter, and a one-time suggestion to lower the graphics when combat stays slow
 const perf = { acc: 0, n: 0, fps: 60, slow: 0, asked: false };
 function perfWatch(dt){
