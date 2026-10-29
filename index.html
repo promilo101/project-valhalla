@@ -548,7 +548,17 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .cmp-r b{font-weight:400}
 .cmp-n{color:#c9cfdb}
 .cmp-v{margin-top:4px}
-.pcard.loot{overflow:hidden} /* no glow or spin while choosing: the reveal plays only once the gear is picked */
+.pcard.loot{overflow:hidden}
+.pcard.shine{overflow:hidden}
+.pcard.shine::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.09) 48%,rgba(255,255,255,.14) 50%,rgba(255,255,255,.09) 52%,transparent 62%);transform:translateX(-130%);animation:pcSheen 5s ease-in-out infinite;pointer-events:none}
+.pcard.shine:nth-child(2)::after{animation-delay:.6s}.pcard.shine:nth-child(3)::after{animation-delay:1.2s}
+.pgroup:last-child .pcard.shine::after{animation-delay:1.8s}
+.pcard .spk{position:absolute!important;width:3px;height:3px;background:#fff;box-shadow:0 0 4px 1px color-mix(in srgb,var(--c,#e2b24c) 70%,#fff);opacity:0;pointer-events:none;animation:pcSpark 3.2s ease-in-out infinite}
+.pcard .spk::before,.pcard .spk::after{content:"";position:absolute;background:#fff;opacity:.7}
+.pcard .spk::before{left:1px;top:-3px;width:1px;height:9px}.pcard .spk::after{top:1px;left:-3px;width:9px;height:1px}
+@keyframes pcSheen{0%,55%{transform:translateX(-130%)}85%,100%{transform:translateX(130%)}}
+@keyframes pcSpark{0%,70%,100%{opacity:0;transform:scale(.4)}80%{opacity:.9;transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.pcard.shine::after,.pcard .spk{animation:none;display:none}} /* no glow or spin while choosing: the reveal plays only once the gear is picked */
 .pcard.loot > *{position:relative}
 .pcard.loot .pk{position:absolute}
 .pcards.grouped{display:grid;grid-template-columns:minmax(0,3fr) auto minmax(0,1fr);gap:12px;align-items:stretch}
@@ -3430,14 +3440,7 @@ function drawMinimap(){
     if (clampIt){ const m = Math.max(Math.abs(mx), Math.abs(my)); if (m > half - 5){ const s = (half - 5) / m; mx *= s; my *= s; edge = true; } }
     return [half + mx, half + my, edge];
   };
-  // ordinary enemies
-  mctx.fillStyle = '#8c3a3a';
-  for (const e of S.enemies){
-    if (e.elite || e.d.boss) continue;
-    const [x, y] = toMini(e.x, e.y);
-    if (x < 0 || y < 0 || x > MINI || y > MINI) continue;
-    mctx.fillRect(x - 1, y - 1, 2, 2);
-  }
+  // ordinary enemies are left off: the minimap shows only runes, events, elites and bosses
   // elites (clamped to the edge when far away)
   for (const e of S.enemies){
     if (!e.elite || e.d.boss) continue;
@@ -4182,7 +4185,8 @@ function renderPick(){
     $('#pickTitle').textContent = P.kind === 'start' ? 'Choose your first ability' : 'Choose a reward';
     const iI = P.opts.findIndex(o => o.type === 'item'), nA = P.opts.length - (iI >= 0 ? 1 : 0);
     $('#pickSub').innerHTML = iI >= 0 ? `Pick an ability (${nA > 1 ? `1–${nA}` : '1'}) or the boss's gear (${iI + 1}). Abilities go on <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> and fire toward your mouse cursor.` : 'Abilities go on <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> and fire toward your mouse cursor.';
-    const cards = P.opts.map(pickCardHTML);
+    const spk = () => [0, 1, 2].map(k => `<i class="spk" style="left:${Math.round(rand(10, 88))}%;top:${Math.round(rand(8, 85))}%;animation-delay:${(rand(0, 3)).toFixed(2)}s"></i>`).join('');
+    const cards = P.opts.map((o, i) => { const h = pickCardHTML(o, i); return P.kind === 'start' ? h : h.replace('class="pcard', 'class="pcard shine').replace(/<\/button>$/, spk() + '</button>'); });
     $('#pickCards').classList.toggle('grouped', iI >= 0);
     $('#pickCards').innerHTML = iI < 0 ? cards.join('') : `<div class="pgroup"><div class="pgl">Abilities</div><div class="pcards">${cards.filter((c, i) => i !== iI).join('')}</div></div><div class="por" aria-hidden="true">or</div><div class="pgroup"><div class="pgl">Boss drop</div><div class="pcards">${cards[iI]}</div></div>`;
     const canSkip = P.kind !== 'start' && !(P.opts.length === 1 && P.opts[0].type === 'gold');
@@ -4471,8 +4475,8 @@ async function cloudStartup(){
 const CHANGES = [
   ['0.20.0', 'Gear and the campfire', {
     Highlights: ['Gear for your hero: helmet, chestplate, leggings, two weapon hands, two rings and a necklace', 'Your warband gathers at the campfire, and the Character panel (C) holds your gear and abilities', 'The Field Guide (J): beasts, units, abilities, battlefield events and gear, each unlocked as you find it', 'Battlefield events: the Blood Shrine, the Cursed Altar, Odin\'s Messenger and Sleipnir\'s Tracks', 'A new enemy from wave 7: the Draugr Spearman'],
-    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'A banner pops up for every new Field Guide find', 'The tutorial shows the Field Guide and the damage meter'],
-    Changed: ['Relics are now jewelry. Each ring or necklace carries one of the old relic powers', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces', 'Bosses no longer heal you to full', 'Swift Stride is now Sleipnir\'s Tracks: run through six hoof marks within 8 seconds for an extra dash slot', 'Blood Shrines and Cursed Altars moved from the campfire to the battlefield', 'The boss reward screen separates the abilities from the boss\'s gear, with a tag on every card. The gear card no longer glows, so it doesn\'t pull your eye; the reveal plays once you pick it', 'Merchant cards show each piece\'s slot on a plain grey strip, so colour always means rarity', 'The pause menu is cleaner: Resume, the Field Guide, Settings and feedback, with Give up on its own', 'Rings and necklaces no longer show beside the ability bar in battle. You find them in the Character panel'],
+    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'A banner pops up for every new Field Guide find', 'The tutorial shows the Field Guide and the damage meter'],
+    Changed: ['Relics are now jewelry. Each ring or necklace carries one of the old relic powers', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces', 'Bosses no longer heal you to full', 'Swift Stride is now Sleipnir\'s Tracks: run through six hoof marks within 8 seconds for an extra dash slot', 'Blood Shrines and Cursed Altars moved from the campfire to the battlefield', 'The boss reward screen separates the abilities from the boss\'s gear, with a tag on every card. Every boss reward card has the same soft sheen and sparkle, so none pulls your eye more than the others. The gear reveal plays once you pick it', 'Merchant cards show each piece\'s slot on a plain grey strip, so colour always means rarity', 'The pause menu is cleaner: Resume, the Field Guide, Settings and feedback, with Give up on its own', 'Rings and necklaces no longer show beside the ability bar in battle. You find them in the Character panel'],
     Fixed: ['With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet', 'The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
   }],
   ['0.17.6', 'Room for the warband', ['With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
