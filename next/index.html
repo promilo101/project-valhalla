@@ -102,7 +102,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .hud-center .w{font-family:var(--font-display);font-size:20px}
 .hud-center .t{font-size:30px;font-variant-numeric:tabular-nums;line-height:1}
 .hud-right{justify-self:end;display:grid;gap:6px;width:162px}
-.tips-btn{pointer-events:auto;background:rgba(11,13,19,.72);font-size:14px;white-space:nowrap;justify-self:stretch;padding-left:6px;padding-right:6px}
+.tips-btn{pointer-events:auto;background:rgba(11,13,19,.72);font-size:14px;justify-self:stretch;min-width:0;padding-left:4px;padding-right:4px}
 .tips-btn[aria-pressed="true"]{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
 .mini{padding:5px}
 #mini{display:block;width:150px;height:150px}
@@ -527,14 +527,14 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #cine .ci-skip{position:absolute;bottom:18px;right:22px;font-size:13px;color:var(--muted);opacity:.7}
 #cine.fade{background:rgba(3,4,8,0)!important;transition:background 1s}
 #cine.fade .ci-box{opacity:0;transition:opacity .8s}
-#evTip{position:absolute;z-index:3;pointer-events:none;transform:translate(-50%,-100%);font-size:12px;line-height:1.35;color:var(--text);text-align:center;white-space:nowrap}
+#evTip{position:absolute;z-index:3;pointer-events:none;transform:translate(-50%,-100%) scale(var(--ui,1));transform-origin:50% 100%;font-size:12px;line-height:1.35;color:var(--text);text-align:center;white-space:nowrap}
 #evTip .et-n{color:var(--ec);font-weight:700;text-shadow:0 1px 0 #000,0 0 4px #000}
 #evTip.full{white-space:normal;width:250px;text-align:left;padding:8px 10px;background:rgba(13,16,24,.94);border:1px solid var(--ec);border-radius:3px;box-shadow:0 4px 14px rgba(0,0,0,.5)}
 #evTip.full .et-n{text-shadow:none;margin-bottom:2px}
 #evTip .et-r b{color:var(--muted);font-weight:400;margin-right:4px}
 #evTip .et-u{color:var(--gold);margin-top:4px}
 #evTip .et-t{color:var(--gold);font-weight:700;text-shadow:0 1px 0 #000}
-#evTip.side{transform:translate(-100%,0)}
+#evTip.side{transform:translate(-100%,0) scale(var(--ui,1));transform-origin:100% 0}
 #achv{position:absolute;left:50%;top:104px;transform:translateX(-50%);z-index:45;display:flex;gap:12px;align-items:center;min-width:300px;max-width:calc(100% - 32px);padding:10px 16px 10px 12px;background:linear-gradient(90deg,#1b2030,#141822);border:1px solid var(--ac);border-radius:3px;box-shadow:0 8px 24px rgba(0,0,0,.6),0 0 18px color-mix(in srgb,var(--ac) 35%,transparent);pointer-events:none;overflow:hidden;zoom:var(--ui,1)}
 #achv::after{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.18) 50%,transparent 70%);transform:translateX(-100%)}
 #achv.go{animation:acIn 2.5s cubic-bezier(.2,.9,.3,1.1) forwards}
@@ -1983,7 +1983,9 @@ const CINE_DUR = { intro: 7.2, fenrir: 9 };
 function startCine(kind, o){
   if (dbg.bot || (S && S.tutorial)) return;
   cine = Object.assign({ kind, t: 0, shown: 0, flakes: [] }, o || {});
+  cine.locked = kind === 'fenrir' && !(meta.wins > 0); // the first time Fenrir falls, the whole scene plays
   const el = $('#cine'); el.hidden = false; el.classList.remove('fade');
+  el.querySelector('.ci-skip').hidden = cine.locked; el.style.cursor = cine.locked ? 'default' : 'pointer';
   el.querySelectorAll('.ci-eye,.ci-h,.ci-p').forEach(x => { x.textContent = ''; x.classList.remove('on'); });
   el.style.setProperty('--cb', kind === 'intro' ? '1' : '0');
   $('#app').classList.toggle('cine-intro', kind === 'intro');
@@ -2009,14 +2011,15 @@ function endCine(){
   $('#app').classList.remove('cine-intro');
   if (C.done) C.done();
 }
-function skipCine(){ if (cine && cine.t > .3) endCine(); }
+function skipCine(){ if (cine && !cine.locked && cine.t > .3) endCine(); }
 $('#cine').addEventListener('click', skipCine);
 // the Endless Winter: frost on the ground and falling snow, from Fenrir's death through all of Endless mode
 const winterOn = () => S && (S.endless || S.winterT > 0) && S.wave >= WAVES.length;
 let snow = [];
+const REDUCED_MOTION = matchMedia('(prefers-reduced-motion: reduce)');
 function drawWinter(dt, camX, camY){
   const k = S.endless ? 1 : S.winterT || 0; if (k <= 0) return;
-  const low = settings.quality === 'low', calmM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const low = settings.quality === 'low', calmM = REDUCED_MOTION.matches;
   // frost: a cold white veil that spreads out from where Fenrir fell
   const fx = (cine && cine.kind === 'fenrir' ? cine.x : S.hero.x) - camX, fy = (cine && cine.kind === 'fenrir' ? cine.y : S.hero.y) - camY;
   const R = S.endless || !cine ? 9999 : 40 + 520 * k;
@@ -2295,7 +2298,7 @@ function endWave(){
   }
   S.enemies.forEach(e => burst(e.x, e.y, 6, ['#6f9479', '#bfe9ff'], 40));
   if (S.altarCh) setTimeout(() => toast('The wave ended before the champions fell. No reward from the altar'), 1400);
-  S.enemies = []; S.eprojs = []; S.tele = []; S.pups = []; S.corpses = []; S.shrine = null; S.altarCh = null; clearBossFx();
+  S.enemies = []; S.eprojs = []; S.projs = []; S.tele = []; S.pups = []; S.corpses = []; S.shrine = null; S.altarCh = null; clearBossFx();
   S.orbs.forEach(o => gainSouls(o.v)); S.orbs = [];
   if (S.wave >= WAVES.length) return showVictory();
   const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
@@ -3413,7 +3416,7 @@ function render(dt){
     }
   }
   ctx.globalCompositeOperation = 'lighter';
-  for (const p of st.projs){
+  if (!camp) for (const p of st.projs){
     if (p.kind === 'fire' || p.kind === 'bigfire'){
       const big = p.kind === 'bigfire', fl = Math.random() * 1.5;
       ctx.fillStyle = 'rgba(255,40,20,.35)'; ctx.beginPath(); ctx.arc(p.x, p.y, (big ? 13 : 6) + fl, 0, 6.283); ctx.fill();
@@ -4581,7 +4584,7 @@ const CHANGES = [
     Highlights: ['A new intro when a raid begins, and Fenrir\'s death now brings the Endless Winter: his dying breath freezes the field, and snow falls through all of Endless mode', 'Gear for your hero: helmet, chestplate, leggings, two weapon hands, two rings and a necklace', 'Your warband gathers at the campfire, and the Character panel (C) holds your gear and abilities', 'The Field Guide (J): beasts, units, abilities, battlefield events and gear, each unlocked as you find it', 'Battlefield events: the Blood Shrine, the Cursed Altar, Odin\'s Messenger and Sleipnir\'s Tracks', 'A new enemy from wave 7: the Draugr Spearman'],
     New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'A banner pops up for every new Field Guide find', 'A Damage meter button with its Tab hotkey sits below the minimap, next to Tooltips', 'The tutorial shows the Field Guide and the damage meter'],
     Changed: ['Relics are now jewelry. Each ring or necklace carries one of the old relic powers', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces', 'Bosses no longer heal you to full', 'Swift Stride is now Sleipnir\'s Tracks: run through six hoof marks within 8 seconds for an extra dash slot', 'Blood Shrines and Cursed Altars moved from the campfire to the battlefield', 'The boss reward screen separates the abilities from the boss\'s gear, with a tag on every card. Every boss reward card has the same soft sheen and sparkle, so none pulls your eye more than the others. The gear reveal plays once you pick it', 'Merchant cards show each piece\'s slot on a plain grey strip, so colour always means rarity', 'The pause menu is cleaner: Resume, the Field Guide, Settings and feedback, with Give up on its own', 'Rings and necklaces no longer show beside the ability bar in battle. You find them in the Character panel'],
-    Fixed: ['With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet', 'The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
+    Fixed: ['A fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet', 'The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
   }],
   ['0.17.6', 'Room for the warband', ['With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
   ['0.17.5', 'Quieter music', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat']],

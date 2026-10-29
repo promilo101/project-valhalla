@@ -1916,7 +1916,7 @@ function endWave(){
     else { S.gold += 12; statGold('Events', 12); setTimeout(() => toast('The altar grants you 12 gold'), 1200); }
   }
   S.enemies.forEach(e => burst(e.x, e.y, 6, ['#6f9479', '#bfe9ff'], 40));
-  S.enemies = []; S.eprojs = []; S.tele = []; S.pups = []; S.corpses = []; clearBossFx();
+  S.enemies = []; S.eprojs = []; S.projs = []; S.tele = []; S.pups = []; S.corpses = []; clearBossFx();
   S.orbs.forEach(o => gainSouls(o.v)); S.orbs = [];
   if (S.wave >= WAVES.length) return showVictory();
   const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
@@ -2938,7 +2938,7 @@ function render(dt){
     }
   }
   ctx.globalCompositeOperation = 'lighter';
-  for (const p of st.projs){
+  if (!camp) for (const p of st.projs){
     if (p.kind === 'fire' || p.kind === 'bigfire'){
       const big = p.kind === 'bigfire', fl = Math.random() * 1.5;
       ctx.fillStyle = 'rgba(255,40,20,.35)'; ctx.beginPath(); ctx.arc(p.x, p.y, (big ? 13 : 6) + fl, 0, 6.283); ctx.fill();
@@ -3875,7 +3875,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.17.6', 'Room for the warband', ['With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
+  ['0.17.6', 'Room for the warband', ['Fixed: a fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
   ['0.17.5', 'Quieter music', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat']],
   ['0.17.4', 'Small fixes', ['Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow. Shots fly through him to the wights']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
