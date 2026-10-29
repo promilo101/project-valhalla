@@ -38,7 +38,7 @@ body{
 }
 #app{position:relative;height:100%;width:100%;overflow:hidden;border:1px solid var(--line);background:#07080c;border-radius:3px}
 #cv{position:absolute;left:0;top:0;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
-#hud,#shop,#dock,#pause,.screen,#btnShopOpen,#toast,#count,#perfTip{zoom:var(--ui,1)}
+#hud,#shop,#dock,#pause,.screen,#btnShopOpen,#toast,#count,#perfTip,#updTip{zoom:var(--ui,1)}
 #app.wide #dock{left:var(--dockX,50%);bottom:24px}
 #shop{left:max(8px,calc(50% - max(820px,34vw)))!important;right:max(8px,calc(50% - max(820px,34vw)))!important}
 .bench{grid-template-columns:repeat(8,minmax(0,clamp(58px,5.4vw,112px)))!important;justify-content:start}
@@ -423,6 +423,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .mt-foot{font-size:13px;color:var(--muted);text-align:right}
 .mt-empty{font-size:15px;color:var(--muted)}
 #fps{position:absolute;left:8px;top:8px;z-index:4;font-size:16px;color:#7dc46a;background:rgba(7,8,12,.7);padding:1px 6px;border-radius:2px;pointer-events:none;font-variant-numeric:tabular-nums}
+#updTip{position:absolute;left:50%;top:10px;transform:translateX(-50%);z-index:7;background:var(--panel);border:1px solid var(--frost);border-radius:2px;padding:8px 12px;display:flex;gap:10px;align-items:center;font-size:18px;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.5)}
 #perfTip{position:absolute;left:50%;top:96px;transform:translateX(-50%);z-index:4;background:var(--panel);border:1px solid var(--gold);border-radius:2px;padding:8px 12px;display:flex;gap:10px;align-items:center;font-size:18px;max-width:calc(100% - 24px);flex-wrap:wrap;justify-content:center}
 .tog[aria-pressed="false"]{color:var(--muted)}
 #setMute{color:var(--fg)}
@@ -713,6 +714,7 @@ a.btn{text-decoration:none;display:inline-block}
 
   <div id="fps" hidden></div>
   <aside id="meter" hidden aria-label="Damage meter"><div class="mt-head"><span id="meterTitle">Damage this wave</span><span class="mt-btns"><button type="button" id="meterKind" class="btn sm">Healing</button><button type="button" id="meterMode" class="btn sm">Raid</button></span></div><div id="meterRows"></div><div class="mt-foot"><kbd>Tab</kbd> hide</div></aside>
+  <div id="updTip" hidden role="status"><span id="updTxt"></span><button class="btn sm primary" id="updGo" type="button">Save and reload</button><button class="btn sm" id="updLater" type="button">Later</button></div>
   <div id="perfTip" hidden role="status"><span>The game is running slowly. Switch to Low graphics?</span><button class="btn sm primary" id="perfYes" type="button">Switch to Low</button><button class="btn sm" id="perfNo" type="button">No thanks</button></div>
   <div id="tut" hidden>
     <div class="tut-spot" id="tutSpot"></div>
@@ -3085,7 +3087,7 @@ function drawMinimap(){
 
 /* ================= UI ================= */
 function setMode(m){
-  mode = m;
+  mode = m; setTimeout(showUpd, 0);
   $('#hud').hidden = m !== 'combat';
   $('#shop').hidden = m !== 'shop';
   $('#title').hidden = m !== 'title';
@@ -3417,7 +3419,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.17.1'; // major.minor.patch
+const VERSION = '0.17.2'; // major.minor.patch
 const BUILD = 'dev'; // 'dev' = test build, '' = public build
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
@@ -3858,6 +3860,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
   ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
   ['0.17.0', 'Balance pass', ['Blood heals the hero less: 1.5%, 2.25% and 3% of damage dealt (was 3%, 4.5% and 6%), and gives +10% attack speed (was +15%)', 'Twin Souls now only doubles class synergies, not elements, and costs 36 gold', 'Warriors deal a little less: +15% and +40% damage (was +20% and +50%)', 'Archers also give archers +15% and +30% damage', 'Mages are stronger: magic damage +30% and +75% (was +25% and +60%)', 'Priests hit harder', 'Elite wolves are half as common, crouch longer before they pounce and hit a little softer', 'Bosses that return in Endless hit less hard and have a bit less health', 'Iron is stronger: +40%, +60% and +80% damage', 'Pact of the Dead: +50% damage and only 20% less maximum health', 'Ghost Ship Chest gives 5 gold every shop', 'Press F in battle to make your units target bosses and elites first. Press it again to go back to the nearest enemy', 'You can skip the reward after a boss and take 10 gold instead', 'No more running away forever: enemies left far behind come back in ahead of you, more enemies appear in the direction you run, and bosses speed up to catch you', 'The damage meter can also show healing: click Healing to see who keeps the hero alive. The run summary shows it too']],
   ['0.16.0', 'Damage meter and run summary', ['A damage meter: press Tab to see how much each unit deals this wave, or for the whole raid. In the shop it shows the last wave', 'A run summary on the result screen: damage by unit, class and element, what hit you hardest, where your gold went, and your health after each wave', 'Anonymous run stats help us balance the game. They are on by default, you are told once, and you can turn them off in Settings', 'The campfire music in the shop is softer and no longer buzzes']],
@@ -4590,6 +4593,29 @@ $('#setUi').onchange = e => { settings.ui = e.target.value; saveSettings(); appl
 $('#setQ').onchange = e => { settings.quality = e.target.value; saveSettings(); groundKey = ''; };
 $('#setCalm').onclick = () => { settings.calm = !settings.calm; saveSettings(); syncSettings(); };
 $('#setFps').onclick = () => { settings.fps = !settings.fps; saveSettings(); syncSettings(); $('#fps').hidden = !settings.fps; };
+/* ---------- new version notice: checked now and then, shown only in the shop or on the title screen ---------- */
+let newVer = null, updLater = null;
+const verNum = v => v.split('.').reduce((a, x) => a * 1000 + (+x || 0), 0);
+async function checkUpdate(){
+  if (!/^https?:$/.test(location.protocol)) return;
+  try {
+    const r = await fetch(location.pathname + '?check=' + Date.now(), { cache: 'no-store' }); if (!r.ok) return;
+    const m = (await r.text()).match(/const VERSION = '(\d+\.\d+\.\d+)'/);
+    if (m && verNum(m[1]) > verNum(VERSION)){ newVer = m[1]; showUpd(); }
+  } catch (e) {}
+}
+function showUpd(){
+  const el = $('#updTip'); if (!el) return;
+  const show = !!newVer && newVer !== updLater && (mode === 'shop' || mode === 'title') && !(S && S.tutorial);
+  el.hidden = !show; if (!show) return;
+  const inRaid = mode === 'shop' && S;
+  $('#updTxt').textContent = `Version ${newVer} is ready.${inRaid ? ' Your raid is saved first, then you continue where you left off.' : ''}`;
+  $('#updGo').textContent = inRaid ? 'Save and reload' : 'Reload';
+}
+$('#updGo').onclick = () => { if (mode === 'shop' && S && !S.tutorial) writeRunSave(runSnapshot()); location.reload(); };
+$('#updLater').onclick = () => { updLater = newVer; showUpd(); };
+setTimeout(checkUpdate, 15000); setInterval(checkUpdate, 5 * 60 * 1000);
+$('#verTxt').textContent = VERSION;
 $('#perfYes').onclick = () => { settings.quality = 'low'; saveSettings(); groundKey = ''; $('#perfTip').hidden = true; toast('Graphics set to Low. Change it any time in Settings'); };
 $('#perfNo').onclick = () => { $('#perfTip').hidden = true; };
 $('#fps').hidden = !settings.fps;
