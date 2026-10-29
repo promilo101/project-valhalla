@@ -452,6 +452,9 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #over .screen-inner{width:min(860px,100%)}
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
 .sum:empty{display:none}
+.sum .sum-more{grid-column:1/-1;justify-self:center}
+.sum .sum-extra{display:contents}
+.sum .sum-extra[hidden]{display:none}
 .sum section{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:8px 10px;display:grid;gap:4px;align-content:start;min-width:0}
 .sum h3{margin:0 0 2px;font-size:16px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .sum .line{display:flex;justify-content:space-between;gap:8px;font-size:16px;color:#c9cfdb}
@@ -3876,7 +3879,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['0.17.6', 'Room for the warband', ['Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'Fixed: a fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
+  ['0.17.6', 'Room for the warband', ['The end screen is more compact: damage dealt, damage by class and healing, with More stats for the rest', 'Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'Fixed: a fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands behind the hero or in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet']],
   ['0.17.5', 'Quieter music', ['The low constant hum under the battle and title music is gone. The battle bass now plays as short notes on the beat']],
   ['0.17.4', 'Small fixes', ['Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow. Shots fly through him to the wights']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
@@ -3948,7 +3951,10 @@ function sumBars(obj, n, label, icon){
   return list.map(([k, v]) => `<div class="mt-row">${icon ? `<img src="${icon(k)}" alt="">` : '<span></span>'}<div class="nm"><span>${label(k)}</span><div class="bar"><i style="width:${Math.max(2, 100 * v / top)}%;background:${meterColor(k)}"></i></div></div><b>${fmtN(v)} <small style="color:var(--muted)">${Math.round(100 * v / tot)}%</small></b></div>`).join('');
 }
 function groupBy(obj, f){ const o = {}; for (const [k, v] of Object.entries(obj)){ const g = f(k); if (g) o[g] = (o[g] || 0) + v; } return o; }
+let sumMore = false; // the end screen shows the main stats; the rest opens on request
+$('#runSum').addEventListener('click', e => { if (!e.target.closest('#btnSumMore')) return; sumMore = !sumMore; const x = $('#runSum .sum-extra'), b = $('#btnSumMore'); if (x) x.hidden = !sumMore; b.setAttribute('aria-expanded', String(sumMore)); b.textContent = sumMore ? 'Fewer stats ▲' : 'More stats ▼'; });
 function renderRunSummary(){
+  sumMore = false;
   const st = S.stats; if (!st){ $('#runSum').innerHTML = ''; return; }
   const byCls = groupBy(st.dmg, k => CLASSES[k.split('_')[0]] ? k.split('_')[0] : null), byEl = groupBy(st.dmg, k => MODS[k.split('_')[1]] ? k.split('_')[1] : null);
   const taken = Object.entries(st.taken).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -3957,15 +3963,20 @@ function renderRunSummary(){
   const spark = hp.length > 1 ? `<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-label="Health after each wave"><polyline fill="none" stroke="var(--hp,#c4213f)" stroke-width="1.5" vector-effect="non-scaling-stroke" points="${hp.map((v, i) => `${(i / w * 100).toFixed(1)},${(38 - v * .36).toFixed(1)}`).join(' ')}"/></svg>` : '<div class="mt-empty">Fewer than two waves</div>';
   const board = S.board.filter(Boolean);
   $('#runSum').innerHTML = `
-    <section><h3>Damage dealt</h3>${sumBars(st.dmg, 8, srcLabel, srcIcon)}</section>
-    <section><h3>By class</h3>${sumBars(byCls, 4, k => CLASSES[k].name + 's', k => ICON[k])}<h3 style="margin-top:6px">By element</h3>${sumBars(byEl, 6, k => MODS[k].name, null)}</section>
-    <section><h3>Healing</h3>${sumBars(st.heal || {}, 6, srcLabel, srcIcon)}</section>
+    <section><h3>Damage dealt</h3>${sumBars(st.dmg, 5, srcLabel, srcIcon)}</section>
+    <section><h3>By class</h3>${sumBars(byCls, 4, k => CLASSES[k].name + 's', k => ICON[k])}</section>
+    <section><h3>Healing</h3>${sumBars(st.heal || {}, 5, srcLabel, srcIcon)}</section>
+    <button class="btn sm sum-more" type="button" id="btnSumMore" aria-expanded="${sumMore}">${sumMore ? 'Fewer stats ▲' : 'More stats ▼'}</button>
+    <div class="sum-extra"${sumMore ? '' : ' hidden'}>
+    <section><h3>All damage dealt</h3>${sumBars(st.dmg, 12, srcLabel, srcIcon)}</section>
+    <section><h3>By element</h3>${sumBars(byEl, 6, k => MODS[k].name, null)}</section>
     <section><h3>Damage taken</h3>${taken.length ? taken.map(([k, v]) => `<div class="line${k === st.killer ? ' kill' : ''}"><span>${k}${k === st.killer ? ' · final blow' : ''}</span><b>${Math.round(v)}</b></div>`).join('') : '<div class="mt-empty">No damage taken</div>'}</section>
     <section><h3>Gold</h3><div class="line"><span>Earned</span><b>${sumO(st.earned)}</b></div>${Object.entries(st.earned).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="line"><span>· ${k}</span><b>${v}</b></div>`).join('')}<div class="line" style="margin-top:4px"><span>Spent</span><b>${sumO(st.spent)}</b></div>${Object.entries(st.spent).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="line"><span>· ${k}</span><b>${v}</b></div>`).join('')}</section>
     <section><h3>Health after each wave</h3>${spark}</section>
     <section><h3>Your build</h3><div class="build">${board.map(u => `<img src="${ICON[ukey(u)]}" alt="${cardName(u)} ${u.star} star" title="${cardName(u)} ${'★'.repeat(u.star)}">`).join('')}</div>
       <div class="line"><span>Abilities</span><b>${S.abil.filter(Boolean).map(a => ABILITIES[a.key].name + ' ' + LV[a.lvl - 1]).join(', ') || 'None'}</b></div>
-      <div class="line"><span>Relics</span><b>${(S.relics || []).map(k => RELICS[k].name).join(', ') || 'None'}</b></div></section>`;
+      <div class="line"><span>Relics</span><b>${(S.relics || []).map(k => RELICS[k].name).join(', ') || 'None'}</b></div></section>
+    </div>`;
 }
 /* ---------- anonymous run stats for balancing ---------- */
 const RUNS_URL = 'https://zgzvhcwzrtjoapnozroo.supabase.co/rest/v1/runs';

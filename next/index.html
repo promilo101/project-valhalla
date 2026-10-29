@@ -643,6 +643,9 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #over .screen-inner{width:min(860px,100%)}
 .sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
 .sum:empty{display:none}
+.sum .sum-more{grid-column:1/-1;justify-self:center}
+.sum .sum-extra{display:contents}
+.sum .sum-extra[hidden]{display:none}
 .sum section{background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:8px 10px;display:grid;gap:4px;align-content:start;min-width:0}
 .sum h3{margin:0 0 2px;font-size:16px;font-weight:400;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
 .sum .line{display:flex;justify-content:space-between;gap:8px;font-size:16px;color:#c9cfdb}
@@ -4583,7 +4586,7 @@ async function cloudStartup(){
 const CHANGES = [
   ['0.20.0', 'Gear and the campfire', {
     Highlights: ['A new intro when a raid begins, and Fenrir\'s death now brings the Endless Winter: his dying breath freezes the field, and snow falls through all of Endless mode', 'Gear for your hero: helmet, chestplate, leggings, two weapon hands, two rings and a necklace', 'Your warband gathers at the campfire, and the Character panel (C) holds your gear and abilities', 'The Field Guide (J): beasts, units, abilities, battlefield events and gear, each unlocked as you find it', 'Battlefield events: the Blood Shrine, the Cursed Altar, Odin\'s Messenger and Sleipnir\'s Tracks', 'A new enemy from wave 7: the Draugr Spearman'],
-    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'A banner pops up for every new Field Guide find', 'A Damage meter button with its Tab hotkey sits below the minimap, next to Tooltips', 'The tutorial shows the Field Guide and the damage meter'],
+    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'A banner pops up for every new Field Guide find', 'The end screen is more compact: damage dealt, damage by class and healing, with More stats for the rest', 'A Damage meter button with its Tab hotkey sits below the minimap, next to Tooltips', 'The tutorial shows the Field Guide and the damage meter'],
     Changed: ['Relics are now jewelry. Each ring or necklace carries one of the old relic powers', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces', 'Bosses no longer heal you to full', 'Swift Stride is now Sleipnir\'s Tracks: run through six hoof marks within 8 seconds for an extra dash slot', 'Blood Shrines and Cursed Altars moved from the campfire to the battlefield', 'The boss reward screen separates the abilities from the boss\'s gear, with a tag on every card. Every boss reward card has the same soft sheen and sparkle, so none pulls your eye more than the others. The gear reveal plays once you pick it', 'Merchant cards show each piece\'s slot on a plain grey strip, so colour always means rarity', 'The pause menu is cleaner: Resume, the Field Guide, Settings and feedback, with Give up on its own', 'Rings and necklaces no longer show beside the ability bar in battle. You find them in the Character panel'],
     Fixed: ['A fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet', 'The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
   }],
@@ -4659,7 +4662,10 @@ function sumBars(obj, n, label, icon){
   return list.map(([k, v]) => `<div class="mt-row">${icon ? `<img src="${icon(k)}" alt="">` : '<span></span>'}<div class="nm"><span>${label(k)}</span><div class="bar"><i style="width:${Math.max(2, 100 * v / top)}%;background:${meterColor(k)}"></i></div></div><b>${fmtN(v)} <small style="color:var(--muted)">${Math.round(100 * v / tot)}%</small></b></div>`).join('');
 }
 function groupBy(obj, f){ const o = {}; for (const [k, v] of Object.entries(obj)){ const g = f(k); if (g) o[g] = (o[g] || 0) + v; } return o; }
+let sumMore = false; // the end screen shows the main stats; the rest opens on request
+$('#runSum').addEventListener('click', e => { if (!e.target.closest('#btnSumMore')) return; sumMore = !sumMore; const x = $('#runSum .sum-extra'), b = $('#btnSumMore'); if (x) x.hidden = !sumMore; b.setAttribute('aria-expanded', String(sumMore)); b.textContent = sumMore ? 'Fewer stats ▲' : 'More stats ▼'; });
 function renderRunSummary(){
+  sumMore = false;
   const st = S.stats; if (!st){ $('#runSum').innerHTML = ''; return; }
   const byCls = groupBy(st.dmg, k => CLASSES[k.split('_')[0]] ? k.split('_')[0] : null), byEl = groupBy(st.dmg, k => MODS[k.split('_')[1]] ? k.split('_')[1] : null);
   const taken = Object.entries(st.taken).sort((a, b) => b[1] - a[1]).slice(0, 5);
@@ -4668,15 +4674,20 @@ function renderRunSummary(){
   const spark = hp.length > 1 ? `<svg viewBox="0 0 100 40" preserveAspectRatio="none" aria-label="Health after each wave"><polyline fill="none" stroke="var(--hp,#c4213f)" stroke-width="1.5" vector-effect="non-scaling-stroke" points="${hp.map((v, i) => `${(i / w * 100).toFixed(1)},${(38 - v * .36).toFixed(1)}`).join(' ')}"/></svg>` : '<div class="mt-empty">Fewer than two waves</div>';
   const board = S.board.filter(Boolean);
   $('#runSum').innerHTML = `
-    <section><h3>Damage dealt</h3>${sumBars(st.dmg, 8, srcLabel, srcIcon)}</section>
-    <section><h3>By class</h3>${sumBars(byCls, 4, k => CLASSES[k].name + 's', k => ICON[k])}<h3 style="margin-top:6px">By element</h3>${sumBars(byEl, 6, k => MODS[k].name, null)}</section>
-    <section><h3>Healing</h3>${sumBars(st.heal || {}, 6, srcLabel, srcIcon)}</section>
+    <section><h3>Damage dealt</h3>${sumBars(st.dmg, 5, srcLabel, srcIcon)}</section>
+    <section><h3>By class</h3>${sumBars(byCls, 4, k => CLASSES[k].name + 's', k => ICON[k])}</section>
+    <section><h3>Healing</h3>${sumBars(st.heal || {}, 5, srcLabel, srcIcon)}</section>
+    <button class="btn sm sum-more" type="button" id="btnSumMore" aria-expanded="${sumMore}">${sumMore ? 'Fewer stats ▲' : 'More stats ▼'}</button>
+    <div class="sum-extra"${sumMore ? '' : ' hidden'}>
+    <section><h3>All damage dealt</h3>${sumBars(st.dmg, 12, srcLabel, srcIcon)}</section>
+    <section><h3>By element</h3>${sumBars(byEl, 6, k => MODS[k].name, null)}</section>
     <section><h3>Damage taken</h3>${taken.length ? taken.map(([k, v]) => `<div class="line${k === st.killer ? ' kill' : ''}"><span>${k}${k === st.killer ? ' · final blow' : ''}</span><b>${Math.round(v)}</b></div>`).join('') : '<div class="mt-empty">No damage taken</div>'}</section>
     <section><h3>Gold</h3><div class="line"><span>Earned</span><b>${sumO(st.earned)}</b></div>${Object.entries(st.earned).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="line"><span>· ${k}</span><b>${v}</b></div>`).join('')}<div class="line" style="margin-top:4px"><span>Spent</span><b>${sumO(st.spent)}</b></div>${Object.entries(st.spent).sort((a, b) => b[1] - a[1]).map(([k, v]) => `<div class="line"><span>· ${k}</span><b>${v}</b></div>`).join('')}</section>
     <section><h3>Health after each wave</h3>${spark}</section>
     <section><h3>Your build</h3><div class="build">${board.map(u => `<img src="${ICON[ukey(u)]}" alt="${cardName(u)} ${u.star} star" title="${cardName(u)} ${'★'.repeat(u.star)}">`).join('')}</div>
       <div class="line"><span>Abilities</span><b>${S.abil.filter(Boolean).map(a => ABILITIES[a.key].name + ' ' + LV[a.lvl - 1]).join(', ') || 'None'}</b></div>
-      <div class="line"><span>Jewelry</span><b>${(S.relics || []).map(k => JEWEL[k] ? JEWEL[k].name : k).join(', ') || 'None'}</b></div></section>`;
+      <div class="line"><span>Jewelry</span><b>${(S.relics || []).map(k => JEWEL[k] ? JEWEL[k].name : k).join(', ') || 'None'}</b></div></section>
+    </div>`;
 }
 /* ---------- anonymous run stats for balancing ---------- */
 const RUNS_URL = 'https://zgzvhcwzrtjoapnozroo.supabase.co/rest/v1/runs';
