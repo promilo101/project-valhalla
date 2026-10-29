@@ -1997,7 +1997,7 @@ function takePowerup(p){
 /* ================= COMBAT ================= */
 function nearest(x, y, range, eliteOnly){
   let best = null, bd = range * range;
-  for (const e of S.enemies){ if (e.dead || (eliteOnly && !e.elite && !e.d.boss)) continue; let d = dist2(x, y, e.x, e.y) - e.r * e.r; if (d > range * range) continue; if (e.d.boss) d *= .3; if (d < bd){ bd = d; best = e; } }
+  for (const e of S.enemies){ if (e.dead || e.immune || (eliteOnly && !e.elite && !e.d.boss && !e.prio)) continue; let d = dist2(x, y, e.x, e.y) - e.r * e.r; if (d > range * range) continue; if (e.d.boss) d *= .3; if (d < bd){ bd = d; best = e; } }
   return best;
 }
 function hit(e, raw, dtype, u, opt){
@@ -2341,7 +2341,7 @@ function update(dt){
     }
     if (p.kind === 'holy' && Math.random() < .5) S.parts.push({ x: p.x, y: p.y, vx: 0, vy: 0, life: .2, max: .2, col: '#ffe9a0', s: 1, add: true });
     for (const e of (S.enemies.length > 40 ? near(p.x, p.y, nb) : S.enemies)){
-      if (e.dead) continue;
+      if (e.dead || e.immune) continue; // shots fly through a boss hiding in his barrow
       if (dist2(p.x, p.y, e.x, e.y) > (p.r + e.r) ** 2) continue;
       if (p.hits && p.hits.has(e)) continue;
       if (p.aoe){ explode(p); p.life = 0; p.boom = true; break; }
@@ -2535,7 +2535,7 @@ function bossAI(e, dt, dx, dy, d, sp){
       return;
     }
     if (phase2 && !e.rose){ e.rose = true; e.immune = true; e.wights = [];
-      for (const s2 of [-1, 1]) e.wights.push(spawnEnemy('wight', e.x + s2 * 50, e.y - 20));
+      for (const s2 of [-1, 1]){ const w = spawnEnemy('wight', e.x + s2 * 50, e.y - 20); w.prio = true; e.wights.push(w); }
       burst(e.x, e.y, 30, ['#6a4428', '#3d2818'], 70, false); addText(e.x, e.y - e.h / 2 - 8, 'Barrow Rise', '#6fc7a0', true); return; }
     e.x += dx / d * sp * dt; e.y += dy / d * sp * dt;
     if (e.atkT <= 0){
@@ -2572,7 +2572,7 @@ function bossAI(e, dt, dx, dy, d, sp){
         e.state = 'cast'; e.st = .9; e.atkT = 2.8; addText(e.x, e.y - e.h / 2 - 6, 'Half-Death', '#d6b8ff', true);
       } else { // Soul Wisps: slow souls that drain the hero and heal her
         const alive = S.enemies.filter(o => o.d.wisp && !o.dead).length;
-        for (let k = alive; k < 3; k++){ const a2 = k * 2.1 + rand(0, .5); spawnEnemy('wisp', e.x + Math.cos(a2) * 18, e.y + Math.sin(a2) * 18); }
+        for (let k = alive; k < 3; k++){ const a2 = k * 2.1 + rand(0, .5); spawnEnemy('wisp', e.x + Math.cos(a2) * 18, e.y + Math.sin(a2) * 18).prio = true; }
         e.state = 'cast'; e.st = .7; e.atkT = 2.4; addText(e.x, e.y - e.h / 2 - 6, 'Soul Wisps', '#bfffe6', true);
       }
     }
@@ -3433,7 +3433,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.17.3'; // major.minor.patch
+const VERSION = '0.17.4'; // major.minor.patch
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
 const FEEDBACK_REPO = (() => {
@@ -3873,6 +3873,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['0.17.4', 'Small fixes', ['Fixed: with Bosses and elites first (F), units also go for the Barrow Wights and Soul Wisps a boss calls up, and no longer waste attacks on a boss hiding in his barrow. Shots fly through him to the wights']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
   ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
   ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
