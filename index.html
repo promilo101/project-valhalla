@@ -181,7 +181,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #abil .cdv{position:absolute;inset:0;background:conic-gradient(rgba(7,8,12,.78) var(--p,0%), transparent 0)}
 #abil .cdt{position:absolute;inset:0;display:grid;place-items:center;font-size:22px;color:#fff;text-shadow:0 2px 0 #000;pointer-events:none}
 #pick{z-index:6;background:rgba(7,8,12,.9)}
-.pcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.pcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
 .pcard{position:relative;display:grid;justify-items:center;gap:6px;text-align:center;padding:16px 12px;background:var(--panel);border:1px solid var(--c,var(--line));border-radius:2px;font:inherit;color:var(--fg);cursor:pointer}
 .pcard:hover{background:var(--panel-2);box-shadow:0 0 0 1px var(--c,var(--line)),0 0 18px color-mix(in srgb, var(--c,#fff) 30%, transparent)}
 .pcard:focus-visible{outline:2px solid var(--frost);outline-offset:2px}
@@ -421,6 +421,55 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .mt-head{display:flex;justify-content:space-between;align-items:center;font-size:15px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
 .mt-head .btn{font-size:13px;padding:1px 6px;letter-spacing:0;text-transform:none}
 .mt-btns{display:flex;gap:4px}
+.charbtn{display:grid;gap:8px;width:100%;text-align:left;background:var(--panel-2);border:1px solid var(--gold);border-radius:2px;padding:10px;color:var(--fg);font:inherit}
+.charbtn:hover{background:#232a3d}
+.cb-top{display:flex;gap:10px;align-items:center}
+.cb-top img{width:34px;height:40px;image-rendering:pixelated;image-rendering:crisp-edges}
+.cb-tt{display:grid;gap:2px;min-width:0}
+.cb-t{font-family:var(--font-display);font-weight:600;font-size:20px;color:var(--gold);white-space:nowrap}
+.cb-t kbd{font-family:var(--font-body);font-weight:400;font-size:16px}
+.cb-s{display:block;font-size:15px;color:var(--muted)}
+.cb-row{display:flex;flex-wrap:wrap;gap:3px}
+.cb-row img{width:22px;height:22px;image-rendering:pixelated;image-rendering:crisp-edges;background:#10131b;border:1px solid var(--rc,var(--line));border-radius:2px;padding:1px}
+.cb-row i{width:22px;height:22px;border:1px dashed var(--line);border-radius:2px}
+.form-help{font-size:16px;margin-top:6px}
+#formation.camp{position:absolute;inset:0;width:auto;height:auto;margin:0;pointer-events:none;z-index:1}
+#formation.camp .slot{position:absolute;pointer-events:auto;background:transparent!important;border:1px solid transparent;border-radius:50%;box-shadow:none;max-width:none;transform:translate(-50%,-50%);animation:none}
+#formation.camp .slot > img,#formation.camp .slot .st,#formation.camp .slot .smi{display:none}
+#formation.camp .slot:hover,#formation.camp .slot.over{border-color:var(--frost);background:rgba(134,212,255,.08)!important}
+#formation.camp .slot.sel{outline:2px solid var(--frost);outline-offset:0}
+#formation.camp .slot.match{outline:2px solid var(--gold);outline-offset:0}
+#formation.camp .slot.ready{box-shadow:0 0 0 1px var(--gold),0 0 12px rgba(226,178,76,.6)}
+#formation.camp .slot.locked{opacity:1;cursor:not-allowed}
+#formation.camp .slot .cnt{right:auto;left:50%;transform:translateX(-50%);bottom:-8px}
+#charPanel{z-index:5;background:rgba(7,8,12,.9)}
+.cp-box{width:min(1040px,100%);background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:14px 16px;display:grid;gap:14px}
+.cp-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.cp-head h2{margin-right:auto}
+.cp-body{display:grid;grid-template-columns:130px minmax(0,1fr) 280px;gap:18px;align-items:start}
+.cp-side h3,.cp-foot h3{font-family:var(--font-display);font-weight:600;font-size:17px;margin:0 0 8px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.cp-relics{flex-direction:column;align-items:flex-start;gap:8px}
+.cp-relics .rl{width:62px;height:62px}
+.cp-relics .rl img{width:40px;height:40px}
+.doll{display:grid;grid-template-columns:repeat(3,92px);grid-template-rows:repeat(3,92px);gap:10px;justify-content:center;grid-template-areas:". helm ." "main hero off" "chest hero legs"}
+.doll .hero-big{grid-area:hero;display:grid;place-items:center;background:radial-gradient(circle at 50% 60%,rgba(255,91,46,.16),transparent 70%)}
+.doll .hero-big img{width:84px;height:100px;image-rendering:pixelated;image-rendering:crisp-edges}
+.gs{display:grid;justify-items:center;align-content:center;gap:2px;background:var(--bg);border:1px solid var(--rc,var(--line));border-radius:2px;padding:4px;color:var(--fg);font:inherit;position:relative}
+.gs.empty{border-style:dashed}
+.gs img{width:46px;height:46px;image-rendering:pixelated;image-rendering:crisp-edges}
+.gs .gl{font-size:14px;color:var(--muted);line-height:1}
+.gs .gn{font-size:14px;line-height:1.05;text-align:center;color:var(--rc,var(--fg));max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.gs:hover,.gs.sel{outline:2px solid var(--frost);outline-offset:1px}
+.cp-stats{display:grid;grid-template-columns:auto auto;justify-content:center;gap:2px 18px;margin:14px 0 0;font-size:18px}
+.cp-stats dt{color:var(--muted)}
+.cp-stats dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
+.cp-info{min-height:12em;max-height:340px;overflow:auto;margin-top:0;border-top:0;border-left:1px solid var(--line);padding:2px 0 0 14px}
+.cp-foot{border-top:1px solid var(--line);padding-top:10px;display:grid;justify-items:center}
+.cp-foot .abt{width:60px;height:60px}
+.cp-foot .abt img{width:40px;height:40px}
+.item-card{border-color:color-mix(in srgb,var(--rc) 55%,var(--line))}
+@media (max-width:820px){.cp-body{grid-template-columns:minmax(0,1fr)}.cp-relics{flex-direction:row}.cp-info{border-left:0;border-top:1px solid var(--line);padding:8px 0 0}}
+
 .mt-row img{width:16px;height:19px;image-rendering:pixelated;image-rendering:crisp-edges}
 .mt-row .nm{min-width:0;display:grid;gap:2px}
 .mt-row .nm span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#c9cfdb}
@@ -508,6 +557,7 @@ a.btn{text-decoration:none;display:inline-block}
 <div id="app">
   <canvas id="cv" aria-label="Battlefield"></canvas>
   <div id="tips" aria-hidden="true"></div>
+  <div class="formation camp" id="formation" hidden aria-label="Formation around the campfire"></div>
 
   <div id="hud" hidden>
     <div aria-hidden="true"></div>
@@ -559,14 +609,10 @@ a.btn{text-decoration:none;display:inline-block}
 
   <section id="shop" hidden aria-label="Shop and formation">
     <div class="s-form">
-      <div class="head"><h3>Formation</h3></div>
-      <div class="formation" id="formation"></div>
-      <p class="note" style="text-align:center;margin-top:6px" id="slotNote">2 of 8 slots</p>
-      <div class="head" style="margin-top:12px"><h3>Hero abilities</h3></div>
-      <div class="abslots" id="shopAbil" aria-label="Hero abilities. Drag or click two slots to swap them"></div>
-      <p class="note" style="text-align:center;margin-top:4px;font-size:16px">Drag or click to reorder</p>
-      <div class="head" style="margin-top:12px"><h3>Relics</h3></div>
-      <div class="relics" id="relicRow" aria-label="Relics"></div>
+      <button class="charbtn" id="btnChar" type="button"><span class="cb-top"><img class="px" id="charBtnImg" alt=""><span class="cb-tt"><span class="cb-t">Character <kbd>C</kbd></span><span class="cb-s">Gear, abilities, relics</span></span></span><span class="cb-row" id="charSum"></span></button>
+      <div class="head" style="margin-top:12px"><h3>Formation</h3></div>
+      <p class="note" id="slotNote">2 of 8 slots</p>
+      <p class="note form-help">Drag units from the bench onto the glowing marks around your hero at the fire. Right-click a unit to swap it between bench and formation.</p>
     </div>
     <div class="s-main">
       <div class="shop-top">
@@ -596,6 +642,17 @@ a.btn{text-decoration:none;display:inline-block}
     <div class="infocol"><div class="info" id="info"></div></div>
   </section>
 
+  <section id="charPanel" class="screen" hidden aria-labelledby="charTitle">
+    <div class="cp-box">
+      <div class="cp-head"><h2 id="charTitle">Character</h2><span class="note"><kbd>C</kbd> or <kbd>Esc</kbd> to close</span><button class="btn sm" id="cpClose" type="button">Close</button></div>
+      <div class="cp-body">
+        <div class="cp-side"><h3>Relics</h3><div class="relics cp-relics" id="relicRow" aria-label="Relics"></div><p class="note">Click a relic to see it or sell it</p></div>
+        <div class="cp-mid"><div class="doll" id="doll"></div><dl class="cp-stats" id="cpStats"></dl></div>
+        <div class="cp-info info" id="charInfo"></div>
+      </div>
+      <div class="cp-foot"><h3>Hero abilities</h3><div class="abslots" id="shopAbil" aria-label="Hero abilities. Drag or click two slots to swap them"></div><p class="note">Drag or click to reorder. Abilities fire toward your mouse with 1, 2 and 3.</p></div>
+    </div>
+  </section>
   <section id="title" class="screen">
     <div class="screen-inner">
       <div class="eyebrow">Prototype <span id="verTxt">0.16.0</span><span id="devTag"> · DEV build</span> · Norse dark fantasy</div>
@@ -619,6 +676,7 @@ a.btn{text-decoration:none;display:inline-block}
         <dt><kbd>M</kbd></dt><dd>Mute or unmute all sound</dd>
         <dt><kbd>Tab</kbd></dt><dd>Show or hide the damage meter</dd>
         <dt><kbd>1</kbd><kbd>2</kbd><kbd>3</kbd></dt><dd>Hero abilities, aimed at the mouse cursor</dd>
+        <dt><kbd>C</kbd></dt><dd>In the shop: open your Character panel with gear, relics and abilities</dd>
         <dt><kbd>F</kbd></dt><dd>In battle: switch between targeting the nearest enemy and bosses and elites first</dd>
         <dt><kbd>B</kbd></dt><dd>Open the shop in Endless mode (once every 2 minutes)</dd>
         <dt>Shop</dt><dd><kbd>R</kbd> reroll · <kbd>F</kbd> buy XP · <kbd>E</kbd> sell · <kbd>Q</kbd> sort bench · <kbd>G</kbd> heal</dd>
@@ -1622,6 +1680,7 @@ function newRun(R){
     endless: false, won: false, midBattle: false, endlessStart: false, shopCd: 0,
   };
   if (R) applyRun(R);
+  if (!S.gear) S.gear = starterGear();
   computeTraits();
   S.hero.maxHp = heroMaxHp(); S.hero.hp = R ? clamp(R.hp, 1, S.hero.maxHp) : S.hero.maxHp;
   if (!R && !tut){ rollShop(); meta.runs++; saveMeta(); }
@@ -1636,7 +1695,7 @@ function runSnapshot(){
     endless: S.endless, won: S.won, debugUsed: S.debugUsed, hp: Math.ceil(S.hero.hp), dashSlots: S.hero.dashSlots,
     board: S.board.map(U), bench: S.bench.map(U), shop: S.shop.map(c => c && { cls: c.cls, mod: c.mod, locked: !!c.locked }),
     abil: S.abil.map(a => a && { key: a.key, lvl: a.lvl }),
-    relics: (S.relics || []).slice(), event: S.event || null, sinceEvent: S.sinceEvent || 0, altarPending: !!S.altarPending,
+    relics: (S.relics || []).slice(), gear: S.gear || null, event: S.event || null, sinceEvent: S.sinceEvent || 0, altarPending: !!S.altarPending,
     rollN: S.rollN || 0, xpN: S.xpN || 0, healN: S.healN || 0, savedAt: Date.now() };
 }
 function applyRun(R){
@@ -1650,7 +1709,8 @@ function applyRun(R){
   S.abil = [0, 1, 2].map(i => { const a = (R.abil || [])[i]; return a && ABILITIES[a.key] ? { key: a.key, lvl: clamp(a.lvl | 0, 1, 3), cd: 0 } : null; });
   S.hero.dashSlots = num(R.dashSlots, 1, dashCap(), 1); S.hero.dashCh = S.hero.dashSlots;
   S.relics = (Array.isArray(R.relics) ? R.relics : []).filter((k, i, a) => RELICS[k] && a.indexOf(k) === i).slice(0, MAX_RELICS);
-  const E = R.event; S.event = E && ['merchant', 'shrine', 'altar'].includes(E.type) ? (E.type === 'merchant' ? { type: 'merchant', offers: (E.offers || []).filter(k => RELICS[k]).slice(0, 3), bought: (E.bought || []).filter(k => RELICS[k]) } : { type: E.type, cost: num(E.cost, 1, 999, 20), gold: num(E.gold, 1, 99, 10), done: !!E.done }) : null;
+  S.gear = validGear(R.gear);
+  const E = R.event; S.event = E && ['merchant', 'shrine', 'altar'].includes(E.type) ? (E.type === 'merchant' ? { type: 'merchant', offers: (E.offers || []).filter(k => RELICS[k]).slice(0, 3), bought: (E.bought || []).filter(k => RELICS[k]), items: (Array.isArray(E.items) ? E.items : []).map(it => validItem(it)).filter(Boolean).slice(0, 3), boughtI: (Array.isArray(E.boughtI) ? E.boughtI : []).filter(Number.isInteger) } : { type: E.type, cost: num(E.cost, 1, 999, 20), gold: num(E.gold, 1, 99, 10), done: !!E.done }) : null;
   S.sinceEvent = num(R.sinceEvent, 0, 9, 0); S.altarPending = !!R.altarPending; S.resumed = true; S.stats.partial = true;
   if (S.event && S.event.type === 'merchant') S.event.offers.forEach(k => { if (!relicSeen(k)){ if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = []; meta.relicsSeen.push(k); } }); (S.relics || []).forEach(k => { if (!relicSeen(k)){ if (!Array.isArray(meta.relicsSeen)) meta.relicsSeen = []; meta.relicsSeen.push(k); } });
   S.board = Array.from({ length: 9 }, (_, i) => mkU((R.board || [])[i]));
@@ -1695,7 +1755,7 @@ function computeTraits(){
   S.regen = (cp >= 4 ? 3 : cp >= 2 ? 1 : 0) + (hasR('mead_hall') ? 1.5 : 0);
 }
 function modPow(m){ const n = S.tr.mod[m] || 0; return n >= 3 ? 2 : n >= 2 ? 1.5 : 1; }
-function heroMaxHp(){ const cp = S.tr.cls.priest; return Math.round((100 + meta.hp * 15 + (cp >= 4 ? 50 : cp >= 2 ? 20 : 0)) * (hasR('draugr_pact') ? .8 : 1)); }
+function heroMaxHp(){ const cp = S.tr.cls.priest; return Math.round((100 + meta.hp * 15 + (cp >= 4 ? 50 : cp >= 2 ? 20 : 0) + gearStat('hp')) * (hasR('draugr_pact') ? .8 : 1)); }
 function calcStats(u){
   const c = CLASSES[u.cls], m = MODS[u.mod], t = S.tr.cls;
   const starM = [1, 1.8, 3.2][u.star - 1], tierM = 1 + .3 * (m.tier - 1);
@@ -1857,6 +1917,7 @@ function startWave(){
   if (hasR('huginn_feather')){ spawnPowerup(); const p = S.pups[S.pups.length - 1]; if (p){ const a = rand(0, 6.283); p.x = S.hero.x + Math.cos(a) * 70; p.y = S.hero.y + Math.sin(a) * 50; } }
   const W = waveDef(S.wave);
   if (W.boss) spawnBoss(W.boss);
+  rollShrine();
   setMode('combat');
   banner(`Wave ${S.wave} · ${W.name}`, W.d);
   if (moved) toast(`${moved} unit${moved > 1 ? 's' : ''} moved from the bench into formation`);
@@ -1882,11 +1943,10 @@ function endlessNext(){
   const reward = 5 + interest + (W.boss ? 5 : 0);
   S.gold += reward; statGold('Wave rewards', reward - interest); statGold('Interest', interest); addXp(WAVE_XP);
   if (S.stats){ S.stats.hp.push(Math.max(0, Math.round(100 * S.hero.hp / S.hero.maxHp))); S.stats.lastW = S.stats.wdmg; S.stats.wdmg = {}; S.stats.lastWH = S.stats.wheal || {}; S.stats.wheal = {}; }
-  if (W.boss) S.hero.hp = S.hero.maxHp;
   S.wave++; S.waveT = 0; S.endDelay = 0; S.boss = null;
   const N = waveDef(S.wave);
   if (N.boss) spawnBoss(N.boss);
-  banner(`Wave ${S.wave} · ${N.name}`, `+${reward} gold${W.boss ? ' · fully healed' : ''} · ${N.d}`);
+  banner(`Wave ${S.wave} · ${N.name}`, `+${reward} gold · ${N.d}`);
   if (W.boss) showPick('boss');
 }
 function showVictory(){
@@ -1897,7 +1957,7 @@ function showVictory(){
 }
 function enterEndless(){
   S.endless = true; S.endlessStart = true; S.wave = WAVES.length + 1;
-  S.gold += 10; S.hero.hp = S.hero.maxHp;
+  S.gold += 10;
   rollShop(); openShop(); showPick('boss');
   banner('Endless mode', 'Prepare your warband. After this, the shop opens only from its button.');
 }
@@ -1914,7 +1974,8 @@ function endWave(){
     else { S.gold += 12; statGold('Events', 12); setTimeout(() => toast('The altar grants you 12 gold'), 1200); }
   }
   S.enemies.forEach(e => burst(e.x, e.y, 6, ['#6f9479', '#bfe9ff'], 40));
-  S.enemies = []; S.eprojs = []; S.tele = []; S.pups = []; S.corpses = []; clearBossFx();
+  if (S.altarCh) setTimeout(() => toast('The wave ended before the champions fell. No reward from the altar'), 1400);
+  S.enemies = []; S.eprojs = []; S.tele = []; S.pups = []; S.corpses = []; S.shrine = null; S.altarCh = null; clearBossFx();
   S.orbs.forEach(o => gainSouls(o.v)); S.orbs = [];
   if (S.wave >= WAVES.length) return showVictory();
   const interest = Math.min(hasR('usurer_coin') ? 8 : 5, Math.floor(S.gold / 10));
@@ -1922,12 +1983,11 @@ function endWave(){
   S.gold += reward; statGold('Wave rewards', reward - interest); statGold('Interest', interest);
   if (S.stats){ S.stats.hp.push(Math.max(0, Math.round(100 * S.hero.hp / S.hero.maxHp))); S.stats.lastW = S.stats.wdmg; S.stats.wdmg = {}; S.stats.lastWH = S.stats.wheal || {}; S.stats.wheal = {}; }
   addXp(WAVE_XP);
-  if (W.boss) S.hero.hp = S.hero.maxHp; // only bosses restore health; otherwise healing is bought in the shop
   S.wave++;
   rollShop();
   openShop();
   if (W.boss) showPick('boss');
-  banner(`Wave ${S.wave - 1} cleared`, `+${reward} gold${interest ? ` (${interest} interest)` : ''}${W.boss ? ' · fully healed' : ''}`);
+  banner(`Wave ${S.wave - 1} cleared`, `+${reward} gold${interest ? ` (${interest} interest)` : ''}`);
 }
 function waveRate(){ const W = waveDef(S.wave); return (S.cursed ? 1.25 : 1) * (0.6 + S.wave * 0.2) * (W.rate || 1) * (W.boss ? (W.endless ? .5 : .3) : 1); }
 function spawnFromWave(){
@@ -2051,10 +2111,11 @@ function kill(e){
 }
 function gainSouls(v){ S.souls += v; sfx('soul'); while (S.souls >= 10){ S.souls -= 10; S.gold++; statGold('Souls', 1); sfx('coin'); } }
 function healHero(n, src){ const h = S.hero, b = h.hp; h.hp = Math.min(h.maxHp, h.hp + n); if (src && mode === 'combat') statHeal(src, h.hp - b); }
+const MAGIC_SRC = /Witch|Frost Breath|Half-Death|Soul Wisp|Burning|Wight|Herald|Devour/i; // the rest of the enemy attacks are physical
 function heroDamage(d, src){
   const h = S.hero;
   if (dbg.god || S.tutorial || h.inv > 0 || h.dashT > 0 || S.wall > 0 || mode !== 'combat') return;
-  d *= S.dmgTaken; h.hp -= d; h.inv = .5; S.hurt = .25; sfx('hurt'); stopFor(.05);
+  d *= S.dmgTaken * armorCut(gearStat(MAGIC_SRC.test(src || '') ? 'ward' : 'armor')); h.hp -= d; h.inv = .5; S.hurt = .25; sfx('hurt'); stopFor(.05);
   if (S.stats){ const k = src || 'Unknown'; S.stats.taken[k] = (S.stats.taken[k] || 0) + Math.min(d, d + Math.min(0, h.hp)); if (h.hp <= 0) S.stats.killer = k; } S.shake = Math.min(7, S.shake + 3);
   addText(h.x, h.y - 10, Math.round(d), '#ff6b6b', true);
   if (h.hp <= 0){ h.hp = 0; gameOver(false); }
@@ -2268,6 +2329,22 @@ function update(dt){
     h.x += mx * spd * dt; h.y += my * spd * dt;
   }
   { const k = Math.min(1, dt * 1.5), px = S.hpx == null ? h.x : S.hpx, py = S.hpy == null ? h.y : S.hpy; S.hvx = (S.hvx || 0) + (clamp((h.x - px) / dt, -120, 120) - (S.hvx || 0)) * k; S.hvy = (S.hvy || 0) + (clamp((h.y - py) / dt, -120, 120) - (S.hvy || 0)) * k; S.hpx = h.x; S.hpy = h.y; }
+  // the hero's own weapon: a quick blow at the nearest enemy in reach
+  const wpn = S.gear && S.gear.main;
+  if (S.slash) S.slash.t -= dt;
+  if (wpn && !S.tutorial && h.dashT <= 0 && !h.bash){
+    h.atkT = (h.atkT || 0) - dt;
+    if (h.atkT <= 0){
+      const t = (settings.focus && nearest(h.x, h.y, wpn.range, true)) || nearest(h.x, h.y, wpn.range);
+      if (t){
+        h.atkT = 1 / (wpn.as * (S.fury > 0 ? 1.6 : 1) * (1 + meta.atkspd * .05));
+        const dmg = (wpn.dmg + ((S.gear.off && S.gear.off.dmg) || 0)) * (1 + meta.physdmg * .08) * (S.rage > 0 ? 1.3 : 1);
+        hit(t, dmg, 'phys', null, { src: 'hero_weapon' });
+        S.slash = { a: Math.atan2(t.y - h.y, t.x - h.x), t: .14, b: wpn.b }; sfx('axe');
+      } else h.atkT = .1;
+    }
+  }
+  tickShrine(dt);
   if (S.regen){ const pr = S.regen - (hasR('mead_hall') ? 1.5 : 0); if (pr > 0) healHero(pr * dt, 'syn_priest'); if (hasR('mead_hall')) healHero(1.5 * dt, 'relic_mead_hall'); }
   S.hurt = Math.max(0, S.hurt - dt);
   S.fury = Math.max(0, S.fury - dt); S.magnet = Math.max(0, S.magnet - dt);
@@ -2698,6 +2775,7 @@ function render(dt){
   camScreenY = camScreenY == null ? want : camScreenY + (want - camScreenY) * Math.min(1, dt * 7);
   const camX = Math.round(h.x - VW / 2 + sx), camY = Math.round(h.y - camScreenY + sy);
   lastCamX = camX; lastCamY = camY;
+  if (camp) positionCamp();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.globalCompositeOperation = 'source-over';
   // ground
@@ -2824,7 +2902,24 @@ function render(dt){
       ctx.drawImage(sp, Math.round(nx - sp.width / 2), Math.round(ny - sp.height / 2 + (k === 'merchant' ? Math.sin(ct * 2) * .6 : 0)));
       if (k === 'altar' && Math.random() < .3) S.parts.push({ x: nx + rand(-6, 6), y: ny - 4, vx: rand(-3, 3), vy: rand(-22, -10), life: .6, max: .6, col: pick(['#b98cff', '#d6b8ff']), s: 1, add: true });
     }
+    const nMarks = hasR('raven_banner') || st.board[8] ? 9 : 8, open = slotCount();
+    for (let i = 0; i < nMarks; i++){
+      if (st.board[i] && i < open) continue;
+      const o = SLOT_OFF[i], mx = h.x + o.x, my = h.y + o.y + 5;
+      ctx.beginPath(); ctx.ellipse(mx, my, 6, 2.6, 0, 0, 6.283);
+      if (i < open){ ctx.fillStyle = 'rgba(226,178,76,.14)'; ctx.fill(); ctx.strokeStyle = `rgba(226,178,76,${.5 + .3 * Math.sin(ct * 3 + i)})`; ctx.lineWidth = 1; ctx.stroke(); }
+      else { ctx.strokeStyle = 'rgba(140,150,170,.3)'; ctx.lineWidth = 1; ctx.setLineDash([2, 2]); ctx.stroke(); ctx.setLineDash([]); }
+    }
     st.board.forEach((u, i) => { if (!u || i >= slotCount()) return; u.x = h.x + SLOT_OFF[i].x; u.y = h.y + SLOT_OFF[i].y; u.face = u.x < fireX ? 1 : u.x > fireX ? -1 : u.face; u.hz = 0; u.leap = null; });
+  }
+  if (S && S.shrine && !S.shrine.done && !camp){ // a shrine or altar on the battlefield
+    const SH = S.shrine, sp = NPC[SH.kind], gc = SH.kind === 'shrine' ? '255,59,43' : '185,140,255', tt = st.time || 0;
+    ctx.globalCompositeOperation = 'lighter'; const gr = ctx.createRadialGradient(SH.x, SH.y - 4, 2, SH.x, SH.y - 4, 30 + Math.sin(tt * 4) * 3); gr.addColorStop(0, `rgba(${gc},.3)`); gr.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(SH.x, SH.y - 4, 34, 0, 6.283); ctx.fill(); ctx.globalCompositeOperation = 'source-over';
+    ctx.strokeStyle = `rgba(${gc},.55)`; ctx.lineWidth = 1; ctx.setLineDash([3, 2]); ctx.beginPath(); ctx.ellipse(SH.x, SH.y + 6, 18, 8, 0, 0, 6.283); ctx.stroke(); ctx.setLineDash([]);
+    if (SH.prog > 0){ ctx.strokeStyle = `rgba(${gc},1)`; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(SH.x, SH.y + 6, 18, 8, 0, -Math.PI / 2, -Math.PI / 2 + 6.283 * Math.min(1, SH.prog / 1.5)); ctx.stroke(); }
+    shadow(SH.x, SH.y + sp.height / 2 - 1, sp.width * .35);
+    ctx.drawImage(sp, Math.round(SH.x - sp.width / 2), Math.round(SH.y - sp.height / 2));
+    if (SH.kind === 'altar' && Math.random() < .3) S.parts.push({ x: SH.x + rand(-6, 6), y: SH.y - 4, vx: rand(-3, 3), vy: rand(-22, -10), life: .6, max: .6, col: pick(['#b98cff', '#d6b8ff']), s: 1, add: true });
   }
   // entities, y-sorted
   const ents = [];
@@ -2894,6 +2989,7 @@ function render(dt){
       ctx.globalAlpha = S && S.fury > 0 ? .35 : .18; ctx.fillStyle = '#ff5b2e'; ctx.beginPath(); ctx.arc(h.x, h.y + 2, S && S.fury > 0 ? 12 : 9, 0, 6.283); ctx.fill(); ctx.globalAlpha = 1;
       const blink = h.inv > 0 && Math.floor(st.time * 20) % 2 === 0;
       if (!blink) drawSprite('hero', h.x, h.y + (Math.sin(h.walk * 14) > 0 ? -1 : 0), 1, h.face);
+      if (S && S.slash && S.slash.t > 0){ const sl = S.slash, k = 1 - sl.t / .14; ctx.strokeStyle = `rgba(232,236,242,${.9 * (1 - k)})`; ctx.lineWidth = 1.5; ctx.beginPath(); if (sl.b === 'spear'){ ctx.moveTo(h.x + Math.cos(sl.a) * 6, h.y + Math.sin(sl.a) * 6); ctx.lineTo(h.x + Math.cos(sl.a) * (10 + 24 * k), h.y + Math.sin(sl.a) * (10 + 24 * k)); } else ctx.arc(h.x, h.y, sl.b === 'axe' ? 15 : 13, sl.a - 1.1 + k * .9, sl.a + .1 + k * .9); ctx.stroke(); }
       if (S && mode === 'combat'){
         const bx = Math.round(h.x) - 8, by = Math.round(h.y) + 9, f = clamp(h.hp / h.maxHp, 0, 1), low = f < .3 && Math.floor(st.time * 4) % 2 === 0;
         ctx.fillStyle = '#05060a'; ctx.fillRect(bx - 1, by - 1, 18, 4);
@@ -3081,6 +3177,7 @@ function drawMinimap(){
     mctx.strokeStyle = '#ffffff'; mctx.lineWidth = 1; mctx.strokeRect(-3, -3, 6, 6);
     mctx.restore();
   }
+  if (S.shrine && !S.shrine.done){ const [x, y, edge] = toMini(S.shrine.x, S.shrine.y, true); mctx.globalAlpha = edge ? pulse : 1; mctx.fillStyle = S.shrine.kind === 'shrine' ? '#ff3a5a' : '#b98cff'; mctx.beginPath(); mctx.arc(x, y, 3.5, 0, 6.283); mctx.fill(); mctx.strokeStyle = '#ffffff'; mctx.lineWidth = 1; mctx.stroke(); mctx.globalAlpha = 1; }
   // bosses
   for (const e of S.enemies){
     if (!e.d.boss) continue;
@@ -3099,6 +3196,7 @@ function setMode(m){
   mode = m; setTimeout(showUpd, 0);
   $('#hud').hidden = m !== 'combat';
   $('#shop').hidden = m !== 'shop';
+  $('#formation').hidden = m !== 'shop'; if (m !== 'shop') $('#charPanel').hidden = true;
   $('#title').hidden = m !== 'title';
   $('#meta').hidden = m !== 'meta';
   $('#lb').hidden = m !== 'lb';
@@ -3120,7 +3218,7 @@ function openShop(){
   if (S.resumed) S.resumed = false; // a continued raid keeps its saved event
   else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 5; statGold('Relics', 5); setTimeout(() => toast("Ghost Ship Chest: +5 gold"), 400); } }
   setMode('shop'); $('#info').innerHTML = DEFAULT_INFO; renderShop(); }
-const DEFAULT_INFO = 'Click a card to buy it. Lock a card with its padlock to keep it through rerolls and into the next shop. Reroll, XP and healing get 50% more expensive each time you use them in the same shop. Health only refills by itself after a boss. Drag a unit onto a slot to move or swap it, or right-click to send it between bench and formation. Three of a kind combine into one more star.';
+const DEFAULT_INFO = 'Click a card to buy it. Lock a card with its padlock to keep it through rerolls and into the next shop. Reroll, XP and healing get 50% more expensive each time you use them in the same shop. Health does not refill by itself: buy healing here, or bring priests, Blood units and good armor. Drag a unit onto a slot to move or swap it, or right-click to send it between bench and formation. Three of a kind combine into one more star.';
 let toastT = 0;
 function toast(msg){ const t = $('#toast'); t.textContent = msg; t.hidden = false; toastT = 1.8; }
 let bannerTimer = 0;
@@ -3225,14 +3323,10 @@ function renderShop(){
     return `<div class="slot has s${u.star}${sel ? ' sel' : ''}${ready ? ' ready' : ''}"${st} role="button" tabindex="0" draggable="true" data-w="${where}" data-i="${i}" data-key="${gkey(u)}" aria-label="${cardName(u)}, ${u.star} star${u.star > 1 ? 's' : ''}${show ? `, ${n} of 3 for an upgrade` : ''}"><span class="st s${u.star}">${'★'.repeat(u.star)}</span>${unitImg(u.cls, u.mod)}<img class="smi" src="${MODS[u.mod].icon}" alt="">${show ? `<span class="cnt">${n}/3</span>` : ''}</div>`;
   };
   $('#bench').innerHTML = S.bench.map((u, i) => slotHTML(u, 'bench', i, false)).join('');
-  const R = 66;
   const nine = hasR('raven_banner') || !!S.board[8];
-  $('#formation').classList.toggle('nine', nine);
-  $('#formation').innerHTML = `<img class="px hero" src="${ICON.hero}" alt="The hero">` + S.board.map((u, i) => {
-    if (i === 8) return nine ? slotHTML(u, 'board', 8, 8 >= slotCount(), 'left:70px;top:184px;') : '';
-    const a = -Math.PI / 2 + i * Math.PI / 4, x = 90 + Math.cos(a) * R - 20, y = 90 + Math.sin(a) * R - 20;
-    return slotHTML(u, 'board', i, i >= slotCount(), `left:${x}px;top:${y}px;`);
-  }).join('');
+  $('#formation').innerHTML = S.board.map((u, i) => i === 8 && !nine ? '' : slotHTML(u, 'board', i, i >= slotCount())).join('');
+  positionCamp();
+  renderCharSum(); if (!$('#charPanel').hidden) renderChar();
   $('#slotNote').textContent = `${S.board.filter(Boolean).length} units · ${slotCount()} of ${hasR('raven_banner') ? 9 : 8} slots open`;
   $('#shopAbil').innerHTML = S.abil.map((a, i) => {
     if (!a) return `<div class="abt empty${S.selAb === i ? ' sel' : ''}" data-ai="${i}" role="button" tabindex="0" aria-label="Empty ability slot ${i + 1}"><span class="k">${i + 1}</span></div>`;
@@ -3258,6 +3352,42 @@ function renderShop(){
   $('#btnSell').innerHTML = su ? `Sell · +${su ? sellValue(su) : 0}g <kbd>E</kbd>` : 'Sell <kbd>E</kbd>';
   if (su) $('#info').innerHTML = describe(su);
 }
+/* ---------- the formation lives at the campfire: invisible hotspots over the units drawn on the canvas ---------- */
+function positionCamp(){
+  const box = $('#formation'); if (!box || box.hidden || !S) return;
+  const sx = cv.clientWidth / VW, sy = cv.clientHeight / VH, sz = Math.round(15 * sy), h = S.hero;
+  box.querySelectorAll('.slot').forEach(el => { const o = SLOT_OFF[+el.dataset.i]; el.style.left = Math.round((h.x + o.x - lastCamX) * sx) + 'px'; el.style.top = Math.round((h.y + o.y - 2 - lastCamY) * sy) + 'px'; el.style.width = el.style.height = sz + 'px'; });
+}
+const dragImgs = {};
+function dragImg(u){ const k = ukey(u); if (!dragImgs[k]){ const im = new Image(); im.src = ICON[k]; dragImgs[k] = im; } return dragImgs[k]; }
+/* ---------- Character panel: gear, relics and hero abilities ---------- */
+const setInfo = html => { $('#info').innerHTML = html; };
+const charDefault = () => '<strong>Your hero</strong><br>Hover or click a piece of gear, a relic or an ability to see what it does. Gear comes from the Merchant and from bosses, and lasts for this raid. Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells.';
+function renderChar(){
+  if (!S) return;
+  const slot = sl => { const it = S.gear[sl]; return it ? `<button class="gs" type="button" data-gs="${sl}" style="grid-area:${sl};--rc:${RARITY[it.r].col}"><img src="${itemIcon(it)}" alt=""><span class="gn">${esc(it.name)}</span><span class="gl">${SLOT_NAME[sl]}</span></button>` : `<button class="gs empty" type="button" data-gs="${sl}" style="grid-area:${sl}"><span class="gl">${SLOT_NAME[sl]}</span><span class="gl">empty</span></button>`; };
+  $('#doll').innerHTML = GEAR_SLOTS.map(slot).join('') + `<div class="hero-big"><img src="${ICON.hero}" alt="Your hero"></div>`;
+  const ar = gearStat('armor'), wa = gearStat('ward'), w = S.gear.main;
+  const pct = v => Math.round((1 - armorCut(v)) * 100);
+  $('#cpStats').innerHTML = `<dt>Health</dt><dd>${Math.ceil(S.hero.hp)} / ${S.hero.maxHp}</dd><dt>Physical armor</dt><dd>${ar} <small style="color:var(--muted)">−${pct(ar)}% damage</small></dd><dt>Magic armor</dt><dd>${wa} <small style="color:var(--muted)">−${pct(wa)}% damage</small></dd><dt>Weapon damage</dt><dd>${w ? Math.round((w.dmg + ((S.gear.off && S.gear.off.dmg) || 0)) * (1 + meta.physdmg * .08)) + ` <small style="color:var(--muted)">${w.as.toFixed(2)}/s</small>` : 'none'}</dd><dt>Ability damage</dt><dd>+${abilBonus()}%</dd>`;
+}
+function renderCharSum(){
+  if (!S) return;
+  $('#charBtnImg').src = ICON.hero;
+  const g = GEAR_SLOTS.map(sl => S.gear[sl] ? `<img src="${itemIcon(S.gear[sl])}" alt="${esc(S.gear[sl].name)}" title="${esc(S.gear[sl].name)}" style="--rc:${RARITY[S.gear[sl].r].col}">` : '<i title="Empty"></i>').join('');
+  const a = S.abil.filter(Boolean).map(x => `<img src="${ABIL_ICON[x.key]}" alt="${ABILITIES[x.key].name}" title="${ABILITIES[x.key].name}">`).join('');
+  const r = (S.relics || []).map(k => `<img src="${RELIC_ICON[k]}" alt="${RELICS[k].name}" title="${RELICS[k].name}">`).join('');
+  $('#charSum').innerHTML = g + (a ? '<span style="width:100%"></span>' + a : '') + (r ? '<span style="width:100%"></span>' + r : '');
+}
+function openChar(){ if (!S || mode !== 'shop' || picking) return; $('#charPanel').hidden = false; renderShop(); renderChar(); $('#charInfo').innerHTML = charDefault(); sfx('click'); }
+function closeChar(){ $('#charPanel').hidden = true; S && (S.selRelic = null); if (S && mode === 'shop') renderShop(); }
+$('#btnChar').onclick = e => { e.currentTarget.blur(); openChar(); };
+$('#cpClose').onclick = closeChar;
+new MutationObserver(() => { if (!$('#charPanel').hidden) $('#charInfo').innerHTML = $('#info').innerHTML; }).observe($('#info'), { childList: true, subtree: true, characterData: true });
+$('#doll').addEventListener('mouseover', e => { const b = e.target.closest('.gs'); if (!b || !S) return; const it = S.gear[b.dataset.gs]; setInfo(it ? describeItem(it, 'worn') : `<strong>${SLOT_NAME[b.dataset.gs]}</strong><br>Empty. The Merchant sells gear at every campfire, and bosses drop rarer pieces.`); });
+$('#doll').addEventListener('click', e => { const b = e.target.closest('.gs'); if (!b || !S) return; const it = S.gear[b.dataset.gs]; if (it) setInfo(describeItem(it, 'worn')); });
+$('#charInfo').addEventListener('click', e => { const b = e.target.closest('#btnRelicSell'); if (b){ sellRelic(b.dataset.r); return; } const g = e.target.closest('#btnGearSell'); if (g) sellGear(g.dataset.gs); });
+$('#info').addEventListener('click', e => { const g = e.target.closest('#btnGearSell'); if (g) sellGear(g.dataset.gs); });
 let showAllTr = false;
 function fitShopCols(){ const sh = $('#shop'); if (!sh || sh.hidden) return; sh.classList.toggle('wide4', sh.clientWidth >= 1480); sh.classList.toggle('xl', sh.clientWidth >= 2200); }
 $('#traits').addEventListener('click', e => { if (e.target.closest('#trAll')){ showAllTr = !showAllTr; renderShop(); } });
@@ -3292,21 +3422,22 @@ for (const id of ['#bench', '#formation']){
 // drag and drop between bench, formation and the sell button
 let drag = null;
 const shopEl = $('#shop');
-shopEl.addEventListener('dragstart', e => {
+for (const dz of [shopEl, $('#formation')]){
+dz.addEventListener('dragstart', e => {
   const b = e.target.closest && e.target.closest('.slot.has'); if (!b){ return; }
   drag = { where: b.dataset.w, i: +b.dataset.i };
-  try { e.dataTransfer.setData('text/plain', 'unit'); e.dataTransfer.effectAllowed = 'move'; } catch (err) {}
+  try { e.dataTransfer.setData('text/plain', 'unit'); e.dataTransfer.effectAllowed = 'move'; if (b.closest('#formation')){ const im = dragImg(S[drag.where][drag.i]); e.dataTransfer.setDragImage(im, 15, 18); } } catch (err) {}
   S.sel = null;
   const sb = $('#btnSell'); sb.disabled = false; sb.innerHTML = `Drop here to sell · +${sellValue(S[drag.where][drag.i])}g`;
 });
-shopEl.addEventListener('dragover', e => {
+dz.addEventListener('dragover', e => {
   if (!drag) return;
   const t = e.target.closest && (e.target.closest('.slot') || e.target.closest('#btnSell'));
   document.querySelectorAll('.over').forEach(el => { if (el !== t) el.classList.remove('over'); });
   if (!t || t.classList.contains('locked')) return;
   e.preventDefault(); t.classList.add('over');
 });
-shopEl.addEventListener('drop', e => {
+dz.addEventListener('drop', e => {
   if (!drag) return;
   e.preventDefault();
   const t = e.target.closest && (e.target.closest('.slot') || e.target.closest('#btnSell'));
@@ -3315,7 +3446,8 @@ shopEl.addEventListener('drop', e => {
   if (t && t.dataset.w){ moveUnit(from, { where: t.dataset.w, i: +t.dataset.i }); computeTraits(); }
   renderShop();
 });
-shopEl.addEventListener('dragend', () => { if (drag){ drag = null; renderShop(); } document.querySelectorAll('.over').forEach(el => el.classList.remove('over')); });
+dz.addEventListener('dragend', () => { if (drag){ drag = null; renderShop(); } document.querySelectorAll('.over').forEach(el => el.classList.remove('over')); });
+}
 
 $('#btnTips').onclick = e => { toggleTips(); e.currentTarget.blur(); }; syncTipsBtn();
 $('#btnHeal').onclick = buyHeal;
@@ -3418,8 +3550,8 @@ document.querySelector('.fg-tabs').addEventListener('keydown', e => {
 $('#btnBest').onclick = () => { showBestiary(true); fgShow(fgTab); };
 $('#btnGuide').onclick = openGuideFromTitle;
 $('#btnBestBack').onclick = () => showBestiary(false);
-$('#event').addEventListener('click', e => { const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
-$('#event').addEventListener('mouseover', e => { const r = e.target.closest('.relic-card'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, false); });
+$('#event').addEventListener('click', e => { const ic = e.target.closest('.item-card'); if (ic){ buyItem(+ic.dataset.item); return; } const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
+$('#event').addEventListener('mouseover', e => { const ic = e.target.closest('.item-card'); if (ic && S.event && S.event.items){ setInfo(describeItem(S.event.items[+ic.dataset.item], 'shop')); return; } const r = e.target.closest('.relic-card'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, false); });
 $('#relicRow').addEventListener('click', e => { const r = e.target.closest('.rl[data-r]'); if (!r) return; S.selRelic = S.selRelic === r.dataset.r ? null : r.dataset.r; renderShop(); $('#info').innerHTML = describeRelic(r.dataset.r, true); });
 $('#relicRow').addEventListener('mouseover', e => { const r = e.target.closest('.rl[data-r]'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, true); });
 $('#info').addEventListener('click', e => { const b = e.target.closest('#btnRelicSell'); if (b) sellRelic(b.dataset.r); });
@@ -3433,7 +3565,7 @@ $('#btnResume').onclick = () => togglePause(false); $('#btnQuit').onclick = e =>
 $('#puList').innerHTML = Object.values(POWERUPS).map(p => `<dt><span class="gem" style="background:${p.col}"></span>${p.name}</dt><dd>${p.desc}</dd>`).join('');
 
 /* ================= FEEDBACK ================= */
-const VERSION = '0.17.3'; // major.minor.patch
+const VERSION = '1.0.0'; // major.minor.patch
 // When the game runs on GitHub Pages (owner.github.io/repo) the repo is found automatically.
 // Set it here by hand if the game is hosted somewhere else, e.g. 'owner/project-valhalla'.
 const FEEDBACK_REPO = (() => {
@@ -3533,7 +3665,7 @@ const ABILITIES = {
     desc: l => `For 6 seconds you move 30% faster and enemies you touch take damage.${l >= 3 ? ' Every kill during the rage refills a dash.' : ''}` },
 };
 const ABIL_ICON = {}; for (const k in ABILITIES) ABIL_ICON[k] = makeSprite(ABILITIES[k].icon, ABILITIES[k].ic).toDataURL();
-const abilDmg = (base, l) => base * [1, 1.4, 1.9][l - 1] * abilScale();
+const abilDmg = (base, l) => base * [1, 1.4, 1.9][l - 1] * abilScale() * (1 + abilBonus() / 100);
 // aiming: a point on the battlefield under the mouse (later: a tap or thumb stick on Android)
 let mouseX = 0, mouseY = 0, mouseSeen = false;
 addEventListener('mousemove', e => { const r = cv.getBoundingClientRect(); mouseX = e.clientX - r.left; mouseY = e.clientY - r.top; mouseSeen = true; });
@@ -3594,11 +3726,13 @@ function showPick(kind){
     const news = Object.keys(ABILITIES).filter(k => !owned.includes(k)).map(key => ({ type: 'new', key }));
     opts = shuffle(ups).slice(0, 2).concat(shuffle(news)); opts = shuffle(opts.slice(0, 3));
     if (!opts.length) opts = [{ type: 'gold', key: 'gold' }];
+    opts.push({ type: 'item', item: makeItem(pick(GEAR_SLOTS), rollRarity(S.wave, true), S.wave) }); // a boss also drops a piece of rare gear
   }
   picking = { kind, opts, step: 'choose', chosen: null };
   renderPick();
 }
 function pickCardHTML(o, i){
+  if (o.type === 'item'){ const it = o.item, R = RARITY[it.r], cur = S.gear && S.gear[it.slot]; return `<button class="pcard" type="button" data-p="${i}" style="--c:${R.col}"><span class="pk">${i + 1}</span><img class="pi px" src="${itemIcon(it)}" alt=""><span class="pn" style="color:${R.col}">${esc(it.name)}</span><span class="pt">${R.name} ${SLOT_NAME[it.slot].toLowerCase()}</span><span class="pd">${itemStats(it).join(' · ')}${cur ? `<br><small style="color:var(--muted)">Replaces your ${esc(cur.name)}, sold for ${itemSell(cur)} gold</small>` : ''}</span></button>`; }
   if (o.type === 'gold') return `<button class="pcard" type="button" data-p="${i}"><span class="pk">${i + 1}</span><span class="pn">Dwarven Hoard</span><span class="pt">Reward</span><span class="pd">Every ability is at level III. Take 25 gold instead.</span></button>`;
   const A = ABILITIES[o.key], sl = S.abil.find(x => x && x.key === o.key), l = o.type === 'up' ? sl.lvl + 1 : 1;
   return `<button class="pcard" type="button" data-p="${i}" style="--c:${A.col}"><span class="pk">${i + 1}</span><img class="pi px" src="${ABIL_ICON[o.key]}" alt=""><span class="pn">${A.name}</span><span class="pt">${o.type === 'up' ? `Upgrade to ${LV[l - 1]}` : 'New ability'} · ${A.cd[l - 1]} s cooldown</span><span class="pd">${A.desc(l)}</span></button>`;
@@ -3609,7 +3743,7 @@ function renderPick(){
   if (P.step === 'choose'){
     $('#pickEye').textContent = P.kind === 'start' ? 'Your saga begins' : 'A boss has fallen';
     $('#pickTitle').textContent = P.kind === 'start' ? 'Choose your first ability' : 'Choose a reward';
-    $('#pickSub').innerHTML = `Abilities go on <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> and fire toward your mouse cursor.`;
+    $('#pickSub').innerHTML = `Abilities go on <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> and fire toward your mouse cursor.${P.opts.some(o => o.type === 'item') ? ' The boss also left a piece of gear: take it instead with its number.' : ''}`;
     $('#pickCards').innerHTML = P.opts.map(pickCardHTML).join('');
     const canSkip = P.kind !== 'start' && !(P.opts.length === 1 && P.opts[0].type === 'gold');
     $('#pickSkip').hidden = !canSkip; $('#pickSkip').innerHTML = 'Skip, take 10 gold <kbd>Esc</kbd>';
@@ -3626,6 +3760,7 @@ function choosePick(i){
   if (P.step === 'replace'){ if (i >= 0 && i < 3) S.abil[i] = { key: P.chosen, lvl: 1, cd: 0 }; return closePick(); }
   const o = P.opts[i]; if (!o) return;
   if (o.type === 'gold'){ S.gold += 25; return closePick(); }
+  if (o.type === 'item'){ const old = equipItem(o.item); if (S.stats) (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: o.item.slot, b: o.item.b, r: o.item.r, w: S.wave, boss: true }); toast(old ? `${o.item.name} equipped · ${old.name} sold for ${itemSell(old)} gold` : `${o.item.name} equipped`); return closePick(); }
   if (o.type === 'up'){ const sl = S.abil.find(x => x && x.key === o.key); sl.lvl = Math.min(3, sl.lvl + 1); return closePick(); }
   const empty = S.abil.indexOf(null);
   if (empty >= 0){ S.abil[empty] = { key: o.key, lvl: 1, cd: 0 }; return closePick(); }
@@ -3873,6 +4008,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
+  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a relic', 'Bosses also drop a rare or epic piece of gear as a reward choice', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a relic', 'Bosses no longer heal you to full']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
   ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
   ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
@@ -3974,7 +4110,8 @@ function runRecord(result){
     endless_wave: S.endless ? Math.max(0, S.wave - WAVES.length - 1) : 0, minutes: Math.round((Date.now() - st.t0) / 6000) / 10, debug: !!S.debugUsed,
     data: { level: S.level, kills: S.kills, bosses: S.bosses, partial: st.partial, board: S.board.filter(Boolean).map(u => ({ c: u.cls, m: u.mod, s: u.star })),
       bench: S.bench.filter(Boolean).map(u => ({ c: u.cls, m: u.mod, s: u.star })), abilities: S.abil.filter(Boolean).map(a => ({ k: a.key, l: a.lvl })),
-      relics: (S.relics || []).slice(), relicBuys: st.relicBuys, events: st.events, forge, dash: S.hero.dashSlots,
+      relics: (S.relics || []).slice(), relicBuys: st.relicBuys, events: st.events, forge,
+      gear: GEAR_SLOTS.map(sl => S.gear && S.gear[sl] && { s: sl, b: S.gear[sl].b, r: S.gear[sl].r }).filter(Boolean), gearBuys: st.gearBuys || [], dash: S.hero.dashSlots,
       dmg, heal, kills: st.kills, taken, killer: st.killer, earned: st.earned, spent: st.spent, hp: st.hp },
   };
 }
@@ -4025,7 +4162,7 @@ addEventListener('keydown', e => {
   if (guideFromTitle){ if (e.code === 'Escape'){ e.preventDefault(); showBestiary(false); } return; }
   if (dbg.bot && e.isTrusted && !e.ctrlKey && !e.metaKey && !e.altKey && MOVE_KEYS.includes(e.code) && !(e.target && e.target.closest && e.target.closest('input, textarea, select'))){ setBot(false); toast('Autoplay off. You have control.'); }
   if (e.ctrlKey && e.shiftKey && e.code === 'KeyD'){ e.preventDefault(); toggleDbg(); return; }
-  const digit = { Digit1: 0, Digit2: 1, Digit3: 2, Numpad1: 0, Numpad2: 1, Numpad3: 2 }[e.code];
+  const digit = { Digit1: 0, Digit2: 1, Digit3: 2, Digit4: 3, Numpad1: 0, Numpad2: 1, Numpad3: 2, Numpad4: 3 }[e.code];
   if (picking){ if (digit != null && !e.repeat){ e.preventDefault(); choosePick(digit); } else if (e.code === 'Escape' && !e.repeat){ e.preventDefault(); skipPick(); } else if (e.code === 'Space') e.preventDefault(); return; }
   if (digit != null && mode === 'combat' && !e.repeat && !(e.target && e.target.closest && e.target.closest('input, textarea, select'))){ castAbility(digit); return; }
   if (mode === 'title' && /^[a-z]$/i.test(e.key)){ titleBuf = (titleBuf + e.key.toLowerCase()).slice(-4); if (titleBuf === 'odin'){ titleBuf = ''; toggleDbg(true); return; } }
@@ -4035,6 +4172,7 @@ addEventListener('keydown', e => {
   if (e.code === 'Tab' && (mode === 'combat' || mode === 'shop') && !e.altKey){ e.preventDefault(); if (!e.repeat) toggleMeter(); return; }
   keys[e.code] = true;
   if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code) && (mode === 'combat' || mode === 'shop')) e.preventDefault();
+  if (mode === 'shop' && !$('#charPanel').hidden && !paused){ if (!e.repeat && (e.code === 'Escape' || e.code === 'KeyC')){ e.preventDefault(); closeChar(); } return; }
   if (mode === 'combat'){
     if (e.code === 'Space' && !paused && !e.repeat){ const h = S.hero; if (h.dashCh > 0 && h.dashT <= 0){ sfx('dash'); onDash(); h.dashT = .16; h.dashCh--; if (h.dashRt <= 0) h.dashRt = DASH_RECHARGE; if (S.bind){ S.bind = null; addText(h.x, h.y - 14, 'Broke free!', '#b4bccb', true); } } }
     if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
@@ -4050,6 +4188,7 @@ addEventListener('keydown', e => {
     else if (e.code === 'KeyE') sellSel();
     else if (e.code === 'KeyQ') sortBench();
     else if (e.code === 'KeyG') buyHeal();
+    else if (e.code === 'KeyC') openChar();
   }
 });
 addEventListener('keyup', e => { keys[e.code] = false; if (e.code === 'Space' && mode !== 'title' && mode !== 'meta' && mode !== 'over') e.preventDefault(); });
@@ -4125,6 +4264,7 @@ function srcLabel(k){
   if (k === 'hero') return 'Hero and power-ups';
   if (k === 'ember') return 'Ember Boots';
   if (k === 'syn_priest') return 'Priests synergy';
+  if (k === 'hero_weapon') return 'Hero weapon';
   if (k === 'pu_mead') return POWERUPS.mead.name;
   if (k.startsWith('relic_')) return RELICS[k.slice(6)] ? RELICS[k.slice(6)].name : k;
   if (k.startsWith('abil_')) return ABILITIES[k.slice(5)] ? ABILITIES[k.slice(5)].name : k;
@@ -4196,35 +4336,198 @@ function renderRelicBar(){
   bar.innerHTML = list.map(k => `<img src="${RELIC_ICON[k]}" alt="${RELICS[k].name}" title="${RELICS[k].name}: ${RELICS[k].desc}">`).join('');
 }
 
+/* ================= GEAR: helmet, chestplate, leggings and two hands, kept for one raid ================= */
+const GEAR_SLOTS = ['helm', 'chest', 'legs', 'main', 'off'];
+const SLOT_NAME = { helm: 'Helmet', chest: 'Chestplate', legs: 'Leggings', main: 'Main hand', off: 'Off hand' };
+const RARITY = [
+  { name: 'Common', col: '#c9cfdb', m: 1, price: 1 },
+  { name: 'Rare', col: '#5fb0ff', m: 1.5, price: 1.8 },
+  { name: 'Epic', col: '#c08aff', m: 2.1, price: 2.8 },
+];
+const FLAVOR = { plate: { armor: 1, ward: .3, hp: .6 }, mail: { armor: .65, ward: .65, hp: .8 }, rune: { armor: .3, ward: 1, hp: .6 } };
+const SLOT_W = { helm: .3, chest: .45, legs: .35, off: .35 };
+const GEAR_BASES = {
+  helm:  { helm: { name: 'Helm', fl: 'plate' }, coif: { name: 'Mail Coif', fl: 'mail' }, hood: { name: 'Rune Hood', fl: 'rune' } },
+  chest: { breast: { name: 'Breastplate', fl: 'plate' }, hauberk: { name: 'Hauberk', fl: 'mail' }, vest: { name: 'Rune Vest', fl: 'rune' } },
+  legs:  { greaves: { name: 'Greaves', fl: 'plate' }, chausses: { name: 'Chausses', fl: 'mail' }, wraps: { name: 'Rune Wraps', fl: 'rune' } },
+  main:  { axe: { name: 'Axe', dmg: 1.15, as: .85, range: 24 }, sword: { name: 'Sword', dmg: 1, as: 1.05, range: 22 }, spear: { name: 'Spear', dmg: .9, as: .95, range: 36 } },
+  off:   { shield: { name: 'Shield', fl: 'plate' }, handaxe: { name: 'Hand Axe', dmg: .5 }, talisman: { name: 'Talisman', fl: 'rune', pow: .4 } },
+};
+const GEAR_PREFIX = [['Worn', 'Plain', 'Rough'], ['Fine', 'Runed', 'Keen'], ['Jarl-Forged', 'Valkyrie', 'Dwarf-Made']];
+let itemUid = 0;
+function makeItem(slot, r, wave, bk){
+  const bases = GEAR_BASES[slot]; bk = bk && bases[bk] ? bk : pick(Object.keys(bases));
+  const B = bases[bk], R = RARITY[r];
+  const it = { id: ++itemUid, slot, b: bk, r, w: wave, name: `${pick(GEAR_PREFIX[r])} ${B.name}`, hp: 0, armor: 0, ward: 0, dmg: 0, as: 0, range: 0, pow: 0, price: 0 };
+  const P = (SLOT_W[slot] || .35) * (6 + 1.6 * wave) * R.m;
+  if (B.fl){ const F = FLAVOR[B.fl]; it.armor = Math.round(P * F.armor); it.ward = Math.round(P * F.ward); it.hp = Math.round(P * F.hp * 1.6); }
+  if (bk === 'shield') it.hp = Math.round(it.hp * .5);
+  if (B.dmg) it.dmg = Math.max(1, Math.round((5 + 1.2 * wave) * R.m * B.dmg));
+  if (slot === 'main'){ it.as = B.as; it.range = B.range; }
+  if (B.pow){ it.pow = Math.round((5 + 1.2 * wave) * R.m * B.pow); it.hp = 0; }
+  it.price = Math.round((5 + wave * .9) * R.price * (slot === 'main' ? 1.15 : 1));
+  return it;
+}
+const starterGear = () => { const g = { helm: null, chest: null, legs: null, main: makeItem('main', 0, 1, 'axe'), off: null }; g.main.name = 'Worn Axe'; return g; };
+// rarer gear later in the raid; bosses always give at least a rare piece
+function rollRarity(w, boss){
+  const e = boss ? (w >= 15 ? .45 : .15) : clamp((w - 8) * .03, 0, .25), rr = boss ? 1 : clamp(.12 + w * .025, 0, .5), x = Math.random();
+  return x < e ? 2 : x < e + rr ? 1 : 0;
+}
+function validItem(it, slot){
+  if (!it || typeof it !== 'object') return null;
+  slot = slot || it.slot; if (it.slot !== slot || !GEAR_BASES[slot] || !GEAR_BASES[slot][it.b]) return null;
+  const n = (v, hi) => Number.isFinite(v) ? clamp(v, 0, hi) : 0;
+  return { id: ++itemUid, slot, b: it.b, r: clamp(it.r | 0, 0, 2), w: n(it.w, 999), name: String(it.name || GEAR_BASES[slot][it.b].name).slice(0, 40), hp: n(it.hp, 9999), armor: n(it.armor, 9999), ward: n(it.ward, 9999), dmg: n(it.dmg, 9999), as: n(it.as, 5), range: n(it.range, 80), pow: n(it.pow, 9999), price: n(it.price, 9999) };
+}
+function validGear(G){ if (!G || typeof G !== 'object') return null; const out = {}; for (const s of GEAR_SLOTS) out[s] = validItem(G[s], s); return out; }
+const gearStat = k => S && S.gear ? GEAR_SLOTS.reduce((a, s) => a + ((S.gear[s] && S.gear[s][k]) || 0), 0) : 0;
+const abilBonus = () => gearStat('dmg') + gearStat('pow'); // in percent
+const armorCut = v => 100 / (100 + v);
+const itemSell = it => Math.floor(it.price / 2);
+function gearChanged(){ const h = S.hero, ratio = h.hp / h.maxHp; h.maxHp = heroMaxHp(); h.hp = Math.max(1, Math.min(h.maxHp, Math.round(h.maxHp * ratio))); }
+function equipItem(it){
+  const old = S.gear[it.slot]; S.gear[it.slot] = it;
+  if (old){ S.gold += itemSell(old); statGold('Selling', itemSell(old)); }
+  gearChanged(); return old;
+}
+function sellGear(slot){
+  const it = S.gear && S.gear[slot]; if (!it) return;
+  S.gear[slot] = null; S.gold += itemSell(it); statGold('Selling', itemSell(it)); gearChanged(); sfx('sell');
+  toast(`Sold ${it.name} for ${itemSell(it)} gold`); renderShop(); setInfo(charDefault());
+}
+function itemStats(it){
+  const a = [];
+  if (it.dmg) a.push(`${it.dmg} damage`);
+  if (it.slot === 'main') a.push(`${it.as.toFixed(2)} attacks/s`, `${it.range > 30 ? 'long' : 'short'} reach`);
+  if (it.dmg) a.push(`+${it.dmg}% ability damage`);
+  if (it.pow) a.push(`+${it.pow}% ability damage`);
+  if (it.hp) a.push(`+${it.hp} max health`);
+  if (it.armor) a.push(`${it.armor} physical armor`);
+  if (it.ward) a.push(`${it.ward} magic armor`);
+  return a;
+}
+function describeItem(it, how){
+  const R = RARITY[it.r], cur = S.gear && S.gear[it.slot];
+  let h = `<strong style="color:${R.col}">${esc(it.name)}</strong><br><span style="color:var(--muted)">${R.name} ${SLOT_NAME[it.slot].toLowerCase()}</span><br>${itemStats(it).join('<br>')}`;
+  if (it.slot === 'main') h += '<br><span style="color:var(--muted)">Your hero strikes the nearest enemy in reach with it.</span>';
+  if (how === 'shop' && cur && cur !== it){
+    const d = k => { const v = (it[k] || 0) - (cur[k] || 0); return v ? `${v > 0 ? '+' : ''}${v}` : ''; };
+    const parts = [['dmg', 'damage'], ['hp', 'health'], ['armor', 'physical armor'], ['ward', 'magic armor'], ['pow', 'ability damage']].map(([k, n]) => d(k) && `${d(k)} ${n}`).filter(Boolean);
+    h += `<br><span style="color:var(--frost)">Compared with your ${esc(cur.name)}: ${parts.join(', ') || 'no change'}. It is sold for ${itemSell(cur)} gold when you buy this.</span>`;
+  }
+  if (how === 'shop') h += `<br><span style="color:var(--gold)">${it.price} gold</span>`;
+  if (how === 'worn') h += `<br><button class="btn sm" id="btnGearSell" type="button" data-gs="${it.slot}">Sell for ${itemSell(it)} gold</button>`;
+  return h;
+}
+const ITEM_ART = {
+  helm:     ['.........', '..XXXXX..', '.XXXXXXX.', '.XXYYYXX.', '.XX.X.XX.', '.XX.X.XX.', '.XX...XX.', '..X...X..', '.........'],
+  coif:     ['..XXXXX..', '.XYXYXYX.', '.XXXXXXX.', '.XX...XX.', '.XX...XX.', '.XXX.XXX.', '..XXXXX..', '...XYX...', '.........'],
+  hood:     ['...XXX...', '..XXXXX..', '.XXXXXXX.', '.XX...XX.', 'XX..Y..XX', 'XX.....XX', 'XX.....XX', 'XXX...XXX', '.........'],
+  breast:   ['.XX...XX.', 'XXXXXXXXX', 'XXXYYYXXX', '.XXXYXXX.', '.XXXYXXX.', '.XXXXXXX.', '..XXXXX..', '..XXXXX..', '.........'],
+  hauberk:  ['.XX...XX.', 'XXXXXXXXX', 'XYXYXYXYX', '.XXXXXXX.', '.XYXYXYX.', '.XXXXXXX.', '.XYXYXYX.', '.XXXXXXX.', '.........'],
+  vest:     ['.XX...XX.', 'XXX...XXX', 'XXXX.XXXX', '.XXXYXXX.', '.XXYYYXX.', '.XXXYXXX.', '.XXXXXXX.', '.XX...XX.', '.........'],
+  greaves:  ['.XXXXXXX.', '.XXXXXXX.', '.XXX.XXX.', '.XXX.XXX.', '.XYX.XYX.', '.XXX.XXX.', '.XXX.XXX.', 'XXXX.XXXX', '.........'],
+  chausses: ['.XXXXXXX.', '.XYXYXYX.', '.XXX.XXX.', '.XYX.XYX.', '.XXX.XXX.', '.XYX.XYX.', '.XXX.XXX.', 'XXX...XXX', '.........'],
+  wraps:    ['.XXXXXXX.', '.XYYYYYX.', '.XXX.XXX.', '.XYX.XYX.', '.XXX.XXX.', '.XYX.XYX.', '.XXX.XXX.', '.XX...XX.', '.........'],
+  axe:      ['...XXX...', '..XXXXX..', '.XXXYXX..', 'XXXXBXX..', '..XXB....', '....B....', '....B....', '....B....', '....Y....'],
+  sword:    ['........X', '.......XX', '......XX.', '.....XX..', '....XX...', '.Y.XX....', '..YY.....', '.BYY.....', 'B........'],
+  spear:    ['.......XX', '......XXX', '.......X.', '......B..', '.....B...', '....Y....', '...B.....', '..B......', '.B.......'],
+  shield:   ['.XXXXXXX.', 'XYYYYYYYX', 'XYYXXXYYX', 'XYXXKXXYX', 'XYYXXXYYX', 'XYYYYYYYX', '.XYYYYYX.', '..XYYYX..', '...XXX...'],
+  handaxe:  ['.........', '...XXX...', '..XXXX...', '..XXYX...', '....B....', '....B....', '....B....', '....B....', '.........'],
+  talisman: ['....X....', '...X.X...', '..X...X..', '...XXX...', '..XYYYX..', '.XYYKYYX.', '.XYKYKYX.', '..XYYYX..', '...XXX...'],
+};
+const ITEM_COL = { plate: '#a8b0bc', mail: '#7f889a', rune: '#6a4fa0', blade: '#d6dbe4' };
+const itemIconCache = {};
+function itemIcon(it){
+  const key = it.b + it.r; if (itemIconCache[key]) return itemIconCache[key];
+  const B = GEAR_BASES[it.slot][it.b], X = it.b === 'shield' ? '#6a4428' : B.fl ? ITEM_COL[B.fl] : ITEM_COL.blade;
+  return itemIconCache[key] = makeSprite(ITEM_ART[it.b], { X, Y: RARITY[it.r].col, B: '#7a5230', K: '#14101a' }).toDataURL();
+}
+function buyItem(i){
+  const E = S.event; if (!E || E.type !== 'merchant' || !E.items || E.boughtI.includes(i)) return;
+  const it = E.items[i]; if (!it) return;
+  if (!dbg.infGold && S.gold < it.price) return toast('Not enough gold');
+  if (!dbg.infGold){ S.gold -= it.price; statGold('Gear', it.price, true); }
+  E.boughtI.push(i); const old = equipItem(it);
+  if (S.stats){ (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: it.slot, b: it.b, r: it.r, w: S.wave }); const ev = S.stats.events[S.stats.events.length - 1]; if (ev && ev.t === 'merchant') ev.a = true; }
+  sfx('merge'); toast(old ? `${it.name} equipped · ${old.name} sold for ${itemSell(old)} gold` : `${it.name} equipped`);
+  renderShop(); setInfo(describeItem(it, 'worn'));
+}
+/* ---------- battlefield shrines: walk up and stand in the circle to use them ---------- */
+function rollShrine(){
+  S.shrine = null; S.altarCh = null;
+  const W = waveDef(S.wave);
+  if (S.tutorial || S.wave < 3 || W.boss) return;
+  const r = Math.random(), kind = r < .25 ? 'shrine' : r < .4 && !S.endless ? 'altar' : null;
+  if (!kind) return;
+  const a = rand(0, 6.283), d = rand(110, 170);
+  S.shrine = { kind, x: S.hero.x + Math.cos(a) * d, y: S.hero.y + Math.sin(a) * d * .8, prog: 0, done: false, hinted: false, gold: 8 + S.wave };
+  if (S.stats) S.stats.events.push({ t: kind, w: S.wave, a: false });
+  setTimeout(() => { if (S && S.shrine && !S.shrine.done) toast(kind === 'shrine' ? 'A Blood Shrine rises nearby. Look for it on the minimap' : 'A Cursed Altar rises nearby. Look for it on the minimap'); }, 1600);
+}
+function tickShrine(dt){
+  const SH = S.shrine, h = S.hero;
+  if (SH && !SH.done){
+    const d2 = dist2(h.x, h.y, SH.x, SH.y);
+    if (!SH.hinted && d2 < 50 * 50){ SH.hinted = true; toast(SH.kind === 'shrine' ? `Blood Shrine: stand in the circle to trade ${Math.round(h.maxHp * .2)} health for ${SH.gold} gold` : 'Cursed Altar: stand in the circle to summon its champions. Kill them in 30 seconds for a relic'); }
+    SH.prog = d2 < 18 * 18 ? SH.prog + dt : Math.max(0, SH.prog - dt * 2);
+    if (SH.prog >= 1.5) activateShrine(SH);
+  }
+  const A = S.altarCh;
+  if (A){
+    A.t -= dt;
+    if (!S.enemies.some(e => e.altar && !e.dead)){ S.altarCh = null; altarReward(); }
+    else if (A.t <= 0){ S.altarCh = null; S.enemies.forEach(e => { e.altar = false; }); toast('The altar falls silent. No reward this time'); }
+  }
+}
+function activateShrine(SH){
+  SH.done = true; const h = S.hero;
+  const ev = S.stats && S.stats.events.slice().reverse().find(x => x.t === SH.kind); if (ev) ev.a = true;
+  if (SH.kind === 'shrine'){
+    const cost = Math.min(Math.round(h.maxHp * .2), Math.max(0, Math.ceil(h.hp) - 1));
+    h.hp -= cost; S.gold += SH.gold; statGold('Events', SH.gold); sfx('hurt'); sfx('coin');
+    addText(SH.x, SH.y - 14, `+${SH.gold} gold`, '#e2b24c', true); toast(`The shrine takes ${cost} health and gives ${SH.gold} gold`);
+    burst(SH.x, SH.y, 24, ['#ff3a5a', '#8e1232'], 80);
+  } else {
+    const n = 3 + Math.floor(S.wave / 6);
+    for (let i = 0; i < n; i++){ const a = i / n * 6.283, e = spawnEnemy(pick(['draugr', 'wolf', 'armored', 'witch']), SH.x + Math.cos(a) * 40, SH.y + Math.sin(a) * 30, true); e.altar = true; e.rise = e.riseM = .7; }
+    S.altarCh = { t: 30 }; sfx('bosscast', 'herald'); toast("Kill the altar's champions within 30 seconds");
+    burst(SH.x, SH.y, 30, ['#b98cff', '#d6b8ff'], 90);
+  }
+}
+function altarReward(){
+  const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
+  if (S.relics.length < MAX_RELICS && pool.length){ const k = pick(pool); gainRelic(k); if (S.stats) S.stats.relicBuys.push({ k, w: S.wave, altar: true }); toast(`The altar grants you ${RELICS[k].name}`); }
+  else { S.gold += 15; statGold('Events', 15); toast('The altar grants you 15 gold'); }
+  sfx('level');
+}
+
 /* ================= SHOP EVENTS: the Wandering Merchant, a Blood Shrine, a Cursed Altar ================= */
 function makeEvent(type){
   if (type === 'merchant'){
     const pool = Object.keys(RELICS).filter(k => !S.relics.includes(k));
-    if (!pool.length) type = 'shrine';
-    else { const offers = []; while (offers.length < 3 && pool.length) offers.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]); offers.forEach(discoverRelic); return { type, offers, bought: [] }; }
+    const offers = pool.length ? [pool[Math.floor(Math.random() * pool.length)]] : []; offers.forEach(discoverRelic);
+    const slots = shuffle(GEAR_SLOTS.slice()).slice(0, 3);
+    return { type, offers, bought: [], items: slots.map(sl => makeItem(sl, rollRarity(S.wave), S.wave)), boughtI: [] };
   }
   if (type === 'shrine') return { type, cost: Math.round(S.hero.maxHp * .2), gold: 8 + S.wave, done: false };
   return { type: 'altar', done: false };
 }
 function rollEvent(){
   S.event = null;
-  if (S.tutorial || S.wave < 3 || picking && picking.kind === 'start') return;
-  S.sinceEvent = (S.sinceEvent || 0) + 1;
-  const chance = S.sinceEvent >= 5 ? 1 : S.sinceEvent >= 3 ? .35 : 0;
-  if (Math.random() >= chance) return;
-  S.sinceEvent = 0;
-  const altarOk = !S.endless && !waveDef(S.wave).boss;
-  S.event = makeEvent(weighted({ merchant: 6, shrine: 2, altar: altarOk ? 2 : 0 }));
-  if (S.stats) S.stats.events.push({ t: S.event.type, w: S.wave, a: false });
+  if (S.tutorial || picking && picking.kind === 'start') return;
+  S.event = makeEvent('merchant'); // the Merchant waits at every campfire
+  if (S.stats) S.stats.events.push({ t: 'merchant', w: S.wave, a: false });
 }
 function renderEvent(){
   const el = $('#event'), E = S.event;
   el.hidden = !E;
   if (!E) return;
   if (E.type === 'merchant'){
-    const full = S.relics.length >= MAX_RELICS;
-    el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.merchant}" alt=""><div><h4>The Wandering Merchant</h4><p>"Rare goods, for those who live long enough to use them." Relics twist a rule for the rest of the raid. You can carry ${MAX_RELICS}.${full ? ' <b>Your relic slots are full. Click a relic under Relics to sell it.</b>' : ''}</p></div></div>
-      <div class="ev-items">${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>`;
+    const full = S.relics.length >= MAX_RELICS, items = E.items || [];
+    el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.merchant}" alt=""><div><h4>The Wandering Merchant</h4><p>"Steel for the living, relics for the bold." Gear goes on right away, and what you wore is sold for half.${full && E.offers.length ? ' <b>Your relic slots are full: sell one in the Character panel.</b>' : ''}</p></div></div>
+      <div class="ev-items">${items.map((it, i) => { const got = E.boughtI.includes(i), R = RARITY[it.r]; return `<button class="relic-card item-card" type="button" data-item="${i}" style="--rc:${R.col}" ${got || (!dbg.infGold && S.gold < it.price) ? 'disabled' : ''}><img src="${itemIcon(it)}" alt=""><span class="rn" style="color:${R.col}">${esc(it.name)}</span><span class="rd">${SLOT_NAME[it.slot]} · ${itemStats(it).slice(0, 2).join(' · ')}</span><span class="rp">${got ? 'Bought' : it.price + ' gold'}</span></button>`; }).join('')}${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>`;
   } else if (E.type === 'shrine'){
     const can = S.hero.hp > E.cost + 1;
     el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.shrine}" alt=""><div><h4>Blood Shrine</h4><p>${E.done ? 'The gods have taken their due.' : `Offer blood to the gods: lose ${E.cost} health and gain ${E.gold} gold.`}</p></div></div>
@@ -4442,16 +4745,16 @@ const TUT_STEPS = [
   { mode: 'shop', center: true, anim: 'hero', h: 'Welcome to Valhalla', p: 'You are a Viking hero leading a warband that fights on its own. This short raid shows you the basics in about two minutes. It doesn\'t touch your saved raid, runes or the leaderboard.' },
   { mode: 'shop', target: '#cards', h: 'Buy a card', p: 'Every card is a unit for your warband. It has a class (Warrior, Archer, Mage or Priest) and an element. Click a card to buy it. Cards cost 1 to 3 gold.', wait: () => owned().length > 0, hint: 'Click any card' },
   { mode: 'shop', target: '#cards', anim: 'merge', h: 'Three of a kind', p: 'Three copies of the same unit merge into a stronger unit with two stars. Three two-star units make a three-star. Cards you already own glow. We put two more copies in the shop.', enter: tutMerge, wait: () => owned().some(u => u.star >= 2), hint: 'Buy the two glowing copies' },
-  { mode: 'shop', target: ['#formation', '#bench'], anim: 'drag', h: 'Formation and bench', p: 'Only units in the formation around your hero fight. The bench holds the rest. Drag a unit to move it, or right-click it to send it between bench and formation. Levelling up with XP opens more formation slots.' },
+  { mode: 'shop', target: ['#formation .slot[data-i="0"]', '#formation .slot[data-i="2"]', '#formation .slot[data-i="4"]', '#formation .slot[data-i="6"]', '#bench'], anim: 'drag', h: 'Formation and bench', p: 'Only units on the glowing marks around your hero at the fire fight. The bench holds the rest. Drag a unit from the bench onto a mark, or right-click it to send it between bench and formation. Levelling up with XP opens more marks.' },
   { mode: 'shop', target: '#traits', h: 'Synergies', p: () => `Units in the formation build synergies. Two of the same class or element switch a bonus on. Four of a class, or three of an element, make it stronger. We added ${tut.gift || 'a unit'} so ${tut.giftEl || 'an element'} is active. Hover or click a synergy row to read exactly what it does.`, enter: tutSynergy },
-  { mode: 'shop', target: '#event', wide: true, h: 'Visitors at the campfire', p: 'The Wandering Merchant sells relics that twist a rule for the rest of the raid. They are expensive, you can carry 3, and you can sell one back for half. Other visitors: a Blood Shrine trades health for gold, and a Cursed Altar gives a free relic for a harder wave. Here is enough gold for one relic, if you want to try.', enter: tutMerchant },
+  { mode: 'shop', target: '#event', wide: true, h: 'The Wandering Merchant', p: 'The Merchant waits at every campfire. He sells gear for your hero (helmets, chestplates, leggings and weapons) and a relic that twists a rule for the rest of the raid. Press C for your Character panel with your gear, relics and abilities. Blood Shrines and Cursed Altars appear on the battlefield instead: stand in their circle to use them. Here is some gold to try.', enter: tutMerchant },
   { mode: 'shop', target: '#btnStart', h: 'Start the wave', p: 'When your warband is ready, start the wave. In a real raid you can also press Space.', unlock: true, wait: () => mode === 'combat', hint: 'Click Start wave' },
-  { mode: 'combat', target: 'hero', r: 46, anim: 'keys', h: 'Move your hero', p: 'Walk with W A S D or the arrow keys. Your hero doesn\'t attack. Your job is to keep the warband close and stay out of reach of the enemies.', enter: () => { tut.x0 = S.hero.x; tut.y0 = S.hero.y; }, wait: () => Math.hypot(S.hero.x - tut.x0, S.hero.y - tut.y0) > 70, hint: 'Walk around a little' },
+  { mode: 'combat', target: 'hero', r: 46, anim: 'keys', h: 'Move your hero', p: 'Walk with W A S D or the arrow keys. Your hero swings the weapon in the main hand at enemies in reach, but the warband does most of the work. Keep it close and stay out of reach of the enemies.', enter: () => { tut.x0 = S.hero.x; tut.y0 = S.hero.y; }, wait: () => Math.hypot(S.hero.x - tut.x0, S.hero.y - tut.y0) > 70, hint: 'Walk around a little' },
   { mode: 'combat', target: 'hero', r: 150, h: 'Your warband fights', p: 'Units attack the nearest enemies on their own. Here come some draugr. Some of them climb out of the ground. Keep moving while your warband deals with them.', enter: tutSpawn, wait: () => S.kills - tut.k0 >= 4, hint: 'Defeat 4 draugr' },
   { mode: 'combat', target: '#goldTxt', h: 'Souls and gold', p: 'Fallen enemies drop souls. Walk close to collect them. Every 10 souls become 1 gold. You also earn gold, and interest on saved gold, when a wave ends.' },
   { mode: 'combat', target: ['#abil', '#hpDock'], anim: 'cast', h: 'Abilities and dash', p: 'Press 1, 2 or 3 to use a hero ability. It aims at your mouse cursor. You start with one and earn more by beating bosses. Press Space to dash through danger. Your health and dashes sit right below.', enter: () => { tut.cast = false; }, wait: () => tut.cast, hint: 'Press 1 or Space' },
   { mode: 'combat', target: '#mini', h: 'Power-ups and the minimap', p: 'Power-ups appear around the battlefield. The minimap shows them, along with elites and bosses. Walk over one to pick it up. Hover it first to see what it does.', enter: tutPowerup },
-  { mode: 'combat', center: true, last: true, h: 'You\'re ready', p: 'Waves 5, 10 and 15 end with a boss, and Fenrir waits on wave 20. Health only refills after a boss, so buy healing in the shop. After a raid, spend your runes in the Rune Forge for permanent upgrades. The pause menu (P) has a Field Guide of every enemy and relic.' },
+  { mode: 'combat', center: true, last: true, h: 'You\'re ready', p: 'Waves 5, 10 and 15 end with a boss, and Fenrir waits on wave 20. Health does not refill between waves, so buy healing in the shop and gear up at the Merchant. After a raid, spend your runes in the Rune Forge for permanent upgrades. The pause menu (P) has a Field Guide of every enemy and relic.' },
 ];
 function tutMerge(){
   const u = owned()[0]; if (!u) return;
@@ -4474,7 +4777,7 @@ function tutSynergy(){
 function tutMerchant(){
   if (tut.merchant) return; tut.merchant = true;
   S.event = makeEvent('merchant');
-  S.gold = Math.max(S.gold, Math.min(...S.event.offers.map(k => RELICS[k].price)));
+  S.gold = Math.max(S.gold, Math.min(...(S.event.items || []).map(it => it.price), 30));
   renderShop();
 }
 function tutSpawn(){
@@ -4654,6 +4957,7 @@ function setBot(on){
   for (const k in keys) keys[k] = false;
 }
 function botShop(){
+  const E = S.event; if (E && E.items) E.items.map((it, i) => [it, i]).sort((a, b) => b[0].r - a[0].r).forEach(([it, i]) => { if (!E.boughtI.includes(i) && S.gold >= it.price + 6) buyItem(i); });
   const own = c => [...S.board, ...S.bench].filter(u => u && u.cls === c.cls && u.mod === c.mod).length;
   for (let pass = 0; pass < 6; pass++){
     if (S.level < MAX_LVL && S.gold >= 12) buyXp();
@@ -4770,7 +5074,7 @@ requestAnimationFrame(frame);
 cloudStartup();
 
 // small hook for automated playtesting
-window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup, runRecord, buyRelic, RELICS, gainRelic, sellAt, MODS, renderShop, showPick };
+window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup, runRecord, buyRelic, RELICS, gainRelic, sellAt, MODS, renderShop, showPick, makeItemT: (sl, r, w, b) => makeItem(sl, r, w, b), buyItem };
 })();
 </script>
 
