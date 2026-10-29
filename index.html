@@ -102,7 +102,8 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .hud-center .w{font-family:var(--font-display);font-size:20px}
 .hud-center .t{font-size:30px;font-variant-numeric:tabular-nums;line-height:1}
 .hud-right{justify-self:end;display:grid;gap:6px;width:162px}
-.tips-btn{pointer-events:auto;background:rgba(11,13,19,.72);font-size:17px;justify-self:stretch}
+.tips-btn{pointer-events:auto;background:rgba(11,13,19,.72);font-size:14px;white-space:nowrap;justify-self:stretch;padding-left:6px;padding-right:6px}
+.tips-btn[aria-pressed="true"]{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
 .mini{padding:5px}
 #mini{display:block;width:150px;height:150px}
 .gold{color:var(--gold)}
@@ -725,6 +726,7 @@ a.btn{text-decoration:none;display:inline-block}
         <div class="bar souls"><i id="soulBar"></i></div>
       </div>
       <button class="btn sm tips-btn" id="btnTips" type="button" aria-pressed="true">Tooltips: on <kbd>T</kbd></button>
+      <button class="btn sm tips-btn" id="btnMeterHud" type="button" aria-pressed="false">Damage meter <kbd>Tab</kbd></button>
     </div>
   </div>
 
@@ -4577,7 +4579,7 @@ async function cloudStartup(){
 const CHANGES = [
   ['0.20.0', 'Gear and the campfire', {
     Highlights: ['A new intro when a raid begins, and Fenrir\'s death now brings the Endless Winter: his dying breath freezes the field, and snow falls through all of Endless mode', 'Gear for your hero: helmet, chestplate, leggings, two weapon hands, two rings and a necklace', 'Your warband gathers at the campfire, and the Character panel (C) holds your gear and abilities', 'The Field Guide (J): beasts, units, abilities, battlefield events and gear, each unlocked as you find it', 'Battlefield events: the Blood Shrine, the Cursed Altar, Odin\'s Messenger and Sleipnir\'s Tracks', 'A new enemy from wave 7: the Draugr Spearman'],
-    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'A banner pops up for every new Field Guide find', 'The tutorial shows the Field Guide and the damage meter'],
+    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'A banner pops up for every new Field Guide find', 'A Damage meter button with its Tab hotkey sits below the minimap, next to Tooltips', 'The tutorial shows the Field Guide and the damage meter'],
     Changed: ['Relics are now jewelry. Each ring or necklace carries one of the old relic powers', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces', 'Bosses no longer heal you to full', 'Swift Stride is now Sleipnir\'s Tracks: run through six hoof marks within 8 seconds for an extra dash slot', 'Blood Shrines and Cursed Altars moved from the campfire to the battlefield', 'The boss reward screen separates the abilities from the boss\'s gear, with a tag on every card. Every boss reward card has the same soft sheen and sparkle, so none pulls your eye more than the others. The gear reveal plays once you pick it', 'Merchant cards show each piece\'s slot on a plain grey strip, so colour always means rarity', 'The pause menu is cleaner: Resume, the Field Guide, Settings and feedback, with Give up on its own', 'Rings and necklaces no longer show beside the ability bar in battle. You find them in the Character panel'],
     Fixed: ['With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet', 'The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
   }],
@@ -5799,6 +5801,7 @@ function meterRows(obj, max, empty){
   return list.map(([k, v]) => `<div class="mt-row"><img src="${srcIcon(k)}" alt=""><div class="nm"><span>${srcLabel(k)}</span><div class="bar"><i style="width:${Math.max(2, 100 * v / top)}%;background:${meterColor(k)}"></i></div></div><b>${fmtN(v)} <small style="color:var(--muted)">${Math.round(100 * v / tot)}%</small></b></div>`).join('');
 }
 function renderMeter(){
+  syncMeterBtn();
   const el = $('#meter'), show = settings.meter && S && S.stats && (mode === 'combat' || mode === 'shop') && (!S.tutorial || (tut && tut.meterWas != null));
   el.hidden = !show; if (!show) return;
   const st = S.stats, raid = meterRaid, hl = meterHeal;
@@ -5809,7 +5812,9 @@ function renderMeter(){
   $('#meter').setAttribute('aria-label', hl ? 'Healing meter' : 'Damage meter');
   $('#meterRows').innerHTML = meterRows(obj, 8, hl ? 'No healing yet' : 'No damage yet');
 }
-function toggleMeter(){ if (tut && tut.meterWas != null) tut.meterSeen = tut.meterSeen || !settings.meter; settings.meter = !settings.meter; saveSettings(); renderMeter(); if (!$('#settings').hidden) syncSettings(); }
+function toggleMeter(){ if (tut && tut.meterWas != null) tut.meterSeen = tut.meterSeen || !settings.meter; settings.meter = !settings.meter; saveSettings(); renderMeter(); syncMeterBtn(); if (!$('#settings').hidden) syncSettings(); }
+function syncMeterBtn(){ const b = document.getElementById('btnMeterHud'); if (!b) return; const t = `Damage meter <kbd>Tab</kbd>`; b.title = settings.meter ? 'Damage meter is on' : 'Damage meter is off'; if (b.innerHTML !== t) b.innerHTML = t; b.setAttribute('aria-pressed', String(!!settings.meter)); }
+$('#btnMeterHud').onclick = e => { toggleMeter(); e.currentTarget.blur(); }; syncMeterBtn();
 $('#meterMode').onclick = e => { meterRaid = !meterRaid; e.currentTarget.blur(); renderMeter(); };
 $('#meterKind').onclick = e => { meterHeal = !meterHeal; e.currentTarget.blur(); renderMeter(); if (tut) tut.meterSeen = true; };
 // frame-rate counter, and a one-time suggestion to lower the graphics when combat stays slow
@@ -5846,7 +5851,7 @@ requestAnimationFrame(frame);
 cloudStartup();
 
 // small hook for automated playtesting
-window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup, runRecord, buyRelic, RELICS, gainRelic, sellAt, MODS, renderShop, showPick, makeItemT: (sl, r, w, b) => makeItem(sl, r, w, b), buyItem, gearDiff, curFor, targetSlot, get cine(){ return cine; } };
+window.VALHALLA = { get picking(){ return picking; }, choosePick, castAbility, ABILITIES, saveAndQuit, continueRaid, readRunSave, cloudPush, get cloudCode(){ return cloudCode; }, dbg, toggleDbg, dbgJump, openLeaderboard, gameOver, get S(){ return S; }, get mode(){ return mode; }, newRun, startWave, buy, reroll, buyXp, sortBench, update, keys, meta, WAVES, drawMinimap, enterEndless, openEndlessShop, showVictory, waveDef, spawnBoss, spawnEnemy, get AU(){ return AU; }, sfx, spawnPowerup, runRecord, buyRelic, RELICS, gainRelic, sellAt, MODS, renderShop, showPick, makeItemT: (sl, r, w, b) => makeItem(sl, r, w, b), buyItem, gearDiff, curFor, targetSlot, get cine(){ return cine; }, discover, discoverGear, achQ, GEAR_BASES, ITEM_TYPES, BF_EVENTS };
 })();
 </script>
 
