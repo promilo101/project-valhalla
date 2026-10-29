@@ -468,6 +468,51 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .cp-foot .abt{width:60px;height:60px}
 .cp-foot .abt img{width:40px;height:40px}
 .item-card{border-color:color-mix(in srgb,var(--rc) 55%,var(--line))}
+.item-card{position:relative}
+.item-card.sel{outline:2px solid var(--frost);outline-offset:1px}
+.verdict{position:absolute;bottom:4px;right:4px;font-size:13px;line-height:1;padding:1px 4px;background:#0d1018;border:1px solid;border-radius:2px}
+.cmp{display:grid;gap:3px;margin-top:4px;font-size:16px}
+.cmp-h,.cmp-i{display:grid;grid-template-columns:1fr 1fr;gap:8px;color:var(--muted);font-size:14px;letter-spacing:.08em;text-transform:uppercase}
+.cmp-i{text-transform:none;letter-spacing:0;font-size:15px}
+.cmp-i span{display:flex;gap:4px;align-items:center;min-width:0}
+.cmp-i img{width:22px;height:22px;image-rendering:pixelated;image-rendering:crisp-edges;flex:none}
+.cmp-i b{font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cmp-r{display:grid;grid-template-columns:minmax(0,1.6fr) .8fr .7fr .8fr;gap:6px;align-items:baseline;border-top:1px solid #1b2030;padding-top:2px;font-variant-numeric:tabular-nums}
+.cmp-r > span:not(.cmp-n){text-align:right}
+.cmp-r b{font-weight:400}
+.cmp-n{color:#c9cfdb}
+.cmp-v{margin-top:4px}
+.pcard.loot{overflow:hidden;animation:lootPulse 1.6s ease-in-out infinite}
+.pcard.loot::before{content:"";position:absolute;inset:-60%;background:conic-gradient(from 0deg,transparent 0 70%,color-mix(in srgb,var(--c) 55%,transparent) 80%,transparent 90%);animation:lootSpin 3s linear infinite;pointer-events:none;opacity:.55}
+.pcard.loot > *{position:relative}
+.loot-tag{position:absolute!important;top:6px;right:8px;font-size:14px;color:var(--c);letter-spacing:.1em;text-transform:uppercase}
+@keyframes lootPulse{50%{box-shadow:0 0 0 1px var(--c),0 0 22px color-mix(in srgb,var(--c) 60%,transparent)}}
+@keyframes lootSpin{to{transform:rotate(360deg)}}
+#lootFx{position:absolute;inset:0;z-index:40;background:radial-gradient(circle at 50% 42%,rgba(9,10,16,.9),rgba(5,6,10,.98) 65%);overflow:hidden;cursor:pointer;zoom:var(--ui,1)}
+#lootFx.on{animation:lfIn .35s ease-out}
+#lootFx.out{animation:lfOut .45s ease-in forwards}
+@keyframes lfIn{from{opacity:0}}
+@keyframes lfOut{to{opacity:0}}
+.lf-rays{position:absolute;left:50%;top:42%;width:1400px;height:1400px;margin:-700px 0 0 -700px;background:repeating-conic-gradient(from 0deg,color-mix(in srgb,var(--lc) 32%,transparent) 0 6deg,transparent 6deg 18deg);-webkit-mask:radial-gradient(circle,#000 0,#000 18%,transparent 60%);mask:radial-gradient(circle,#000 0,#000 18%,transparent 60%);animation:lfSpin 9s linear infinite,lfGrow .7s cubic-bezier(.2,.9,.3,1.3)}
+.lf-rays.calm{animation:none;opacity:.5}
+.lf-glow{position:absolute;left:50%;top:42%;width:320px;height:320px;margin:-160px 0 0 -160px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--lc) 70%,#fff) 0,color-mix(in srgb,var(--lc) 40%,transparent) 35%,transparent 70%);animation:lfBeat 1.2s ease-in-out infinite}
+.lf-item{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);animation:lfRise .9s cubic-bezier(.2,1.4,.4,1) both}
+.lf-item img{display:block;width:132px;height:132px;image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 0 14px var(--lc)) drop-shadow(0 0 4px #fff)}
+.lf-spark{position:absolute;left:50%;top:42%;width:6px;height:6px;background:#fff;box-shadow:0 0 8px var(--lc),0 0 2px #fff;transform:rotate(var(--a)) translateY(0);animation:lfSpark 1.4s ease-out var(--d) infinite}
+@keyframes lfSpark{0%{transform:rotate(var(--a)) translateY(-30px) scale(1);opacity:1}100%{transform:rotate(var(--a)) translateY(-260px) scale(.2);opacity:0}}
+.lf-text{position:absolute;left:0;right:0;top:calc(42% + 100px);text-align:center;display:grid;gap:4px;padding:0 16px;animation:lfText .9s ease-out .35s both}
+.lf-r{font-size:20px;letter-spacing:.3em;text-transform:uppercase;color:var(--lc)}
+.lf-n{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,5vw,52px);color:#fff;filter:drop-shadow(0 0 10px var(--lc)) drop-shadow(0 3px 0 #000);background:linear-gradient(90deg,#fff 0,#fff 40%,var(--lc) 50%,#fff 60%,#fff 100%);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:lfShine 2s linear .6s infinite}
+.lf-s{font-size:20px;color:#c9cfdb}
+.lf-skip{position:absolute;left:0;right:0;bottom:24px;text-align:center;color:var(--muted);font-size:17px}
+@keyframes lfSpin{to{transform:rotate(360deg)}}
+@keyframes lfGrow{from{transform:scale(.2);opacity:0}}
+@keyframes lfBeat{50%{transform:scale(1.12)}}
+@keyframes lfRise{0%{transform:translate(-50%,10%) scale(.2) rotate(-25deg);opacity:0}100%{transform:translate(-50%,-50%) scale(1) rotate(0)}}
+@keyframes lfText{from{opacity:0;transform:translateY(14px)}}
+@keyframes lfShine{to{background-position:-300% 0}}
+@media (prefers-reduced-motion:reduce){.lf-rays,.lf-glow,.lf-spark,.lf-n,.pcard.loot,.pcard.loot::before{animation:none!important}}
+
 @media (max-width:820px){.cp-body{grid-template-columns:minmax(0,1fr)}.cp-relics{flex-direction:row}.cp-info{border-left:0;border-top:1px solid var(--line);padding:8px 0 0}}
 
 .mt-row img{width:16px;height:19px;image-rendering:pixelated;image-rendering:crisp-edges}
@@ -642,6 +687,7 @@ a.btn{text-decoration:none;display:inline-block}
     <div class="infocol"><div class="info" id="info"></div></div>
   </section>
 
+  <div id="lootFx" hidden aria-live="polite"></div>
   <section id="charPanel" class="screen" hidden aria-labelledby="charTitle">
     <div class="cp-box">
       <div class="cp-head"><h2 id="charTitle">Character</h2><span class="note"><kbd>C</kbd> or <kbd>Esc</kbd> to close</span><button class="btn sm" id="cpClose" type="button">Close</button></div>
@@ -3213,7 +3259,7 @@ function setMode(m){
 }
 let shopReadyAt = 0;
 function openShop(){
-  shopReadyAt = performance.now() + 800; S.rollN = 0; S.xpN = 0; S.healN = 0; S.selRelic = null;
+  shopReadyAt = performance.now() + 800; S.selItem = null; S.rollN = 0; S.xpN = 0; S.healN = 0; S.selRelic = null;
   if (!S.relics) S.relics = [];
   if (S.resumed) S.resumed = false; // a continued raid keeps its saved event
   else if (S.wave > 1 || S.endless){ rollEvent(); if (hasR('naglfar_chest')){ S.gold += 5; statGold('Relics', 5); setTimeout(() => toast("Ghost Ship Chest: +5 gold"), 400); } }
@@ -3387,7 +3433,7 @@ new MutationObserver(() => { if (!$('#charPanel').hidden) $('#charInfo').innerHT
 $('#doll').addEventListener('mouseover', e => { const b = e.target.closest('.gs'); if (!b || !S) return; const it = S.gear[b.dataset.gs]; setInfo(it ? describeItem(it, 'worn') : `<strong>${SLOT_NAME[b.dataset.gs]}</strong><br>Empty. The Merchant sells gear at every campfire, and bosses drop rarer pieces.`); });
 $('#doll').addEventListener('click', e => { const b = e.target.closest('.gs'); if (!b || !S) return; const it = S.gear[b.dataset.gs]; if (it) setInfo(describeItem(it, 'worn')); });
 $('#charInfo').addEventListener('click', e => { const b = e.target.closest('#btnRelicSell'); if (b){ sellRelic(b.dataset.r); return; } const g = e.target.closest('#btnGearSell'); if (g) sellGear(g.dataset.gs); });
-$('#info').addEventListener('click', e => { const g = e.target.closest('#btnGearSell'); if (g) sellGear(g.dataset.gs); });
+for (const box of ['#info', '#charInfo']) $(box).addEventListener('click', e => { const b = e.target.closest('#btnBuyItem'); if (b){ buyItem(+b.dataset.item); return; } if (e.target.closest('#btnCancelItem')){ S.selItem = null; renderShop(); setInfo(DEFAULT_INFO); return; } if (box === '#info'){ const g = e.target.closest('#btnGearSell'); if (g) sellGear(g.dataset.gs); } });
 let showAllTr = false;
 function fitShopCols(){ const sh = $('#shop'); if (!sh || sh.hidden) return; sh.classList.toggle('wide4', sh.clientWidth >= 1480); sh.classList.toggle('xl', sh.clientWidth >= 2200); }
 $('#traits').addEventListener('click', e => { if (e.target.closest('#trAll')){ showAllTr = !showAllTr; renderShop(); } });
@@ -3550,7 +3596,8 @@ document.querySelector('.fg-tabs').addEventListener('keydown', e => {
 $('#btnBest').onclick = () => { showBestiary(true); fgShow(fgTab); };
 $('#btnGuide').onclick = openGuideFromTitle;
 $('#btnBestBack').onclick = () => showBestiary(false);
-$('#event').addEventListener('click', e => { const ic = e.target.closest('.item-card'); if (ic){ buyItem(+ic.dataset.item); return; } const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
+$('#event').addEventListener('click', e => { const ic = e.target.closest('.item-card'); if (ic){ pickItem(+ic.dataset.item); return; } const r = e.target.closest('.relic-card'); if (r){ buyRelic(r.dataset.r); return; } const b = e.target.closest('[data-ev]'); if (b) eventAction(b.dataset.ev); });
+$('#event').addEventListener('mouseleave', () => { const E = S && S.event; if (E && E.items && S.selItem != null && E.items[S.selItem]) setInfo(describeItem(E.items[S.selItem], 'shop')); });
 $('#event').addEventListener('mouseover', e => { const ic = e.target.closest('.item-card'); if (ic && S.event && S.event.items){ setInfo(describeItem(S.event.items[+ic.dataset.item], 'shop')); return; } const r = e.target.closest('.relic-card'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, false); });
 $('#relicRow').addEventListener('click', e => { const r = e.target.closest('.rl[data-r]'); if (!r) return; S.selRelic = S.selRelic === r.dataset.r ? null : r.dataset.r; renderShop(); $('#info').innerHTML = describeRelic(r.dataset.r, true); });
 $('#relicRow').addEventListener('mouseover', e => { const r = e.target.closest('.rl[data-r]'); if (r) $('#info').innerHTML = describeRelic(r.dataset.r, true); });
@@ -3732,7 +3779,12 @@ function showPick(kind){
   renderPick();
 }
 function pickCardHTML(o, i){
-  if (o.type === 'item'){ const it = o.item, R = RARITY[it.r], cur = S.gear && S.gear[it.slot]; return `<button class="pcard" type="button" data-p="${i}" style="--c:${R.col}"><span class="pk">${i + 1}</span><img class="pi px" src="${itemIcon(it)}" alt=""><span class="pn" style="color:${R.col}">${esc(it.name)}</span><span class="pt">${R.name} ${SLOT_NAME[it.slot].toLowerCase()}</span><span class="pd">${itemStats(it).join(' · ')}${cur ? `<br><small style="color:var(--muted)">Replaces your ${esc(cur.name)}, sold for ${itemSell(cur)} gold</small>` : ''}</span></button>`; }
+  if (o.type === 'item'){
+    const it = o.item, R = RARITY[it.r], cur = S.gear && S.gear[it.slot];
+    let body = itemStats(it).join(' · ');
+    if (cur){ const D = gearDiff(it, cur), V = VERDICT[D.verdict]; body = D.rows.filter(r => r.k !== 'range').map(r => `${r.n} ${r.k === 'as' ? r.a.toFixed(2) : Math.round(r.a)} ${r.d ? `<b style="color:${r.d > 0 ? '#7dc46a' : '#ff6b6b'}">${r.d > 0 ? '+' : '−'}${r.k === 'as' ? Math.abs(r.d).toFixed(2) : Math.abs(Math.round(r.d))}</b>` : ''}`).join('<br>') + `<br><b style="color:${V[1]}">${V[0]}</b> <small style="color:var(--muted)">vs your ${esc(cur.name)}, sold for ${itemSell(cur)} gold</small>`; }
+    return `<button class="pcard loot r${it.r}" type="button" data-p="${i}" style="--c:${R.col}"><span class="pk">${i + 1}</span><span class="loot-tag">Boss drop</span><img class="pi px" src="${itemIcon(it)}" alt=""><span class="pn" style="color:${R.col}">${esc(it.name)}</span><span class="pt">${R.name} ${SLOT_NAME[it.slot].toLowerCase()}</span><span class="pd">${body}</span></button>`;
+  }
   if (o.type === 'gold') return `<button class="pcard" type="button" data-p="${i}"><span class="pk">${i + 1}</span><span class="pn">Dwarven Hoard</span><span class="pt">Reward</span><span class="pd">Every ability is at level III. Take 25 gold instead.</span></button>`;
   const A = ABILITIES[o.key], sl = S.abil.find(x => x && x.key === o.key), l = o.type === 'up' ? sl.lvl + 1 : 1;
   return `<button class="pcard" type="button" data-p="${i}" style="--c:${A.col}"><span class="pk">${i + 1}</span><img class="pi px" src="${ABIL_ICON[o.key]}" alt=""><span class="pn">${A.name}</span><span class="pt">${o.type === 'up' ? `Upgrade to ${LV[l - 1]}` : 'New ability'} · ${A.cd[l - 1]} s cooldown</span><span class="pd">${A.desc(l)}</span></button>`;
@@ -3760,7 +3812,7 @@ function choosePick(i){
   if (P.step === 'replace'){ if (i >= 0 && i < 3) S.abil[i] = { key: P.chosen, lvl: 1, cd: 0 }; return closePick(); }
   const o = P.opts[i]; if (!o) return;
   if (o.type === 'gold'){ S.gold += 25; return closePick(); }
-  if (o.type === 'item'){ const old = equipItem(o.item); if (S.stats) (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: o.item.slot, b: o.item.b, r: o.item.r, w: S.wave, boss: true }); toast(old ? `${o.item.name} equipped · ${old.name} sold for ${itemSell(old)} gold` : `${o.item.name} equipped`); return closePick(); }
+  if (o.type === 'item'){ const old = equipItem(o.item); lootReveal(o.item, old ? `Equipped. Your ${old.name} was sold for ${itemSell(old)} gold` : 'Equipped'); if (S.stats) (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: o.item.slot, b: o.item.b, r: o.item.r, w: S.wave, boss: true }); return closePick(); }
   if (o.type === 'up'){ const sl = S.abil.find(x => x && x.key === o.key); sl.lvl = Math.min(3, sl.lvl + 1); return closePick(); }
   const empty = S.abil.indexOf(null);
   if (empty >= 0){ S.abil[empty] = { key: o.key, lvl: 1, cd: 0 }; return closePick(); }
@@ -4008,7 +4060,7 @@ async function cloudStartup(){
 
 /* ================= CHANGE NOTES (newest first). Versions are major.minor.patch ================= */
 const CHANGES = [
-  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a relic', 'Bosses also drop a rare or epic piece of gear as a reward choice', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a relic', 'Bosses no longer heal you to full']],
+  ['1.0.0', 'Gear and the campfire', ['Gear for your hero: helmet, chestplate, leggings, main hand and off hand. Armor adds health, physical armor and magic armor. Weapons deal damage and raise ability damage', 'Your hero strikes the nearest enemy in reach with the weapon in the main hand. You start with a Worn Axe', 'Enemy attacks are physical (claws, blades, hammers) or magic (curses, fire, frost and Hel\'s spells). Each kind of armor protects against its own', 'The Character panel (C in the shop) holds your gear, relics and hero abilities', 'The formation moved to the campfire: drag units onto the glowing marks around your hero', 'The Wandering Merchant waits at every campfire with three pieces of gear and a relic', 'Bosses also drop a rare or epic piece of gear as a reward choice, revealed in style when you take it', 'Gear you already wear in a slot is compared side by side: the Merchant marks every piece as an upgrade, worse or mixed, and the first click shows the comparison before you buy', 'Blood Shrines and Cursed Altars appear on the battlefield. Stand in the circle to use them. The altar summons champions: kill them within 30 seconds for a relic', 'Bosses no longer heal you to full']],
   ['0.17.3', 'Room to read', ['On wide screens the info box gets its own column next to Synergies, with room for long descriptions', 'Classes you have none of are tucked away, so the info box under Synergies is bigger. Show all classes brings them back', 'Fixed: on ultrawide screens the ability and health bar no longer covers the Open shop button in Endless. It stays in the middle on every screen']],
   ['0.17.2', 'Update notice', ['When a new version of the game is out, the shop and the title screen tell you. One click saves your raid and reloads, and you continue where you left off. The notice never shows up during a wave', 'Fixed: the title screen shows the right version number']],
   ['0.17.1', 'Easier to read stars', ['Stars are bronze, silver or gold for one, two and three stars, on the bench, in the formation and on the battlefield', 'Two- and three-star units are a little bigger in battle, and their slots have a silver or gold frame', 'Shop cards show every copy you own, also two- and three-star ones, and hovering a card highlights all of them']],
@@ -4411,14 +4463,35 @@ function describeItem(it, how){
   const R = RARITY[it.r], cur = S.gear && S.gear[it.slot];
   let h = `<strong style="color:${R.col}">${esc(it.name)}</strong><br><span style="color:var(--muted)">${R.name} ${SLOT_NAME[it.slot].toLowerCase()}</span><br>${itemStats(it).join('<br>')}`;
   if (it.slot === 'main') h += '<br><span style="color:var(--muted)">Your hero strikes the nearest enemy in reach with it.</span>';
-  if (how === 'shop' && cur && cur !== it){
-    const d = k => { const v = (it[k] || 0) - (cur[k] || 0); return v ? `${v > 0 ? '+' : ''}${v}` : ''; };
-    const parts = [['dmg', 'damage'], ['hp', 'health'], ['armor', 'physical armor'], ['ward', 'magic armor'], ['pow', 'ability damage']].map(([k, n]) => d(k) && `${d(k)} ${n}`).filter(Boolean);
-    h += `<br><span style="color:var(--frost)">Compared with your ${esc(cur.name)}: ${parts.join(', ') || 'no change'}. It is sold for ${itemSell(cur)} gold when you buy this.</span>`;
-  }
+  if (how === 'shop' && cur && cur !== it) return `<strong>${SLOT_NAME[it.slot]} · ${it.price} gold</strong><br>` + compareHTML(it, cur, S.event && S.event.items ? S.event.items.indexOf(it) : null);
   if (how === 'shop') h += `<br><span style="color:var(--gold)">${it.price} gold</span>`;
   if (how === 'worn') h += `<br><button class="btn sm" id="btnGearSell" type="button" data-gs="${it.slot}">Sell for ${itemSell(it)} gold</button>`;
   return h;
+}
+const CMP_ROWS = [['dmg', 'Damage'], ['as', 'Attacks per second'], ['range', 'Reach'], ['abil', 'Ability damage %'], ['hp', 'Max health'], ['armor', 'Physical armor'], ['ward', 'Magic armor']];
+const cmpVal = (it, k) => !it ? 0 : k === 'abil' ? (it.dmg || 0) + (it.pow || 0) : (it[k] || 0);
+function gearDiff(it, cur){
+  let up = 0, down = 0; const rows = [];
+  for (const [k, n] of CMP_ROWS){
+    const a = cmpVal(it, k), b = cmpVal(cur, k); if (!a && !b) continue;
+    const d = Math.round((a - b) * 100) / 100; if (d > 0) up++; if (d < 0) down++;
+    rows.push({ k, n, a, b, d });
+  }
+  return { rows, up, down, verdict: !cur ? 'new' : up && !down ? 'up' : down && !up ? 'down' : up && down ? 'mixed' : 'same' };
+}
+const VERDICT = { up: ['▲ Upgrade', '#7dc46a'], down: ['▼ Worse', '#ff6b6b'], mixed: ['◆ Mixed', '#e2b24c'], same: ['= Same', '#8a92a6'] };
+function compareHTML(it, cur, buyIdx){
+  const D = gearDiff(it, cur), R = RARITY[it.r], C = cur && RARITY[cur.r];
+  const fmt = (k, v) => k === 'as' ? v.toFixed(2) : k === 'range' ? (v ? (v > 30 ? 'long' : 'short') : '–') : Math.round(v);
+  const diff = r => r.k === 'range' ? '' : r.d ? `<b style="color:${r.d > 0 ? '#7dc46a' : '#ff6b6b'}">${r.d > 0 ? '+' : '−'}${r.k === 'as' ? Math.abs(r.d).toFixed(2) : Math.abs(Math.round(r.d))}</b>` : '<b style="color:var(--muted)">=</b>';
+  const net = D.rows.filter(r => r.d && r.k !== 'range' && r.k !== 'as').map(r => `${r.d > 0 ? '+' : '−'}${Math.abs(Math.round(r.d))} ${r.n.toLowerCase().replace(' %', '')}`);
+  let h = `<div class="cmp"><div class="cmp-h"><span>New</span><span>Equipped</span></div>
+    <div class="cmp-i"><span><img src="${itemIcon(it)}" alt=""><b style="color:${R.col}">${esc(it.name)}</b></span><span><img src="${itemIcon(cur)}" alt=""><b style="color:${C.col}">${esc(cur.name)}</b></span></div>
+    ${D.rows.map(r => `<div class="cmp-r"><span class="cmp-n">${r.n}</span><span>${fmt(r.k, r.a)}</span><span>${diff(r)}</span><span>${fmt(r.k, r.b)}</span></div>`).join('')}
+    <div class="cmp-v" style="color:${VERDICT[D.verdict][1]}">${VERDICT[D.verdict][0]}${net.length ? ' · Net: ' + net.join(', ') : ''}</div>
+    <div class="note">Your ${esc(cur.name)} is sold for ${itemSell(cur)} gold.</div>`;
+  if (buyIdx != null) h += `<div class="row" style="margin-top:6px"><button class="btn sm primary" type="button" id="btnBuyItem" data-item="${buyIdx}" ${!dbg.infGold && S.gold < it.price ? 'disabled' : ''}>Buy and equip · ${it.price} gold</button><button class="btn sm" type="button" id="btnCancelItem">Cancel</button></div>`;
+  return h + '</div>';
 }
 const ITEM_ART = {
   helm:     ['.........', '..XXXXX..', '.XXXXXXX.', '.XXYYYXX.', '.XX.X.XX.', '.XX.X.XX.', '.XX...XX.', '..X...X..', '.........'],
@@ -4444,7 +4517,14 @@ function itemIcon(it){
   const B = GEAR_BASES[it.slot][it.b], X = it.b === 'shield' ? '#6a4428' : B.fl ? ITEM_COL[B.fl] : ITEM_COL.blade;
   return itemIconCache[key] = makeSprite(ITEM_ART[it.b], { X, Y: RARITY[it.r].col, B: '#7a5230', K: '#14101a' }).toDataURL();
 }
+// a piece for an empty slot is bought at once; if the slot is taken, the first click opens the comparison
+function pickItem(i){
+  const E = S.event; if (!E || !E.items || !E.items[i]) return; const it = E.items[i];
+  if (!S.gear[it.slot] || S.selItem === i) return buyItem(i);
+  S.selItem = i; sfx('click'); renderShop(); setInfo(describeItem(it, 'shop'));
+}
 function buyItem(i){
+  S.selItem = null;
   const E = S.event; if (!E || E.type !== 'merchant' || !E.items || E.boughtI.includes(i)) return;
   const it = E.items[i]; if (!it) return;
   if (!dbg.infGold && S.gold < it.price) return toast('Not enough gold');
@@ -4453,6 +4533,27 @@ function buyItem(i){
   if (S.stats){ (S.stats.gearBuys = S.stats.gearBuys || []).push({ s: it.slot, b: it.b, r: it.r, w: S.wave }); const ev = S.stats.events[S.stats.events.length - 1]; if (ev && ev.t === 'merchant') ev.a = true; }
   sfx('merge'); toast(old ? `${it.name} equipped · ${old.name} sold for ${itemSell(old)} gold` : `${it.name} equipped`);
   renderShop(); setInfo(describeItem(it, 'worn'));
+}
+/* ---------- boss loot reveal: light rays, the item rises, its name in rarity colour, then it flies to the Character button ---------- */
+function lootReveal(it, note){
+  const R = RARITY[it.r], el = $('#lootFx'), calm = settings.calm;
+  el.style.setProperty('--lc', R.col);
+  el.innerHTML = `<div class="lf-rays${calm ? ' calm' : ''}"></div><div class="lf-glow"></div>${Array.from({ length: calm ? 0 : 18 }, (_, k) => `<i class="lf-spark" style="--a:${k * 20}deg;--d:${(k % 3) * .12}s"></i>`).join('')}<div class="lf-item"><img src="${itemIcon(it)}" alt=""></div><div class="lf-text"><div class="lf-r">${R.name} ${SLOT_NAME[it.slot].toLowerCase()}</div><div class="lf-n">${esc(it.name)}</div><div class="lf-s">${itemStats(it).slice(0, 3).join(' · ')}</div>${note ? `<div class="lf-s" style="color:var(--muted);font-size:17px">${esc(note)}</div>` : ''}</div><div class="lf-skip">Click to continue</div>`;
+  el.hidden = false; el.classList.remove('out'); void el.offsetWidth; el.classList.add('on');
+  sfx('loot'); if (!calm) flash(R.col === RARITY[2].col ? '192,138,255' : '95,176,255', .18);
+  clearTimeout(lootReveal.t1); clearTimeout(lootReveal.t2);
+  const done = () => {
+    clearTimeout(lootReveal.t1); clearTimeout(lootReveal.t2);
+    const img = el.querySelector('.lf-item'), to = $('#btnChar');
+    if (img && to && !to.closest('[hidden]') && img.animate){
+      const a = img.getBoundingClientRect(), b = to.getBoundingClientRect();
+      img.animate([{ transform: 'translate(-50%,-50%) scale(1)', opacity: 1 }, { transform: `translate(calc(-50% + ${b.left + b.width / 2 - (a.left + a.width / 2)}px), calc(-50% + ${b.top + b.height / 2 - (a.top + a.height / 2)}px)) scale(.25)`, opacity: .2 }], { duration: 420, easing: 'cubic-bezier(.5,0,.8,.4)', fill: 'forwards' });
+      to.animate([{ boxShadow: `0 0 0 0 ${R.col}` }, { boxShadow: `0 0 24px 6px ${R.col}` }, { boxShadow: `0 0 0 0 ${R.col}` }], { duration: 900, delay: 380 });
+    }
+    el.classList.add('out'); lootReveal.t2 = setTimeout(() => { el.hidden = true; el.classList.remove('on', 'out'); el.innerHTML = ''; }, 460);
+  };
+  el.onclick = done;
+  lootReveal.t1 = setTimeout(done, 2600);
 }
 /* ---------- battlefield shrines: walk up and stand in the circle to use them ---------- */
 function rollShrine(){
@@ -4527,7 +4628,7 @@ function renderEvent(){
   if (E.type === 'merchant'){
     const full = S.relics.length >= MAX_RELICS, items = E.items || [];
     el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.merchant}" alt=""><div><h4>The Wandering Merchant</h4><p>"Steel for the living, relics for the bold." Gear goes on right away, and what you wore is sold for half.${full && E.offers.length ? ' <b>Your relic slots are full: sell one in the Character panel.</b>' : ''}</p></div></div>
-      <div class="ev-items">${items.map((it, i) => { const got = E.boughtI.includes(i), R = RARITY[it.r]; return `<button class="relic-card item-card" type="button" data-item="${i}" style="--rc:${R.col}" ${got || (!dbg.infGold && S.gold < it.price) ? 'disabled' : ''}><img src="${itemIcon(it)}" alt=""><span class="rn" style="color:${R.col}">${esc(it.name)}</span><span class="rd">${SLOT_NAME[it.slot]} · ${itemStats(it).slice(0, 2).join(' · ')}</span><span class="rp">${got ? 'Bought' : it.price + ' gold'}</span></button>`; }).join('')}${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>`;
+      <div class="ev-items">${items.map((it, i) => { const got = E.boughtI.includes(i), R = RARITY[it.r], cur = S.gear[it.slot], v = !got && cur ? VERDICT[gearDiff(it, cur).verdict] : null; return `<button class="relic-card item-card${S.selItem === i ? ' sel' : ''}" type="button" data-item="${i}" style="--rc:${R.col}" ${got || (!dbg.infGold && S.gold < it.price) ? 'disabled' : ''}>${v ? `<span class="verdict" style="color:${v[1]};border-color:${v[1]}">${v[0]}</span>` : ''}<img src="${itemIcon(it)}" alt=""><span class="rn" style="color:${R.col}">${esc(it.name)}</span><span class="rd">${SLOT_NAME[it.slot]} · ${itemStats(it).slice(0, 2).join(' · ')}</span><span class="rp">${got ? 'Bought' : it.price + ' gold'}</span></button>`; }).join('')}${E.offers.map(k => { const R = RELICS[k], got = E.bought.includes(k); return `<button class="relic-card" type="button" data-r="${k}" ${got || full || (!dbg.infGold && S.gold < R.price) ? 'disabled' : ''}><img src="${RELIC_ICON[k]}" alt=""><span class="rn">${R.name}</span><span class="rd">${R.desc}</span><span class="rp">${got ? 'Bought' : R.price + ' gold'}</span></button>`; }).join('')}</div>`;
   } else if (E.type === 'shrine'){
     const can = S.hero.hp > E.cost + 1;
     el.innerHTML = `<div class="ev-head"><img class="ev-ic" src="${NPC_ICON.shrine}" alt=""><div><h4>Blood Shrine</h4><p>${E.done ? 'The gods have taken their due.' : `Offer blood to the gods: lose ${E.cost} health and gain ${E.gold} gold.`}</p></div></div>
@@ -4608,7 +4709,7 @@ function noise(dur, o = {}){
   AU.voices++; src.onended = () => { AU.voices--; g.disconnect(); };
 }
 const SFX_GAP = { hit: .05, crit: .09, axe: .07, arrow: .06, fire: .08, holy: .1, soul: .035, coin: .06, zap: .08, bones: .06, yelp: .08, caw: .08, clang: .1, shriek: .12, spirit: .08, warn: .15, slam: .08, hurt: .15, click: .03, burn: .3 };
-const SFX_KEY = { horn: 1, roar: 1, bossdie: 1, victory: 1, death: 1, merge: 1, level: 1, cast: 1, power: 1, dash: 1, hurt: 1, warn: 1, slam: 1 };
+const SFX_KEY = { loot: 1, horn: 1, roar: 1, bossdie: 1, victory: 1, death: 1, merge: 1, level: 1, cast: 1, power: 1, dash: 1, hurt: 1, warn: 1, slam: 1 };
 const RUN = ['jarl', 'giant', 'herald', 'fenrir'];
 function sfx(name, p){
   if (!auOn() || settings.muted || settings.master <= 0 || settings.sfx <= 0) return;
@@ -4618,6 +4719,7 @@ function sfx(name, p){
   AU.last[name] = now;
   const r = (a, b) => a + Math.random() * (b - a);
   switch (name){
+    case 'loot': tone(110, .7, { to: 55, vol: .18 }); noise(.5, { f: 6000, to: 9000, ft: 'highpass', vol: .05 }); [523, 659, 784, 1046, 1318].forEach((f, k) => tone(f, .5, { type: 'triangle', vol: .07, delay: .07 * k })); tone(1568, 1, { vol: .05, delay: .4 }); tone(2093, 1.1, { vol: .03, delay: .48 }); break;
     case 'hit': noise(.06, { f: r(500, 800), ft: 'lowpass', vol: .07 }); tone(r(140, 180), .06, { type: 'triangle', vol: .04, to: 80 }); break;
     case 'crit': tone(r(900, 1100), .1, { type: 'triangle', vol: .07, to: 1500 }); noise(.08, { f: 3000, ft: 'highpass', vol: .05 }); break;
     case 'axe': noise(.14, { f: 2200, to: 700, q: 3, vol: .06 }); break;
