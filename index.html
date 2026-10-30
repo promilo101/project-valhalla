@@ -453,6 +453,7 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 #formation.camp .slot.locked{opacity:1;cursor:not-allowed}
 #formation.camp .slot .cnt{right:auto;left:50%;transform:translateX(-50%);bottom:-8px}
 #charPanel{z-index:5;background:rgba(7,8,12,.9)}
+#app.cp-open #info{visibility:hidden}
 .cp-box{width:min(1040px,100%);background:var(--panel);border:1px solid var(--line);border-radius:2px;padding:14px 16px;display:grid;gap:14px}
 .cp-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .cp-head h2{margin-right:auto}
@@ -461,17 +462,20 @@ kbd{font-family:var(--font-body);border:1px solid var(--line);border-bottom-widt
 .cp-relics{flex-direction:column;align-items:flex-start;gap:8px}
 .cp-relics .rl{width:62px;height:62px}
 .cp-relics .rl img{width:40px;height:40px}
-.doll{display:grid;grid-template-columns:repeat(3,92px);grid-template-rows:repeat(4,92px);gap:10px;justify-content:center;grid-template-areas:"ring1 helm neck" "main hero off" "chest hero legs" "ring2 . ."}
+.doll{display:grid;grid-template-columns:92px 92px 92px 92px;grid-template-rows:auto 92px 92px 92px;column-gap:12px;row-gap:8px;justify-content:center;grid-template-areas:"la hero hero lj" "helm hero hero neck" "chest hero hero ring1" "legs main off ring2"}
+.doll .dl-h{margin:0;font-family:var(--font-display);font-weight:600;font-size:14px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;align-self:end}
+.gs img.ghost{opacity:.22}
 .gs.jw{border-radius:50%}
 .doll .hero-big{grid-area:hero;display:grid;place-items:center;background:radial-gradient(circle at 50% 60%,rgba(255,91,46,.16),transparent 70%)}
-.doll .hero-big img{width:84px;height:100px;image-rendering:pixelated;image-rendering:crisp-edges}
+.doll .hero-big img{width:110px;height:131px;image-rendering:pixelated;image-rendering:crisp-edges}
 .gs{display:grid;justify-items:center;align-content:center;gap:2px;background:var(--bg);border:1px solid var(--rc,var(--line));border-radius:2px;padding:4px;color:var(--fg);font:inherit;position:relative}
 .gs.empty{border-style:dashed}
 .gs img{width:46px;height:46px;image-rendering:pixelated;image-rendering:crisp-edges}
 .gs .gl{font-size:14px;color:var(--muted);line-height:1}
 .gs .gn{font-size:14px;line-height:1.05;text-align:center;color:var(--rc,var(--fg));max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .gs:hover,.gs.sel{outline:2px solid var(--frost);outline-offset:1px}
-.cp-stats{display:grid;grid-template-columns:auto auto;justify-content:center;gap:2px 18px;margin:14px 0 0;font-size:18px}
+.cp-stats{display:grid;grid-template-columns:auto auto auto auto;justify-content:center;gap:3px 14px;margin:14px 0 0;font-size:17px}
+.cp-stats dt:nth-of-type(even){padding-left:18px;border-left:1px solid var(--line)}
 .cp-stats dt{color:var(--muted)}
 .cp-stats dd{margin:0;text-align:right;font-variant-numeric:tabular-nums}
 .cp-info{min-height:12em;max-height:340px;overflow:auto;margin-top:0;border-top:0;border-left:1px solid var(--line);padding:2px 0 0 14px}
@@ -3618,7 +3622,7 @@ function setMode(m){
   mode = m; setTimeout(showUpd, 0);
   $('#hud').hidden = m !== 'combat';
   $('#shop').hidden = m !== 'shop';
-  $('#formation').hidden = m !== 'shop'; if (m !== 'shop') $('#charPanel').hidden = true;
+  $('#formation').hidden = m !== 'shop'; if (m !== 'shop'){ $('#charPanel').hidden = true; $('#app').classList.remove('cp-open'); }
   $('#title').hidden = m !== 'title';
   $('#meta').hidden = m !== 'meta';
   $('#lb').hidden = m !== 'lb';
@@ -3787,11 +3791,16 @@ const setInfo = html => { $('#info').innerHTML = html; };
 const charDefault = () => '<strong>Your hero</strong><br>Hover or click a piece of gear or an ability to see what it does. Gear comes from the Merchant and from bosses, and lasts for this raid. Rings and necklaces each carry a special power. Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells.';
 function renderChar(){
   if (!S) return;
-  const slot = sl => { const it = S.gear[sl], jw = typeOf(sl) === 'ring' || sl === 'neck' ? ' jw' : ''; return it ? `<button class="gs${jw}" type="button" data-gs="${sl}" style="grid-area:${sl};--rc:${RARITY[it.r].col}"><img src="${itemIcon(it)}" alt=""><span class="gn">${esc(it.name)}</span><span class="gl">${SLOT_NAME[sl]}</span></button>` : `<button class="gs empty${jw}" type="button" data-gs="${sl}" style="grid-area:${sl}"><span class="gl">${SLOT_NAME[sl]}</span><span class="gl">empty</span></button>`; };
-  $('#doll').innerHTML = GEAR_SLOTS.map(slot).join('') + `<div class="hero-big"><img src="${ICON.hero}" alt="Your hero"></div>`;
+  // three columns: armor on the left, the hero with both weapons in the middle, jewelry on the right
+  const slot = sl => { const it = S.gear[sl], jw = typeOf(sl) === 'ring' || sl === 'neck' ? ' jw' : '';
+    return it ? `<button class="gs${jw}" type="button" data-gs="${sl}" style="grid-area:${sl};--rc:${RARITY[it.r].col}" title="${esc(it.name)}" aria-label="${SLOT_NAME[sl]}: ${esc(it.name)}"><img src="${itemIcon(it)}" alt=""><span class="gl">${SLOT_NAME[sl]}</span></button>`
+      : `<button class="gs empty${jw}" type="button" data-gs="${sl}" style="grid-area:${sl}" aria-label="${SLOT_NAME[sl]}: empty"><img class="ghost" src="${SLOT_ICON[typeOf(sl)]}" alt=""><span class="gl">${SLOT_NAME[sl]}</span></button>`; };
+  $('#doll').innerHTML = '<h3 class="dl-h" style="grid-area:la">Armor</h3><h3 class="dl-h" style="grid-area:lj">Jewelry</h3>' + GEAR_SLOTS.map(slot).join('') + `<div class="hero-big"><img src="${ICON.hero}" alt="Your hero"></div>`;
   const ar = gearStat('armor'), wa = gearStat('ward'), w = S.gear.main;
-  const pct = v => Math.round((1 - armorCut(v)) * 100);
-  $('#cpStats').innerHTML = `<dt>Health</dt><dd>${Math.ceil(S.hero.hp)} / ${S.hero.maxHp}</dd><dt>Physical armor</dt><dd>${ar} <small style="color:var(--muted)">−${pct(ar)}% damage</small></dd><dt>Magic armor</dt><dd>${wa} <small style="color:var(--muted)">−${pct(wa)}% damage</small></dd><dt>Weapon damage</dt><dd>${w ? Math.round((w.dmg + ((S.gear.off && S.gear.off.dmg) || 0)) * (1 + meta.physdmg * .08)) + ` <small style="color:var(--muted)">${w.as.toFixed(2)}/s</small>` : 'none'}</dd><dt>Ability damage</dt><dd>+${abilBonus()}%</dd><dt>Pickup range</dt><dd>+${gearStat('pull')}%</dd>`;
+  const pct = v => Math.round((1 - armorCut(v)) * 100), m = t => `<small style="color:var(--muted)">${t}</small>`;
+  $('#cpStats').innerHTML = `<dt>Health</dt><dd>${Math.ceil(S.hero.hp)} / ${S.hero.maxHp}</dd><dt>Weapon damage</dt><dd>${w ? Math.round((w.dmg + ((S.gear.off && S.gear.off.dmg) || 0)) * (1 + meta.physdmg * .08)) + ' ' + m(w.as.toFixed(2) + '/s') : 'none'}</dd>`
+    + `<dt>Physical armor</dt><dd>${ar} ${m('−' + pct(ar) + '%')}</dd><dt>Ability damage</dt><dd>+${abilBonus()}%</dd>`
+    + `<dt>Magic armor</dt><dd>${wa} ${m('−' + pct(wa) + '%')}</dd><dt>Pickup range</dt><dd>+${gearStat('pull')}%</dd>`;
 }
 function renderCharSum(){
   if (!S) return;
@@ -3800,8 +3809,8 @@ function renderCharSum(){
   const a = S.abil.filter(Boolean).map(x => `<img src="${ABIL_ICON[x.key]}" alt="${ABILITIES[x.key].name}" title="${ABILITIES[x.key].name}">`).join('');
   $('#charSum').innerHTML = g + (a ? '<span style="width:100%"></span>' + a : '');
 }
-function openChar(){ if (!S || mode !== 'shop' || picking) return; $('#charPanel').hidden = false; renderShop(); renderChar(); $('#charInfo').innerHTML = charDefault(); sfx('click'); }
-function closeChar(){ $('#charPanel').hidden = true; S && (S.selRelic = null); if (S && mode === 'shop') renderShop(); }
+function openChar(){ if (!S || mode !== 'shop' || picking) return; $('#charPanel').hidden = false; $('#app').classList.add('cp-open'); renderShop(); renderChar(); $('#charInfo').innerHTML = charDefault(); sfx('click'); }
+function closeChar(){ $('#charPanel').hidden = true; $('#app').classList.remove('cp-open'); S && (S.selRelic = null); if (S && mode === 'shop') renderShop(); }
 $('#btnChar').onclick = e => { e.currentTarget.blur(); openChar(); };
 $('#cpClose').onclick = closeChar;
 new MutationObserver(() => { if (!$('#charPanel').hidden) $('#charInfo').innerHTML = $('#info').innerHTML; }).observe($('#info'), { childList: true, subtree: true, characterData: true });
@@ -4618,7 +4627,7 @@ async function cloudStartup(){
 const CHANGES = [
   ['0.20.0', 'Gear and the campfire', {
     Highlights: ['A new intro when a raid begins, and Fenrir\'s death now brings the Endless Winter: his dying breath freezes the field, and snow falls through all of Endless mode', 'Gear for your hero: helmet, chestplate, leggings, two weapon hands, two rings and a necklace', 'Your warband gathers at the campfire, and the Character panel (C) holds your gear and abilities', 'The Field Guide (J): beasts, units, abilities, battlefield events and gear, each unlocked as you find it', 'Battlefield events: the Blood Shrine, the Cursed Altar, Odin\'s Messenger and Sleipnir\'s Tracks', 'A new enemy from wave 7: the Draugr Spearman'],
-    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'A banner pops up for every new Field Guide find', 'A cleaner title screen: one main button, the four main menus in a row, and the controls behind a Controls link', 'The end screen is more compact: damage dealt, damage by class and healing, with More stats for the rest', 'A Damage meter button with its Tab hotkey sits below the minimap, next to Tooltips', 'The tutorial shows the Field Guide and the damage meter'],
+    New: ['Your hero strikes the nearest enemy with the main-hand weapon. You start with a Worn Axe', 'Physical armor protects against claws, blades and hammers. Magic armor protects against curses, fire, frost and Hel\'s spells', 'The Wandering Merchant waits at every campfire with three pieces of gear and a ring or necklace', 'Bosses offer a rare or epic piece of gear as a reward choice', 'Gear you already wear is compared side by side and marked as an upgrade, worse or mixed', 'Rings and necklaces widen your pickup range for souls: +15% Common, +25% Rare, +40% Epic', 'The Draugr Spearman throws spears along a red line, aimed where you run. Change direction to dodge', 'Odin\'s Messenger: catch the golden raven within 12 seconds for a free ability level', 'Battlefield events show their name, and a card with the risk and reward when you come close or hover them', 'The minimap is cleaner: it shows runes, events, elites and bosses, but no longer every ordinary enemy', 'Every boss attack has its own sound, from the Draugr King\'s whirring axe to Fenrir\'s howl as he devours the sun', 'A banner pops up for every new Field Guide find', 'A cleaner title screen: one main button, the four main menus in a row, and the controls behind a Controls link', 'The Character panel is tidier: armor on the left, the hero with both weapons in the middle, the necklace and both rings on the right, and stats in two columns', 'The end screen is more compact: damage dealt, damage by class and healing, with More stats for the rest', 'A Damage meter button with its Tab hotkey sits below the minimap, next to Tooltips', 'The tutorial shows the Field Guide and the damage meter'],
     Changed: ['Relics are now jewelry. Each ring or necklace carries one of the old relic powers', 'The Amulet of Twin Souls and the Raven Torc only come as Epic necklaces', 'Bosses no longer heal you to full', 'Swift Stride is now Sleipnir\'s Tracks: run through six hoof marks within 8 seconds for an extra dash slot', 'Blood Shrines and Cursed Altars moved from the campfire to the battlefield', 'The boss reward screen separates the abilities from the boss\'s gear, with a tag on every card. Every boss reward card has the same soft sheen and sparkle, so none pulls your eye more than the others. The gear reveal plays once you pick it', 'Merchant cards show each piece\'s slot on a plain grey strip, so colour always means rarity', 'The pause menu is cleaner: Resume, the Field Guide, Settings and feedback, with Give up on its own', 'Rings and necklaces no longer show beside the ability bar in battle. You find them in the Character panel'],
     Balance: ['Endless gets tougher a little faster after Fenrir', 'Blood units heal 20% less', 'Archers\' arrows ignore half of physical armor', 'Pact Amulet: units deal 60% more damage (was 50%), and the hero loses 15% maximum health (was 20%)', 'Moneylender\'s Ring: interest up to 9 gold (was 8), and healing costs 50% more (was double)'],
     Fixed: ['A fireball cast at the end of a wave no longer hangs over the campfire', 'With the Raven Banner\'s 9th slot, the formation widens into an even ring, so no unit stands in the campfire', 'The hero\'s health bar is thinner and always drawn on top. Units standing below the hero show their stars under their feet', 'The constant low hum in the battle and title music is gone', 'With Bosses and elites first (F), units attack the Barrow Wights and Soul Wisps a boss calls up'],
